@@ -1,0 +1,8 @@
+{
+  "component": "AEDUCK",
+  "build": "hello_aethiea_template",
+  "created_utc": "20260602T233512Z",
+  "source": "/mnt/h/AETHIEAOPSYS/TOOLIO/HID/AEDUCK/templates/circuitpython",
+  "output": "/mnt/i/AETHIEAOPSYS/HEAVY/TOOLIO/HID/AEDUCK/builds/hello_aethiea/20260602T233512Z",
+  "route": "AEUSB template -> AE320 build"
+}

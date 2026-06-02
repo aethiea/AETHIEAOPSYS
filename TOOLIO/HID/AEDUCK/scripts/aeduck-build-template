@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+AEUSB="/mnt/h/AETHIEAOPSYS"
+AE320="/mnt/i/AETHIEAOPSYS"
+STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
+
+SRC="$AEUSB/TOOLIO/HID/AEDUCK/templates/circuitpython"
+OUT="$AE320/HEAVY/TOOLIO/HID/AEDUCK/builds/hello_aethiea/$STAMP"
+
+mkdir -p "$OUT"
+cp -a "$SRC/." "$OUT/"
+
+cat > "$AEUSB/TOOLIO/HID/AEDUCK/receipts/aeduck_build_template_${STAMP}.json" <<JSON
+{
+  "component": "AEDUCK",
+  "build": "hello_aethiea_template",
+  "created_utc": "$STAMP",
+  "source": "$SRC",
+  "output": "$OUT",
+  "route": "AEUSB template -> AE320 build"
+}
+JSON
+
+echo "AEDUCK template build written -> $OUT"
