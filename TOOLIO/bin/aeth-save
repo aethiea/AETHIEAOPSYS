@@ -2,6 +2,11 @@
 set -euo pipefail
 
 AEUSB="/mnt/h/AETHIEAOPSYS"
+AEGIT_DIR="$HOME/.aethiea_git/AETHIEAOPSYS.git"
+
+aegit_real() {
+  git --git-dir="$AEGIT_DIR" --work-tree="$AEUSB" "$@"
+}
 
 if [ "${1:-}" = "" ]; then
   echo "Usage:"
@@ -13,29 +18,22 @@ fi
 MSG="$1"
 shift || true
 
-run_aegit() {
-  local cmd="cd $(printf '%q' "$AEUSB"); aegit"
-  local arg
-  for arg in "$@"; do
-    cmd="$cmd $(printf '%q' "$arg")"
-  done
-  bash -lc "$cmd"
-}
+cd "$AEUSB"
 
 echo "=== AETHIEA SAVE ==="
 echo "message=$MSG"
 
 if [ "$#" -eq 0 ]; then
   echo "paths=."
-  run_aegit add .
+  aegit_real add .
 else
   echo "paths=$*"
-  run_aegit add "$@"
+  aegit_real add "$@"
 fi
 
 echo
 echo "=== BAD-PATH CHECK ==="
-if run_aegit diff --cached --name-only | grep -E 'node_modules|npm-cache|\.wrangler|wrangler-account|\.token|MODELS/llama|\.gguf|\.uf2|\.img|\.iso|\.pcap|\.pcapng|/builds/|/exports/|/logs/|/images/|sdcard_backups|firmware_cache|\.bin'; then
+if aegit_real diff --cached --name-only | grep -E 'node_modules|npm-cache|\.wrangler|wrangler-account|\.token|MODELS/llama|\.gguf|\.uf2|\.img|\.iso|\.pcap|\.pcapng|/builds/|/exports/|/logs/|/images/|sdcard_backups|firmware_cache|\.bin'; then
   echo "BAD PATH STAGED. STOPPING."
   exit 1
 else
@@ -44,16 +42,16 @@ fi
 
 echo
 echo "=== COMMIT ==="
-if run_aegit diff --cached --quiet; then
+if aegit_real diff --cached --quiet; then
   echo "nothing staged; working tree likely clean"
 else
-  run_aegit commit -m "$MSG"
+  aegit_real commit -m "$MSG"
 fi
 
 echo
 echo "=== PUSH ==="
-run_aegit push origin main
+aegit_real push origin main
 
 echo
 echo "=== STATUS ==="
-run_aegit status --short
+aegit_real status --short

@@ -12,4 +12,4 @@ aeth-components
 echo
 aeth-hid
 echo
-bash -lc 'cd /mnt/h/AETHIEAOPSYS; aegit status --short'
+git --git-dir="$HOME/.aethiea_git/AETHIEAOPSYS.git" --work-tree="/mnt/h/AETHIEAOPSYS" status --short
