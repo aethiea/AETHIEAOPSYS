@@ -184,3 +184,6 @@ DATA/HERMES/auth.lock
 DOMAINS/*/*/OUTPUT/
 DOMAINS/*/*/PROCESS/
 DOMAINS/*/*/REJECTED_ARCHIVE_*/
+
+# WSL-native autosync runner lives in ~/.aethiea_git/bin, not AEUSB
+TOOLIO/bin/aegit-autosync
