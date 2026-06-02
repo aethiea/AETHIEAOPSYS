@@ -1,0 +1,137 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+AEUSB="/mnt/h/AETHIEAOPSYS"
+AE320="/mnt/i/AETHIEAOPSYS"
+
+AEDUCK="$AEUSB/TOOLIO/HID/AEDUCK"
+AEBUNNY="$AEUSB/TOOLIO/HID/AEBUNNY"
+
+usage() {
+  cat <<USAGE
+=== AETHIEA HID CLI ===
+
+Usage:
+  aeth-hid
+  aeth-hid status
+  aeth-hid aeduck
+  aeth-hid aebunny
+  aeth-hid build
+  aeth-hid build aeduck
+  aeth-hid build aebunny
+  aeth-hid paths
+  aeth-hid manifests
+
+Meaning:
+  AEDUCK  = Pico-class HID component
+  AEBUNNY = Pi Zero-class USB gadget component
+
+Rule:
+  AEUSB defines.
+  AE320 carries mass.
+USAGE
+}
+
+status() {
+  echo "=== HID STATUS ==="
+  echo "AEUSB=$AEUSB"
+  echo "AE320=$AE320"
+  echo
+
+  test -f "$AEUSB/.aeth_root" && echo "AEUSB authority: OK" || echo "AEUSB authority: MISSING"
+  test -d "$AE320/HEAVY/TOOLIO/HID" && echo "AE320 HID heavy: OK" || echo "AE320 HID heavy: MISSING"
+  echo
+
+  echo "=== REGISTERED HID COMPONENTS ==="
+  test -f "$AEDUCK/manifest.json" && echo "AEDUCK: OK" || echo "AEDUCK: MISSING"
+  test -f "$AEBUNNY/manifest.json" && echo "AEBUNNY: OK" || echo "AEBUNNY: MISSING"
+}
+
+paths() {
+  echo "=== HID PATHS ==="
+  echo "AEDUCK authority: $AEDUCK"
+  echo "AEDUCK heavy:     $AE320/HEAVY/TOOLIO/HID/AEDUCK"
+  echo
+  echo "AEBUNNY authority: $AEBUNNY"
+  echo "AEBUNNY heavy:     $AE320/HEAVY/TOOLIO/HID/AEBUNNY"
+}
+
+manifests() {
+  echo "=== AEDUCK MANIFEST ==="
+  cat "$AEDUCK/manifest.json"
+  echo
+  echo "=== AEBUNNY MANIFEST ==="
+  cat "$AEBUNNY/manifest.json"
+}
+
+aeduck() {
+  echo "=== AEDUCK ==="
+  "$AEDUCK/scripts/aeduck-route-check"
+  echo
+  echo "Templates:"
+  find "$AEDUCK/templates" -maxdepth 4 -type f 2>/dev/null | sort || true
+  echo
+  echo "Heavy builds:"
+  find "$AE320/HEAVY/TOOLIO/HID/AEDUCK/builds" -maxdepth 4 -type f 2>/dev/null | sort || true
+}
+
+aebunny() {
+  echo "=== AEBUNNY ==="
+  "$AEBUNNY/scripts/aebunny-route-check"
+  echo
+  echo "Templates:"
+  find "$AEBUNNY/templates" -maxdepth 4 -type f 2>/dev/null | sort || true
+  echo
+  echo "Heavy builds:"
+  find "$AE320/HEAVY/TOOLIO/HID/AEBUNNY/builds" -maxdepth 4 -type f 2>/dev/null | sort || true
+}
+
+build_all() {
+  echo "=== BUILD AEDUCK TEMPLATE ==="
+  "$AEDUCK/scripts/aeduck-build-template"
+  echo
+  echo "=== BUILD AEBUNNY TEMPLATE ==="
+  "$AEBUNNY/scripts/aebunny-build-template"
+}
+
+case "${1:-status}" in
+  status)
+    status
+    ;;
+  aeduck)
+    aeduck
+    ;;
+  aebunny)
+    aebunny
+    ;;
+  build)
+    case "${2:-all}" in
+      all)
+        build_all
+        ;;
+      aeduck)
+        "$AEDUCK/scripts/aeduck-build-template"
+        ;;
+      aebunny)
+        "$AEBUNNY/scripts/aebunny-build-template"
+        ;;
+      *)
+        usage
+        exit 1
+        ;;
+    esac
+    ;;
+  paths)
+    paths
+    ;;
+  manifests)
+    manifests
+    ;;
+  help|-h|--help)
+    usage
+    ;;
+  *)
+    usage
+    exit 1
+    ;;
+esac
