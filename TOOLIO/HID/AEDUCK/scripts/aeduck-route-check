@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+AEUSB="/mnt/h/AETHIEAOPSYS"
+AE320="/mnt/i/AETHIEAOPSYS"
+
+echo "=== AEDUCK ROUTE CHECK ==="
+test -f "$AEUSB/TOOLIO/HID/AEDUCK/manifest.json" && echo "manifest: OK"
+test -d "$AEUSB/TOOLIO/HID/AEDUCK/payloads" && echo "payloads: OK"
+test -d "$AE320/HEAVY/TOOLIO/HID/AEDUCK/firmware_cache" && echo "firmware_cache: OK"
+test -d "$AE320/HEAVY/TOOLIO/HID/AEDUCK/builds" && echo "builds: OK"
+test -d "$AE320/HEAVY/TOOLIO/HID/AEDUCK/exports" && echo "exports: OK"

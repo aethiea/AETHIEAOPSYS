@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+AEUSB="/mnt/h/AETHIEAOPSYS"
+AE320="/mnt/i/AETHIEAOPSYS"
+
+echo "=== AEBUNNY ROUTE CHECK ==="
+test -f "$AEUSB/TOOLIO/HID/AEBUNNY/manifest.json" && echo "manifest: OK"
+test -d "$AEUSB/TOOLIO/HID/AEBUNNY/payloads" && echo "payloads: OK"
+test -d "$AE320/HEAVY/TOOLIO/HID/AEBUNNY/images" && echo "images: OK"
+test -d "$AE320/HEAVY/TOOLIO/HID/AEBUNNY/sdcard_backups" && echo "sdcard_backups: OK"
+test -d "$AE320/HEAVY/TOOLIO/HID/AEBUNNY/builds" && echo "builds: OK"
+test -d "$AE320/HEAVY/TOOLIO/HID/AEBUNNY/exports" && echo "exports: OK"
