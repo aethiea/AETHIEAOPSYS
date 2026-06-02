@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd /mnt/h/AETHIEAOPSYS
+
+echo "=== AETHIEA WAKE ==="
+aeth-ssh-agent
+echo
+aeth-bodies
+echo
+aeth-components
+echo
+aeth-hid
+echo
+bash -lc 'cd /mnt/h/AETHIEAOPSYS; aegit status --short'
