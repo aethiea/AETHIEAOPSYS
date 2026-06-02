@@ -1,0 +1,25 @@
+{
+  "authority_switch": {
+    "authority": "DNY-5U5",
+    "context": "PLATEAU",
+    "switch_active": true,
+    "scope": "GLOBAL",
+    "targets": "ALL",
+    "operator_directive": "operator broadcast authority context",
+    "host": "LOLITA",
+    "timestamp_utc": "2026-05-07T18:01:06.168608+00:00",
+    "rule": "Script does not decide policy. Script broadcasts operator-declared authority context into AETHIEAOPSYS runtime.",
+    "structural_paths": {
+      "authority_truth": "CORE/AUTHORITY/authority_switch.json",
+      "inherited_state": "DATA/MEMORY/STATE/AUTHORITY",
+      "audit_log": "LOGS/AUTHORITY/authority_switch.log"
+    },
+    "event_hash": "ff0cb12020853622b12c429ac148973b2ea1dc26eac886d11354950f849357bf"
+  },
+  "inheritance": {
+    "all_targets_inherit_operator_context": true,
+    "script_imposes_policy": false,
+    "script_decides_permissions": false,
+    "operator_is_authority_source": true
+  }
+}

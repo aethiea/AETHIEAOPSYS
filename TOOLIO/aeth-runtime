@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ -f /mnt/h/AETHIEAOPSYS/ENV/SHELL/aethiea_env.sh ]; then
+  # shellcheck source=/mnt/h/AETHIEAOPSYS/ENV/SHELL/aethiea_env.sh
+  . /mnt/h/AETHIEAOPSYS/ENV/SHELL/aethiea_env.sh
+fi
+
+echo
+echo "=== AETHIEAOPSYS RUNTIME ==="
+echo "HOST      -> $(hostname)"
+echo "USER      -> $(whoami)"
+echo "MODE      -> ${AETHIEA_MODE:-UNK}"
+echo "ROOT      -> ${AETHIEA:-NONE}"
+echo "OLLAMA    -> ${OLLAMA_MODELS:-UNSET}"
+echo "HF_HOME   -> ${HF_HOME:-UNSET}"
+echo
+
+df -h "${AETHIEA:-/}" 2>/dev/null || true
+
+echo
+echo "=== DNY-5U5 ==="
+echo "PROFILE   -> DIONYSUS"
+echo "INTERFACE -> ONE EYE RABBIT"
+echo "LENS      -> MONOCLE"
+echo "LAW       -> Chaos is terrain, not operator"

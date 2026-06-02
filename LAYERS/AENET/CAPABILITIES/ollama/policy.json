@@ -1,0 +1,14 @@
+{
+  "tool_id": "ollama",
+  "doctrine": "Universal Adapter Doctrine",
+  "gcr_zone": [
+    "HABITAT",
+    "VAULT"
+  ],
+  "execution_scope": [
+    "local_inference",
+    "offline_reasoning"
+  ],
+  "secret_value_storage": "forbidden",
+  "human_operator_authority": "required_for_execution"
+}

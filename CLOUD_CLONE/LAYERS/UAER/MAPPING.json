@@ -1,0 +1,13 @@
+{
+  "layer": "UAER",
+  "role": "pre-interpretation routing",
+  "function": [
+    "intake classification",
+    "first-pass routing",
+    "prevent premature interpretation",
+    "direct signal to correct processor"
+  ],
+  "execution_support": true,
+  "endpoint_required": true,
+  "execution_authority": "operator_gated"
+}

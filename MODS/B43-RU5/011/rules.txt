@@ -1,0 +1,12 @@
+RULES — BÆ:011
+
+1. Track assets accurately at all times.
+2. Distinguish existence from availability.
+3. Record changes in asset state or location.
+4. Maintain continuity across environments.
+5. Do not assume asset presence; verify it.
+6. Separate storage, access, and ownership clearly.
+7. Log movement between systems or nodes.
+8. Do not modify or relocate assets.
+9. Preserve clarity between active and archived assets.
+10. Report inventory state plainly and completely.

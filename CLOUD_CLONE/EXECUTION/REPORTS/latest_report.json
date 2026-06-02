@@ -1,0 +1,112 @@
+{
+  "generated_utc": "2026-05-03T09:50:17Z",
+  "root": "/mnt/h/AETHIEAOPSYS",
+  "system": {
+    "active_host": "OLIVIA",
+    "system_root": "/mnt/h/AETHIEAOPSYS",
+    "pointer": "$AETHIEA",
+    "device": "AETHIEA128G",
+    "phase": "MAP_REPORT_CORE_v1 complete",
+    "status": "active",
+    "mounted": true,
+    "last_action": "map/report/reflex/export/hud/snapshot/cleanup consolidation complete",
+    "next": "begin pipeline behavior layer: controlled job movement, retry queues, and domain-specific thresholds"
+  },
+  "pipelines": {
+    "CHRYSALIS": {
+      "status": "HEALTHY",
+      "flags": [],
+      "metrics": {
+        "pipe": "CHRYSALIS",
+        "total_events": 6,
+        "processed": 1,
+        "rejected_events": 0,
+        "rejected_files": 0,
+        "input_pending": 0,
+        "process_total": 2,
+        "process_active": 1,
+        "output_files": 1,
+        "success_rate": 16.67,
+        "latest_output": "/mnt/h/AETHIEAOPSYS/EXECUTION/PIPELINES/CHRYSALIS/OUTPUT/TEXT/chrysalis_text.processed.json",
+        "latest_rejected": "none"
+      }
+    },
+    "CHURCH": {
+      "status": "HEALTHY",
+      "flags": [],
+      "metrics": {
+        "pipe": "CHURCH",
+        "total_events": 2,
+        "processed": 0,
+        "rejected_events": 0,
+        "rejected_files": 0,
+        "input_pending": 0,
+        "process_total": 3,
+        "process_active": 1,
+        "output_files": 1,
+        "success_rate": 0.0,
+        "latest_output": "/mnt/h/AETHIEAOPSYS/EXECUTION/PIPELINES/CHURCH/OUTPUT/TEXT/church_text.processed.json",
+        "latest_rejected": "none"
+      }
+    },
+    "JUTSUBOYZZ": {
+      "status": "HEALTHY",
+      "flags": [],
+      "metrics": {
+        "pipe": "JUTSUBOYZZ",
+        "total_events": 6,
+        "processed": 1,
+        "rejected_events": 0,
+        "rejected_files": 0,
+        "input_pending": 0,
+        "process_total": 2,
+        "process_active": 1,
+        "output_files": 1,
+        "success_rate": 16.67,
+        "latest_output": "/mnt/h/AETHIEAOPSYS/EXECUTION/PIPELINES/JUTSUBOYZZ/OUTPUT/DATA/jbz_data.processed.json",
+        "latest_rejected": "none"
+      }
+    },
+    "MULTIMEDIA": {
+      "status": "HEALTHY",
+      "flags": [],
+      "metrics": {
+        "pipe": "MULTIMEDIA",
+        "total_events": 2,
+        "processed": 0,
+        "rejected_events": 0,
+        "rejected_files": 0,
+        "input_pending": 0,
+        "process_total": 14,
+        "process_active": 3,
+        "output_files": 4,
+        "success_rate": 0.0,
+        "latest_output": "/mnt/h/AETHIEAOPSYS/EXECUTION/PIPELINES/MULTIMEDIA/OUTPUT/AUDIO/mm_good_validation.processed.json",
+        "latest_rejected": "none"
+      }
+    },
+    "SOLUTIONS": {
+      "status": "HEALTHY",
+      "flags": [],
+      "metrics": {
+        "pipe": "SOLUTIONS",
+        "total_events": 6,
+        "processed": 1,
+        "rejected_events": 0,
+        "rejected_files": 0,
+        "input_pending": 0,
+        "process_total": 2,
+        "process_active": 1,
+        "output_files": 1,
+        "success_rate": 16.67,
+        "latest_output": "/mnt/h/AETHIEAOPSYS/EXECUTION/PIPELINES/SOLUTIONS/OUTPUT/CONTENT/solutions_content.processed.json",
+        "latest_rejected": "none"
+      }
+    }
+  },
+  "summary": {
+    "pipeline_count": 5,
+    "system_flags": 0,
+    "system_pipeline_status": "HEALTHY"
+  }
+}

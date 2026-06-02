@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd /mnt/h/AETHIEAOPSYS
+
+POLICY="LAYERS/AENET/POLICY/provider_policy.json"
+
+if [[ ! -f "$POLICY" ]]; then
+  echo "AENET provider policy missing: $POLICY"
+  exit 1
+fi
+
+python3 - <<'PY'
+import json
+from pathlib import Path
+
+policy = json.loads(Path("LAYERS/AENET/POLICY/provider_policy.json").read_text())
+
+print("=== AENET PROVIDER POLICY ===")
+print("policy:", policy["policy_name"])
+print("version:", policy["version"])
+print("default_provider:", policy["default_provider"])
+print("default_model:", policy["default_model"])
+print()
+
+print("=== PROVIDERS ===")
+for name, data in policy["providers"].items():
+    print(f"{name}: {data['status']} | {data['role']} | priority {data['priority']}")
+
+print()
+print("=== ROUTING RULES ===")
+for item in policy["routing_rules"]:
+    print("-", item["rule"])
+PY

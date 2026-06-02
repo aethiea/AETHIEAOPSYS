@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+export AETHIEA="${AETHIEA:-/mnt/h/AETHIEAOPSYS}"
+export AETH_ROOT="${AETH_ROOT:-$AETHIEA}"
+
+mkdir -p "$AETHIEA/LOGS/SYSTEM"
+
+STAMP="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+echo "[$STAMP] AETHIEA surface down requested on $(hostname)" >> "$AETHIEA/LOGS/SYSTEM/surface_runtime.log"
+
+echo "AETHIEA DOWN"
+echo "HOST   → $(hostname)"
+echo "ROOT   → $AETHIEA"
+echo "STATUS → LOGGED"

@@ -1,0 +1,22 @@
+{
+  "entry": "AENET",
+  "aenet_route": "LAYERS/AENET/CAPABILITIES/runway",
+  "gcr_zone": [
+    "WINDOW",
+    "DOOR"
+  ],
+  "execution_scope": [
+    "video_generation",
+    "visual_asset_processing"
+  ],
+  "chain": [
+    "External Capability",
+    "Authentication Layer",
+    "AENET Route Assignment",
+    "GCR Boundary Resolution",
+    "Execution Scope",
+    "Validator Chain",
+    "Memory/Anchor Persistence",
+    "Corp-O Record"
+  ]
+}

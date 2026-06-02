@@ -1,0 +1,23 @@
+{
+  "entry": "AENET",
+  "aenet_route": "LAYERS/AENET/CAPABILITIES/huggingface",
+  "gcr_zone": [
+    "HABITAT",
+    "DOOR"
+  ],
+  "execution_scope": [
+    "model_download",
+    "inference",
+    "dataset_reference"
+  ],
+  "chain": [
+    "External Capability",
+    "Authentication Layer",
+    "AENET Route Assignment",
+    "GCR Boundary Resolution",
+    "Execution Scope",
+    "Validator Chain",
+    "Memory/Anchor Persistence",
+    "Corp-O Record"
+  ]
+}

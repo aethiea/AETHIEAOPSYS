@@ -1,0 +1,6 @@
+pressure -> observation
+observation -> routing
+routing -> structure
+structure -> continuity
+continuity -> memory
+memory -> adaptive refinement

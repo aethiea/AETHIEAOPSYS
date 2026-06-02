@@ -1,0 +1,29 @@
+{
+  "account_id": "062cfb070858f437afa2591f462e9cda",
+  "worker": {
+    "name": "aethernet",
+    "status": "exists",
+    "last_known_deployments": [
+      "b8805614-b802-48f2-a997-b9a1083d38c5",
+      "da56d2de-ad78-4ed7-b537-444ebd6c109a"
+    ]
+  },
+  "kv": {
+    "binding": "AENET_STATE",
+    "name": "AENET-EDGE-STATE",
+    "id": "740417d9f2264b16b9fd5cf7390a9278"
+  },
+  "d1": {
+    "door": {
+      "binding": "AENET_DOOR",
+      "name": "aenet-door",
+      "database_id": "ed9c9a61-6ee5-4885-ba8b-e0326b0d1cdf"
+    },
+    "persistent": {
+      "binding": "AETHERNET_DB",
+      "name": "aethernet-persistent",
+      "database_id": "9e80778f-0394-4d75-9193-4a6a28663fbe"
+    }
+  },
+  "status": "INVENTORIED"
+}

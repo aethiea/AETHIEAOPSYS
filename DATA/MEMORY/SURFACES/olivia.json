@@ -1,0 +1,17 @@
+{
+  "id": "OLIVIA",
+  "type": "canonical_interface_surface",
+  "classification": "surface_layer",
+  "relationship": "renders_and_interacts_with_AETHIEAOPSYS",
+  "host_role": "execution_and_interface",
+  "runtime": "AETHIEAOPSYS",
+  "operator_node": "DNY-5U5",
+  "status": "ACTIVE",
+  "rules": [
+    "OLIVIA is not AETHIEA",
+    "OLIVIA is not AETHIEAOPSYS",
+    "OLIVIA is a canonical surface/interface layer",
+    "Hosts provide execution only",
+    "Continuity belongs to AETHIEAOPSYS"
+  ]
+}

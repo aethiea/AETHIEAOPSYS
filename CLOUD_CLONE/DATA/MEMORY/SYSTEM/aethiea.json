@@ -1,0 +1,7 @@
+{
+  "system_name": "AETHIEA",
+  "device": "AETHIEA128G",
+  "root_marker": "AETHIEAOPSYS",
+  "pointer": "$AETHIEA",
+  "layers": ["UAER","AAE","AENET","AETHER","AE1OF1"]
+}

@@ -1,0 +1,31 @@
+{
+  "id": "DNY-5U5-ROUTES",
+  "status": "ACTIVE",
+  "source_node": "DNY-5U5",
+  "source_path": "MODS/P47H30N/NODES/DNY-5U5",
+  "route_logic": "POV equals where the signal is routed",
+  "routes": {
+    "operator_profile": "MODS/P47H30N/NODES/DNY-5U5/PROFILE/operator_profile.json",
+    "dionysus": "MODS/P47H30N/NODES/DNY-5U5/PROFILE/dionysus.md",
+    "one_eye_rabbit": "MODS/P47H30N/NODES/DNY-5U5/PROFILE/one_eye_rabbit.md",
+    "doctrine": "MODS/P47H30N/NODES/DNY-5U5/DOCTRINE",
+    "state": "MODS/P47H30N/NODES/DNY-5U5/STATE/current.json",
+    "pov_map": "MODS/P47H30N/NODES/DNY-5U5/ROUTES/pov/map.json",
+    "signal_flow": "MODS/P47H30N/NODES/DNY-5U5/ROUTES/signal/flow.txt",
+    "continuity_machine": "MODS/P47H30N/NODES/DNY-5U5/ROUTES/continuity/state_machine.txt",
+    "interface": "MODS/P47H30N/NODES/DNY-5U5/INTERFACE",
+    "symbols": "MODS/P47H30N/NODES/DNY-5U5/SYMBOLS",
+    "hud": "MODS/P47H30N/NODES/DNY-5U5/HUD/render_state.txt"
+  },
+  "systemwide_tags": [
+    "operator",
+    "dny5u5",
+    "dionysus",
+    "one_eye_rabbit",
+    "monocle",
+    "pov",
+    "controlled_visibility",
+    "continuity",
+    "chaos_is_terrain"
+  ]
+}

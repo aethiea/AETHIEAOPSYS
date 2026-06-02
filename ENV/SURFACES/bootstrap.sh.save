@@ -1,0 +1,64 @@
+cp /mnt/e/AETHIEAOPSYS/ENV/SURFACES/bootstrap.sh \
+   /mnt/e/AETHIEAOPSYS/ENV/SURFACES/bootstrap.sh.broken.$(date +%s)
+
+nano /mnt/e/AETHIEAOPSYS/ENV/SURFACES/bootstrap.sh#!/bin/bash
+
+MARKER=".aeth_root"
+
+if [ -n "$AETH_ROOT" ] && [ -f "$AETH_ROOT/CORE/aeth.py" ]; then
+    export AETH_ROOT
+else
+    FOUND=""
+
+    DIR="$PWD"
+
+    while [ "$DIR" != "/" ]; do
+        if [ -f "$DIR/$MARKER" ] && [ -f "$DIR/CORE/aeth.py" ]; then
+            FOUND="$DIR"
+            break
+        fi
+        DIR=$(dirname "$DIR")
+    done
+
+    if [ -z "$FOUND" ]; then
+        for base in /mnt/* /media/* /run/media/* /Volumes/*; do
+            if [ -d "$base" ]; then
+                if [ -f "$base/AETHIEAOPSYS/$MARKER" ] && [ -f "$base/AETHIEAOPSYS/CORE/aeth.py" ]; then
+                    FOUND="$base/AETHIEAOPSYS"
+                    break
+                elif [ -f "$base/$MARKER" ] && [ -f "$base/CORE/aeth.py" ]; then
+                    FOUND="$base"
+                    break
+                fi
+            fi
+        done
+    fi
+
+    if [ -n "$FOUND" ]; then
+        export AETH_ROOT="$FOUND"
+    else
+        echo "ERROR: Could not locate AETHIEAOPSYS root." >&2
+        return 1 2>/dev/null || exit 1
+    fi
+fi
+
+export AETH_CORE="$AETH_ROOT/CORE"
+export AETH_DATA="$AETH_ROOT/DATA"
+export AETH_LAYERS="$AETH_ROOT/LAYERS"
+export AETH_TOOLIO="$AETH_ROOT/TOOLIO"
+export AETH_SURFACE="${AETH_SURFACE:-$(hostname)}"
+
+if [[ ":$PATH:" != *":$AETH_TOOLIO:"* ]]; then
+    export PATH="$AETH_TOOLIO:$PATH"
+fi
+
+echo "AETH_ROOT → $AETH_ROOT"
+echo "SURFACE  → $AETH_SURFACE"
+echo "MODE     → ${AETH_MODE:-USB_CONTINUITY}"
+
+if [ -x "$AETH_TOOLIO/aeth" ]; then
+    "$AETH_TOOLIO/aeth" surface register "$AETH_SURFACE" \
+        --mode "${AETH_MODE:-USB_CONTINUITY}" \
+        --root "$AETH_ROOT" \
+        2>/dev/null &
+fi

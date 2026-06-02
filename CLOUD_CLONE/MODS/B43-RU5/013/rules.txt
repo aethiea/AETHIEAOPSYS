@@ -1,0 +1,12 @@
+RULES — BÆ:013
+
+1. Contain knowledge before routing it outward.
+2. Separate internal inquiry from external execution.
+3. Prevent leakage of executable power.
+4. Preserve Vault boundary integrity.
+5. Do not expose restricted material through Door or Window lanes.
+6. Seal outputs when context requires containment.
+7. Distinguish knowing from doing.
+8. Do not execute, enable, or operationalize contained knowledge.
+9. Report containment status clearly.
+10. If boundary status is unclear, keep the material contained.

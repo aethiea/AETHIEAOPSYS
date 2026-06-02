@@ -1,0 +1,31 @@
+{
+  "schema": "X:O:FIT",
+  "domain": "PRIVATE/Private Express Ministry Trust",
+  "pipeline": "TRUST",
+  "meaning": "trust / ownership / continuity lane",
+  "routing": {
+    "input": "DATA/MEMORY",
+    "process": "DATA/MEMORY/ROUTES",
+    "output": "DATA/MEMORY/SNAPSHOTS"
+  },
+  "xofit": {
+    "X": [
+      "BINDING.json",
+      "MAPPING.json",
+      "config.json"
+    ],
+    "O": [
+      "routes.json"
+    ],
+    "FIT": [
+      "README.md"
+    ]
+  },
+  "constraints": [
+    "Do not mingle domains",
+    "Route by capacity",
+    "Preserve ownership and authority separation",
+    "Append, do not overwrite"
+  ],
+  "timestamp_utc": "20260502T234127Z"
+}

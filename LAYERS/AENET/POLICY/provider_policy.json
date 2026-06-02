@@ -1,0 +1,57 @@
+{
+  "policy_name": "AENET_PROVIDER_POLICY",
+  "version": "2026-06-02.1",
+  "default_provider": "workers-ai",
+  "default_model": "llama",
+  "doctrine": {
+    "costless_heartbeat": true,
+    "premium_not_default": true,
+    "local_when_possible": true,
+    "no_tool_becomes_body": true
+  },
+  "providers": {
+    "workers-ai": {
+      "role": "default heartbeat",
+      "status": "verified_active",
+      "cost_class": "costless_or_low",
+      "models": {
+        "llama": "@cf/meta/llama-3.2-3b-instruct",
+        "mistral": "@cf/mistral/mistral-7b-instruct-v0.1"
+      },
+      "priority": 1
+    },
+    "huggingface": {
+      "role": "fallback / model-library lane",
+      "status": "token_ready",
+      "cost_class": "free_or_metered",
+      "models": {
+        "mistral": "mistralai/Mistral-7B-Instruct-v0.3"
+      },
+      "priority": 2
+    },
+    "openai": {
+      "role": "premium provider lane",
+      "status": "quota_gated",
+      "cost_class": "premium",
+      "models": {
+        "gpt-5": "openai/gpt-5"
+      },
+      "priority": 9,
+      "requires_explicit_selection": true
+    }
+  },
+  "routing_rules": [
+    {
+      "rule": "Use workers-ai unless a provider is explicitly requested."
+    },
+    {
+      "rule": "Do not route to openai automatically while status is quota_gated."
+    },
+    {
+      "rule": "If premium provider fails, preserve failure reason and return to workers-ai heartbeat."
+    },
+    {
+      "rule": "Log provider, model, status, timestamp, and route result."
+    }
+  ]
+}

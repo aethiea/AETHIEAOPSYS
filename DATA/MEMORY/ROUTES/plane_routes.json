@@ -1,0 +1,13 @@
+{
+  "id": "PLANE_ROUTES",
+  "status": "ACTIVE",
+  "routes": {
+    "GOVERNANCE": "DATA/MEMORY/GOVERNANCE",
+    "MEDIA": "DATA/MEMORY/MEDIA",
+    "INFRASTRUCTURE": "DATA/MEMORY/INFRASTRUCTURE",
+    "IDENTITY": "DATA/MEMORY/IDENTITY",
+    "CONTINUITY": "DATA/MEMORY/CONTINUITY",
+    "ROUTES": "DATA/MEMORY/ROUTES"
+  },
+  "law": "Source material resolves into routed operational planes."
+}

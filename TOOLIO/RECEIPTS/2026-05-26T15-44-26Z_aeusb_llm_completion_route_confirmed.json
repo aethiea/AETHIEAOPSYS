@@ -1,0 +1,14 @@
+{
+  "anchor": "AEUSB llama.cpp one-shot completion route confirmed",
+  "host": "RUBIII",
+  "user": "d_ny5u5",
+  "root": "/mnt/h/AETHIEAOPSYS",
+  "timestamp_utc": "2026-05-26T15:44:26Z",
+  "mode": "USB_CONTINUITY",
+  "runtime": "/mnt/h/AETHIEAOPSYS/TOOLIO/bin/llama-completion",
+  "model": "/mnt/h/AETHIEAOPSYS/MODELS/llama.cpp/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf",
+  "prompt": "AEUSB LOCAL LLM ONLINE",
+  "prompt_eval_speed": "65.39 tokens/sec",
+  "generation_speed": "25.52 tokens/sec",
+  "status": "AEUSB_LLM_COMPLETION_ROUTE_CONFIRMED"
+}

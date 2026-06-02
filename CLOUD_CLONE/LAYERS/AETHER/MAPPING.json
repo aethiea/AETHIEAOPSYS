@@ -1,0 +1,13 @@
+{
+  "layer": "AETHER",
+  "role": "meaning / compression / continuity medium",
+  "function": [
+    "compress signals",
+    "preserve continuity",
+    "translate meaning",
+    "maintain coherence"
+  ],
+  "execution_support": true,
+  "endpoint_required": true,
+  "execution_authority": "operator_gated"
+}

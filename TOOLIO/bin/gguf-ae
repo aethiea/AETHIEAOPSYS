@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+AETH_ROOT="${AETH_ROOT:-/mnt/h/AETHIEAOPSYS}"
+MODEL_DIR="$AETH_ROOT/MODELS/llama.cpp"
+HF_HOME="${HF_HOME:-$AETH_ROOT/MODELS/huggingface/cache}"
+
+mkdir -p "$MODEL_DIR" "$HF_HOME"
+
+cmd="${1:-help}"
+shift || true
+
+case "$cmd" in
+  status)
+    echo "GGUF-AE"
+    echo "ROOT      -> $AETH_ROOT"
+    echo "MODEL_DIR -> $MODEL_DIR"
+    echo "HF_HOME   -> $HF_HOME"
+    echo
+    find "$MODEL_DIR" -type f -name "*.gguf" -printf '%p\n' 2>/dev/null | sort
+    ;;
+
+  files)
+    repo="${1:?usage: gguf-ae files <hf_repo>}"
+    hf repo files "$repo" | grep -i gguf || true
+    ;;
+
+  pull)
+    repo="${1:?usage: gguf-ae pull <hf_repo> <filename.gguf>}"
+    file="${2:?usage: gguf-ae pull <hf_repo> <filename.gguf>}"
+
+    echo "PULLING -> $repo / $file"
+    echo "OUT     -> $MODEL_DIR/$file"
+
+    if command -v hf >/dev/null 2>&1; then
+      HF_HOME="$HF_HOME" hf download "$repo" "$file" --local-dir "$MODEL_DIR"
+    else
+      echo "MISSING -> hf command"
+      exit 1
+    fi
+
+    echo "DONE"
+    ;;
+
+  test)
+    model="${1:?usage: gguf-ae test <path-to-model.gguf>}"
+    shift || true
+    llama-completion -m "$model" -p "AEUSB LOCAL LLM ONLINE" -n 24 -no-cnv "$@"
+    ;;
+
+  *)
+    echo "Usage: gguf-ae {status|files|pull|test}"
+    echo "  gguf-ae files <hf_repo>"
+    echo "  gguf-ae pull <hf_repo> <filename.gguf>"
+    echo "  gguf-ae test <path-to-model.gguf>"
+    exit 2
+    ;;
+esac

@@ -1,0 +1,7 @@
+{
+  "pipeline": "hf_local_inference",
+  "source": "MODELS/huggingface/models",
+  "execution": "local",
+  "requires": ["hf_runtime"],
+  "output": "EXECUTION/PIPELINES/_HF/OUTPUT"
+}

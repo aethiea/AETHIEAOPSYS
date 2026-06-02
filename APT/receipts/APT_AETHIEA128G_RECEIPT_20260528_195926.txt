@@ -1,0 +1,22 @@
+APT AETHIEA128G RECEIPT
+=======================
+DATE: Thu May 28 19:59:26 EDT 2026
+HOST: Olivia
+USER: d_ny5u5
+
+SOURCE:
+  /mnt/h/AETHIEAOPSYS/APT
+
+LOCAL POINTER:
+  /opt/AETHIEAOPSYS/INFRASTRUCTURE/APT/AETHIEA128G
+
+CAPTURED:
+  apt installed manifest
+  apt upgradable manifest
+  dpkg selections manifest
+  apt source configuration copy attempt
+
+CLASSIFICATION:
+  APT portable package-memory lane on AETHIEA128G.
+  Olivia remains execution body.
+  AETHIEA128G carries package state, source configs, rebuild evidence, and restore instructions.

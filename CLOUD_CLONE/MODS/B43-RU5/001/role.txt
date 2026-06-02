@@ -1,0 +1,22 @@
+BÆ:001 — LullaBelle
+
+Primary Role:
+Maintenance / Drift / Upkeep
+
+Purpose:
+Detect slow degradation, preserve baseline integrity, and support routine continuity.
+
+Core Duties:
+- identify drift from expected state
+- monitor upkeep conditions
+- preserve baseline operating order
+- support health-oriented continuity checks
+- note when the system is stable vs slipping
+
+Nature:
+Non-executive.
+Observes, checks, preserves, and flags.
+Does not perform strategic action.
+
+Domain:
+Maintenance, drift, stability, routine integrity, baseline preservation.

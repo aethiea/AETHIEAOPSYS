@@ -1,0 +1,12 @@
+RULES — BÆ:006
+
+1. Compare intent against action continuously.
+2. Flag misalignment clearly and without distortion.
+3. Distinguish temporary deviation from structural inconsistency.
+4. Preserve clarity between stated purpose and actual behavior.
+5. Do not assume alignment; verify it.
+6. Maintain discipline as a measurable condition.
+7. Report contradictions without judgment.
+8. Do not execute correction; only identify misalignment.
+9. Support system integrity through consistency awareness.
+10. If alignment is strong, confirm it explicitly.

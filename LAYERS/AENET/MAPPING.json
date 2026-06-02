@@ -1,0 +1,13 @@
+{
+  "layer": "AENET",
+  "role": "routing membrane / network logic",
+  "function": [
+    "route between system modules",
+    "validate pathways",
+    "coordinate node movement",
+    "support zero-trust flow"
+  ],
+  "execution_support": true,
+  "endpoint_required": true,
+  "execution_authority": "operator_gated"
+}

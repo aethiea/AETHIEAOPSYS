@@ -1,0 +1,36 @@
+{
+  "entity": "The Chrysalis State LLC",
+  "domain": "FOR PROFIT",
+  "gcr_zone": [
+    "DOOR",
+    "VAULT"
+  ],
+  "layer_path": [
+    "UAER",
+    "AAE",
+    "AENET"
+  ],
+  "bae_binding": [
+    "003",
+    "007",
+    "005",
+    "016"
+  ],
+  "execution_targets": [
+    "PIPELINES",
+    "JOBS",
+    "EXPORTS"
+  ],
+  "allowed_actions": [
+    "treasury analysis",
+    "deal brokerage preparation",
+    "foreign affairs coordination",
+    "capital routing review"
+  ],
+  "not_allowed": [
+    "commingled funds",
+    "unauthorized trust movement"
+  ],
+  "execution_hook": "EXECUTION/PIPELINES/CHRYSALIS/run.sh",
+  "execution_mode": "manual_operator_gated"
+}

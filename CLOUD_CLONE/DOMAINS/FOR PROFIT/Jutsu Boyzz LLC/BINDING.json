@@ -1,0 +1,36 @@
+{
+  "entity": "Jutsu Boyzz LLC",
+  "domain": "FOR PROFIT",
+  "gcr_zone": [
+    "DOOR",
+    "HABITAT"
+  ],
+  "layer_path": [
+    "UAER",
+    "AAE",
+    "AENET"
+  ],
+  "bae_binding": [
+    "004",
+    "014",
+    "016",
+    "005"
+  ],
+  "execution_targets": [
+    "PIPELINES",
+    "RUNTIME",
+    "EXPORTS"
+  ],
+  "allowed_actions": [
+    "IT systems work",
+    "security lab routing",
+    "tooling development",
+    "infrastructure support"
+  ],
+  "not_allowed": [
+    "unauthorized external testing",
+    "commingled entity activity"
+  ],
+  "execution_hook": "EXECUTION/PIPELINES/JUTSUBOYZZ/run.sh",
+  "execution_mode": "manual_operator_gated"
+}

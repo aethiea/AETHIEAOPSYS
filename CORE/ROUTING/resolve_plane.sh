@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="${AETHIEA:-/mnt/e/AETHIEAOPSYS}"
+
+PLANE="$(echo "${1:-}" | tr '[:lower:]' '[:upper:]')"
+
+case "$PLANE" in
+  GOVERNANCE)
+    TARGET="$ROOT/DATA/MEMORY/GOVERNANCE"
+    ;;
+  MEDIA)
+    TARGET="$ROOT/DATA/MEMORY/MEDIA"
+    ;;
+  INFRASTRUCTURE)
+    TARGET="$ROOT/DATA/MEMORY/INFRASTRUCTURE"
+    ;;
+  IDENTITY)
+    TARGET="$ROOT/DATA/MEMORY/IDENTITY"
+    ;;
+  CONTINUITY)
+    TARGET="$ROOT/DATA/MEMORY/CONTINUITY"
+    ;;
+  ROUTES)
+    TARGET="$ROOT/DATA/MEMORY/ROUTES"
+    ;;
+  *)
+    echo "UNRESOLVED PLANE → $PLANE"
+    exit 1
+    ;;
+esac
+
+echo "PLANE  → $PLANE"
+echo "TARGET → $TARGET"
+echo
+
+find "$TARGET" -maxdepth 2 -type f | sort

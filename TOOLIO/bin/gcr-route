@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ITEM="${1:-}"
+
+if [[ -z "$ITEM" ]]; then
+  echo "usage: gcr-route <item-description>"
+  echo
+  echo "examples:"
+  echo "  gcr-route private-key"
+  echo "  gcr-route api-token"
+  echo "  gcr-route public-endpoint"
+  echo "  gcr-route curl-output"
+  echo "  gcr-route node_modules"
+  exit 1
+fi
+
+case "$ITEM" in
+  private-key|ssh-private|api-token|token|secret|oauth|recovery|cloudflare-secret|openai-key|hf-token|hcloud-token)
+    echo "GCR/VAULT"
+    ;;
+  cli|command|ssh-config|deploy-script|login-procedure|account-linking)
+    echo "GCR/DOOR"
+    ;;
+  public-endpoint|public-doc|product-language|screenshot-public|1of1)
+    echo "GCR/WINDOW"
+    ;;
+  curl-output|status-check|verification|audit|screenshot|receipt|inspection)
+    echo "GCR/PEEP_HOLE"
+    ;;
+  node_modules|npm-cache|build-lane|package-lock|runtime|test-harness|aethiea-build)
+    echo "GCR/HABITAT"
+    ;;
+  *)
+    echo "UNCLASSIFIED → inspect with Monocle before routing"
+    ;;
+esac

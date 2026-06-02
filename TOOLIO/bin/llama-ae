@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+AETH_ROOT="${AETH_ROOT:-/mnt/h/AETHIEAOPSYS}"
+MODEL_DIR="$AETH_ROOT/MODELS/llama.cpp"
+
+cmd="${1:-help}"
+shift || true
+
+case "$cmd" in
+  cli)
+    exec "$AETH_ROOT/TOOLIO/bin/llama-cli" "$@"
+    ;;
+  server)
+    exec "$AETH_ROOT/TOOLIO/bin/llama-server" "$@"
+    ;;
+  bench)
+    exec "$AETH_ROOT/TOOLIO/bin/llama-bench" "$@"
+    ;;
+  models)
+    find "$MODEL_DIR" -type f \( -name "*.gguf" -o -name "*.bin" \) 2>/dev/null | sort
+    ;;
+  status)
+    echo "LLAMA-AE"
+    echo "ROOT      -> $AETH_ROOT"
+    echo "MODEL_DIR -> $MODEL_DIR"
+    echo "CLI       -> $(command -v llama-cli || true)"
+    echo "SERVER    -> $(command -v llama-server || true)"
+    echo "BENCH     -> $(command -v llama-bench || true)"
+    llama-cli --version 2>/dev/null || true
+    ;;
+  *)
+    echo "Usage: llama-ae {status|models|cli|server|bench}"
+    exit 2
+    ;;
+esac

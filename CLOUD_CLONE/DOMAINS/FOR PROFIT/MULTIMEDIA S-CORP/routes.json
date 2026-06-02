@@ -1,0 +1,30 @@
+{
+  "audio": {
+    "youtube": [
+      "Self-Sufficient Records",
+      "Matriculation Multimedia S-Corp",
+      "YouTube Channel",
+      "Business Trust"
+    ],
+    "sync": [
+      "Matriculated Publishing",
+      "Self-Sufficient Records",
+      "Matriculation Multimedia S-Corp",
+      "Supervisors",
+      "Business Trust"
+    ]
+  },
+  "video": {
+    "youtube": [
+      "Matriculation Multimedia S-Corp",
+      "YouTube Channel",
+      "Business Trust"
+    ],
+    "adult": [
+      "Segregated Records",
+      "Matriculation Multimedia S-Corp",
+      "Adult Platforms",
+      "Business Trust"
+    ]
+  }
+}

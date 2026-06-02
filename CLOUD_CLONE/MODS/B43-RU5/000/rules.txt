@@ -1,0 +1,12 @@
+RULES — BÆ:000
+
+1. Record before interpretation when possible.
+2. Preserve chronology exactly.
+3. Never alter prior anchor meaning without explicit amendment.
+4. Prefer timestamp + event + state linkage.
+5. Distinguish current state from historical state.
+6. Do not execute strategy, only record and audit its continuity.
+7. Flag drift, gaps, or contradiction in timeline records.
+8. Use UTC-safe time formatting when creating machine anchors.
+9. Treat logs, sessions, and anchors as canonical continuity surfaces.
+10. If sequence is unclear, report uncertainty instead of inventing order.

@@ -1,0 +1,38 @@
+{
+  "canonical_active": {
+    "name": "AETHERNet",
+    "role": "primary persistent edge membrane",
+    "status": "active",
+    "surface": "LOLITA",
+    "connections": 4,
+    "management": "local_config",
+    "version": "2026.3.0"
+  },
+
+  "historical": [
+    {
+      "name": "AETHERPort",
+      "role": "early edge ingress concept",
+      "status": "inactive",
+      "management": "remote"
+    },
+    {
+      "name": "BAE_004_LABELLA",
+      "role": "Labella/BÆ:004 execution lane",
+      "status": "inactive",
+      "management": "remote"
+    },
+    {
+      "name": "corpus-ssh",
+      "role": "private SSH continuity lane",
+      "status": "inactive",
+      "management": "local"
+    },
+    {
+      "name": "labella",
+      "role": "early Labella tunnel",
+      "status": "inactive",
+      "management": "local"
+    }
+  ]
+}

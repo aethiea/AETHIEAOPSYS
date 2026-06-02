@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ -f /mnt/h/AETHIEAOPSYS/ENV/SHELL/aethiea_env.sh ]; then
+  # shellcheck source=/mnt/h/AETHIEAOPSYS/ENV/SHELL/aethiea_env.sh
+  . /mnt/h/AETHIEAOPSYS/ENV/SHELL/aethiea_env.sh
+else
+  export AETHIEAOPSYS="/mnt/h/AETHIEAOPSYS"
+  export AETH_ROOT="$AETHIEAOPSYS"
+  export OLLAMA_MODELS="$AETHIEAOPSYS/DATA/OLLAMA"
+fi
+
+cd "$AETH_ROOT"
+
+if ! command -v ollama >/dev/null 2>&1; then
+  echo "OLLAMA EXECUTABLE MISSING ON RUBIII"
+  echo "AETHIEA DATA EXISTS: $OLLAMA_MODELS"
+  echo "Install host executable with:"
+  echo "curl -fsSL https://ollama.com/install.sh | sh"
+  exit 127
+fi
+
+exec ollama "$@"

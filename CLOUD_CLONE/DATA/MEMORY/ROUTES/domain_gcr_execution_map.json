@@ -1,0 +1,19 @@
+{
+  "FOR PROFIT": {
+    "default_gcr": ["DOOR"],
+    "execution_allowed": true,
+    "execution_targets": ["PIPELINES", "OUTPUT", "EXPORTS"]
+  },
+  "NONPROFIT": {
+    "default_gcr": ["DOOR", "VAULT"],
+    "execution_allowed": true,
+    "execution_targets": ["PIPELINES", "OUTPUT"],
+    "constraint": "no direct profit distribution"
+  },
+  "PRIVATE": {
+    "default_gcr": ["VAULT"],
+    "execution_allowed": false,
+    "execution_targets": [],
+    "constraint": "no public exposure"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "SOURCE_TRANSLATION_MAP",
+  "status": "ACTIVE",
+  "description": "Maps source material into AETHIEAOPSYS system lanes",
+  "source_planes": {
+    "governance": "DATA/MEMORY/GOVERNANCE",
+    "media_attention": "DATA/MEMORY/MEDIA",
+    "infrastructure": "DATA/MEMORY/INFRASTRUCTURE",
+    "identity_symbolic": "DATA/MEMORY/IDENTITY",
+    "continuity_memory": "DATA/MEMORY/CONTINUITY"
+  }
+}

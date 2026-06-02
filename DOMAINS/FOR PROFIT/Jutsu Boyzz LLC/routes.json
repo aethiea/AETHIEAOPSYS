@@ -1,0 +1,31 @@
+{
+  "schema": "X:O:FIT",
+  "domain": "FOR PROFIT/Jutsu Boyzz LLC",
+  "pipeline": "JUTSUBOYZZ",
+  "meaning": "execution / revenue / services",
+  "routing": {
+    "input": "EXECUTION/PIPELINES/JUTSUBOYZZ/INPUT",
+    "process": "EXECUTION/PIPELINES/JUTSUBOYZZ/PROCESS",
+    "output": "EXECUTION/PIPELINES/JUTSUBOYZZ/OUTPUT"
+  },
+  "xofit": {
+    "X": [
+      "BINDING.json",
+      "MAPPING.json",
+      "config.json"
+    ],
+    "O": [
+      "routes.json"
+    ],
+    "FIT": [
+      "README.md"
+    ]
+  },
+  "constraints": [
+    "Do not mingle domains",
+    "Route by capacity",
+    "Preserve ownership and authority separation",
+    "Append, do not overwrite"
+  ],
+  "timestamp_utc": "20260502T234127Z"
+}

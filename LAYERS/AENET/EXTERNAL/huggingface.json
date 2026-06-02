@@ -1,0 +1,11 @@
+{
+  "service": "huggingface",
+  "type": "model_sync",
+  "direction": "egress_optional",
+  "routes": [
+    "model_download",
+    "dataset_sync",
+    "model_push"
+  ],
+  "mode": "non_runtime"
+}

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+bash "${AETHIEA:-/mnt/e/AETHIEAOPSYS}/CORE/INTERPRETER/resolve_operator.sh"

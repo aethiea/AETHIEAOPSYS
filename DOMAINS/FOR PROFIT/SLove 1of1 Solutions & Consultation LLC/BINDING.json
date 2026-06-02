@@ -1,0 +1,36 @@
+{
+  "entity": "SLove 1of1 Solutions & Consultation LLC",
+  "domain": "FOR PROFIT",
+  "gcr_zone": [
+    "DOOR",
+    "WINDOW"
+  ],
+  "layer_path": [
+    "UAER",
+    "AAE",
+    "AENET"
+  ],
+  "bae_binding": [
+    "003",
+    "005",
+    "012",
+    "016"
+  ],
+  "execution_targets": [
+    "PIPELINES",
+    "OUTPUT",
+    "EXPORTS"
+  ],
+  "allowed_actions": [
+    "consultation workflow",
+    "client education preparation",
+    "credit/business formation support",
+    "case-study packaging"
+  ],
+  "not_allowed": [
+    "legal representation",
+    "commingled nonprofit/private trust activity"
+  ],
+  "execution_hook": "EXECUTION/PIPELINES/SOLUTIONS/run.sh",
+  "execution_mode": "manual_operator_gated"
+}

@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="${AETHIEA:-$(pwd)}"
+NODE="$ROOT/MODS/P47H30N/NODES/DNY-5U5"
+MEM_NODE="$ROOT/DATA/MEMORY/NODES/dny5u5.json"
+MEM_ROUTES="$ROOT/DATA/MEMORY/ROUTES/dny5u5_routes.json"
+SYS_ROUTE="$ROOT/DATA/MEMORY/SYSTEM/dny5u5_systemwide_route.md"
+
+case "${1:-status}" in
+  status)
+    echo "DNY-5U5 :: SYSTEMWIDE ROUTE"
+    echo "NODE      → $NODE"
+    echo "PROFILE   → DIONYSUS"
+    echo "INTERFACE → ONE EYE RABBIT"
+    echo "LENS      → MONOCLE"
+    echo "LAW       → Chaos is terrain, not operator"
+    ;;
+  node)
+    cd "$NODE" && find . -maxdepth 3 -type f | sort
+    ;;
+  profile)
+    sed -n '1,220p' "$NODE/PROFILE/dionysus.md"
+    ;;
+  rabbit)
+    sed -n '1,220p' "$NODE/PROFILE/one_eye_rabbit.md"
+    ;;
+  routes)
+    python3 -m json.tool "$MEM_ROUTES"
+    ;;
+  memory)
+    python3 -m json.tool "$MEM_NODE"
+    ;;
+  system)
+    sed -n '1,220p' "$SYS_ROUTE"
+    ;;
+  hud)
+    sed -n '1,220p' "$NODE/HUD/render_state.txt"
+    ;;
+  *)
+    echo "Usage: dny-resolve {status|node|profile|rabbit|routes|memory|system|hud}"
+    exit 1
+    ;;
+esac

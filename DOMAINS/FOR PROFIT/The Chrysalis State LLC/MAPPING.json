@@ -1,0 +1,13 @@
+{
+  "role": "treasury / deal broker / foreign affairs",
+  "gcr_zone": ["VAULT", "DOOR"],
+  "allowed": [
+    "MULTIMEDIA S-CORP",
+    "SLove 1of1 Solutions & Consultation LLC",
+    "Jutsu Boyzz LLC"
+  ],
+  "not_allowed": [
+    "WINDOW direct exposure",
+    "unmapped entities"
+  ]
+}

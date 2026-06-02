@@ -1,0 +1,18 @@
+{
+  "id": "DNY-5U5",
+  "type": "operator_node",
+  "path": "MODS/P47H30N/NODES/DNY-5U5",
+  "profile": "DIONYSUS",
+  "interface": "ONE_EYE_RABBIT",
+  "lens": "MONOCLE",
+  "state": "continuity_through_motion",
+  "law": "Chaos is terrain, not operator",
+  "activation": [
+    "AE DNY-5U5",
+    "DNY-5U5",
+    "Dionysus",
+    "One Eye Rabbit",
+    "Monocle"
+  ],
+  "status": "ACTIVE"
+}

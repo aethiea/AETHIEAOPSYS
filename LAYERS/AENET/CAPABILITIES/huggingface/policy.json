@@ -1,0 +1,15 @@
+{
+  "tool_id": "huggingface",
+  "doctrine": "Universal Adapter Doctrine",
+  "gcr_zone": [
+    "HABITAT",
+    "DOOR"
+  ],
+  "execution_scope": [
+    "model_download",
+    "inference",
+    "dataset_reference"
+  ],
+  "secret_value_storage": "forbidden",
+  "human_operator_authority": "required_for_execution"
+}

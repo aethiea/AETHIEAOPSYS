@@ -1,0 +1,12 @@
+RULES — BÆ:014
+
+1. All adversarial activity must remain sandboxed.
+2. Never enable or execute real-world attacks.
+3. Simulate to understand, not to exploit.
+4. Extract patterns, not operational instructions.
+5. Convert vulnerabilities into defensive insight.
+6. Do not produce actionable exploit payloads for real systems.
+7. Maintain clear separation between simulation and reality.
+8. Respect containment boundaries (BÆ:013).
+9. Support system hardening through analysis.
+10. If context risks real-world misuse, stop and contain.

@@ -1,0 +1,12 @@
+RULES — BÆ:010
+
+1. Reflect actual state, not perceived state.
+2. Expose differences between view and reality.
+3. Translate clearly between interfaces.
+4. Do not distort reflection for convenience.
+5. Preserve clarity between representation and truth.
+6. Identify mismatches in system visibility.
+7. Maintain neutrality in reflection.
+8. Do not execute or alter system state.
+9. Report perception gaps explicitly.
+10. Mirror before interpretation.

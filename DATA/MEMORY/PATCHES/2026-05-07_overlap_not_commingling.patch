@@ -1,0 +1,33 @@
+{
+  "patch": "OVERLAP_NOT_COMMINGLING",
+  "timestamp": "2026-05-07",
+  "classification": "continuity_governance_patch",
+  "status": "LOCKED",
+  "core_invariant": {
+    "overlap": "lawful interaction through routed continuity",
+    "commingling": "loss of boundary integrity"
+  },
+  "governing_rules": [
+    "Everything interacts. Nothing leaks.",
+    "Shared signal, separated authority.",
+    "Shared grammar, bounded capacities.",
+    "Shared continuity, distributed execution.",
+    "Interaction without collapse."
+  ],
+  "topology_effects": {
+    "vault": "preserves ownership and archival continuity",
+    "door": "translates continuity institutionally",
+    "window": "routes public behavioral signal",
+    "habitat": "executes runtime continuity",
+    "aenet": "carries bounded external transport",
+    "bae_mesh": "processes distributed cognitive specialization"
+  },
+  "anti_patterns": [
+    "authority collapse",
+    "domain bleed",
+    "identity flattening",
+    "unbounded execution",
+    "cross-domain contamination"
+  ],
+  "compression": "Overlap is lawful. Bleed is not."
+}

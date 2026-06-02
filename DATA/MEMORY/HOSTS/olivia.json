@@ -1,0 +1,25 @@
+{
+  "host": "OLIVIA",
+  "role": "primary_dev_execution_node",
+  "storage": "1TB",
+  "ram": "12GB DDR4",
+  "os_layer": "Windows + WSL Ubuntu",
+  "aethiea_root": "/mnt/h/AETHIEAOPSYS",
+  "services": {
+    "aetherportal": {
+      "port": 3000,
+      "path": "/mnt/h/AETHIEAOPSYS/DOMAINS/thematriculation.cc/aether/PORTAL",
+      "manager": "systemd",
+      "role": "local portal backend"
+    },
+    "cloudflared": {
+      "manager": "systemd",
+      "role": "AETHERPORT tunnel connector"
+    }
+  },
+  "limits": [
+    "Windows sleep can stop WSL",
+    "WSL must be running for services to stay active"
+  ],
+  "timestamp_utc": "2026-05-03T09:41:07Z"
+}

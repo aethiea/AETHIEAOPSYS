@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+
+export AETH_ROOT="$ROOT"
+export AETHIEA="$ROOT"
+export HERMES_HOME="$ROOT/DATA/HERMES"
+export HERMES_LOGS="$ROOT/LOGS/HERMES"
+export HERMES_RUNTIME="$ROOT/RUN/apps/hermes"
+
+exec "$ROOT/TOOLIO/hermes/hermes.sh" "$@"

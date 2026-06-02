@@ -1,0 +1,16 @@
+{
+  "id": "CONTINUITY_ENGINE",
+  "status": "ACTIVE",
+  "components": [
+    "anchors",
+    "routes",
+    "state files",
+    "surface registration",
+    "runtime detection",
+    "lifecycle 0-16",
+    "memory maps",
+    "filesystem embodiment"
+  ],
+  "law": "If not recorded, it is not system-real.",
+  "compression": "Continuity survives by routing, anchoring, and state preservation."
+}

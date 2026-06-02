@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+python3 "$AETHIEA/TOOLIO/aeth_cloud_clone.py" "$@"

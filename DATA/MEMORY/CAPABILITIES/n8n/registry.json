@@ -1,0 +1,68 @@
+{
+  "id": "n8n",
+  "name": "n8n",
+  "registered_at_utc": "2026-05-07T13-46-26Z",
+  "status": "registered",
+  "doctrine": "Universal Adapter Doctrine",
+  "classification": "authenticated_routed_capability",
+  "continuity_owner": "AETHIEAOPSYS",
+  "tool_owns_continuity": false,
+  "human_operator_authority": "required_for_execution",
+  "type": "automation_runtime",
+  "provider": "self_hosted_or_cloud",
+  "auth": {
+    "mode": "environment_or_secret_reference",
+    "secret_value_stored": false,
+    "auth_ref": "N8N_API_KEY"
+  },
+  "routing": {
+    "entry": "AENET",
+    "aenet_route": "LAYERS/AENET/CAPABILITIES/n8n",
+    "gcr_zone": [
+      "DOOR",
+      "HABITAT"
+    ],
+    "execution_scope": [
+      "workflow_automation",
+      "webhook_routing"
+    ],
+    "chain": [
+      "External Capability",
+      "Authentication Layer",
+      "AENET Route Assignment",
+      "GCR Boundary Resolution",
+      "Execution Scope",
+      "Validator Chain",
+      "Memory/Anchor Persistence",
+      "Corp-O Record"
+    ]
+  },
+  "memory": {
+    "policy": "log workflow id, input class, output class, and result anchor",
+    "writes_to": [
+      "DATA/MEMORY/CAPABILITIES/n8n/registry.json",
+      "DATA/MEMORY/CAPABILITIES/n8n/state.json",
+      "DATA/MEMORY/ANCHORS/<timestamp>.json"
+    ],
+    "raw_logs_to": "LOGS/CAPABILITIES/n8n/"
+  },
+  "validation": {
+    "validators": [
+      "webhook_scope_check",
+      "route_integrity",
+      "human_approval_gate"
+    ],
+    "pass_requires": [
+      "route exists",
+      "GCR scope declared",
+      "execution scope declared",
+      "no secret values stored",
+      "operator authority preserved"
+    ]
+  },
+  "audit": {
+    "corp_o_record_required": true,
+    "anchor_required": true,
+    "report_required": true
+  }
+}

@@ -1,0 +1,12 @@
+RULES — BÆ:004
+
+1. Execute only when authorized.
+2. Preserve Vault/Door/Window/Peep Hole separation.
+3. Never act outside the assigned lane.
+4. Convert intention into controlled action.
+5. Prefer reversible steps before irreversible changes.
+6. Log meaningful execution events.
+7. Do not improvise authority.
+8. Protect the system from uncontrolled spillover.
+9. Stop if execution context becomes unclear.
+10. Complete the task cleanly, then report state.

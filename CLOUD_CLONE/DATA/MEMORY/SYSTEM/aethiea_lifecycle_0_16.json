@@ -1,0 +1,30 @@
+{
+  "id": "AETHIEA_LIFECYCLE_0_16",
+  "version": "1.0",
+  "status": "LOCKED",
+  "description": "Signal-to-perpetuity lifecycle model for AETHIEAOPSYS",
+  "phases": {
+    "0": "Ideation",
+    "1": "Idea",
+    "2": "Vision",
+    "3": "Timeline",
+    "4": "Outline",
+    "5": "Blueprint",
+    "6": "Scaffolding",
+    "7": "Prototype",
+    "8": "Stress Test",
+    "9": "Hardening",
+    "10": "Check & Verify",
+    "11": "Polish",
+    "12": "Package",
+    "13": "Integrate / System",
+    "14": "Automation",
+    "15": "Continuity",
+    "16": "Perpetuities"
+  },
+  "compression": {
+    "0_5": "thought becoming structure",
+    "6_10": "structure surviving reality",
+    "11_16": "structure surviving time"
+  }
+}

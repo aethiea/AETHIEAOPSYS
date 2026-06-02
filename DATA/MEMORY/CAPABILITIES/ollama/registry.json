@@ -1,0 +1,67 @@
+{
+  "id": "ollama",
+  "name": "ollama",
+  "registered_at_utc": "2026-05-07T13-46-26Z",
+  "status": "registered",
+  "doctrine": "Universal Adapter Doctrine",
+  "classification": "authenticated_routed_capability",
+  "continuity_owner": "AETHIEAOPSYS",
+  "tool_owns_continuity": false,
+  "human_operator_authority": "required_for_execution",
+  "type": "local_model_runtime",
+  "provider": "local",
+  "auth": {
+    "mode": "environment_or_secret_reference",
+    "secret_value_stored": false,
+    "auth_ref": null
+  },
+  "routing": {
+    "entry": "AENET",
+    "aenet_route": "LAYERS/AENET/CAPABILITIES/ollama",
+    "gcr_zone": [
+      "HABITAT",
+      "VAULT"
+    ],
+    "execution_scope": [
+      "local_inference",
+      "offline_reasoning"
+    ],
+    "chain": [
+      "External Capability",
+      "Authentication Layer",
+      "AENET Route Assignment",
+      "GCR Boundary Resolution",
+      "Execution Scope",
+      "Validator Chain",
+      "Memory/Anchor Persistence",
+      "Corp-O Record"
+    ]
+  },
+  "memory": {
+    "policy": "local-only unless explicitly exported",
+    "writes_to": [
+      "DATA/MEMORY/CAPABILITIES/ollama/registry.json",
+      "DATA/MEMORY/CAPABILITIES/ollama/state.json",
+      "DATA/MEMORY/ANCHORS/<timestamp>.json"
+    ],
+    "raw_logs_to": "LOGS/CAPABILITIES/ollama/"
+  },
+  "validation": {
+    "validators": [
+      "route_integrity",
+      "model_state_check"
+    ],
+    "pass_requires": [
+      "route exists",
+      "GCR scope declared",
+      "execution scope declared",
+      "no secret values stored",
+      "operator authority preserved"
+    ]
+  },
+  "audit": {
+    "corp_o_record_required": true,
+    "anchor_required": true,
+    "report_required": true
+  }
+}

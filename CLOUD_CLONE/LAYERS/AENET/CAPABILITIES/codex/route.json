@@ -1,0 +1,23 @@
+{
+  "entry": "AENET",
+  "aenet_route": "LAYERS/AENET/CAPABILITIES/codex",
+  "gcr_zone": [
+    "HABITAT",
+    "DOOR"
+  ],
+  "execution_scope": [
+    "code_editing",
+    "repo_analysis",
+    "terminal_assist"
+  ],
+  "chain": [
+    "External Capability",
+    "Authentication Layer",
+    "AENET Route Assignment",
+    "GCR Boundary Resolution",
+    "Execution Scope",
+    "Validator Chain",
+    "Memory/Anchor Persistence",
+    "Corp-O Record"
+  ]
+}

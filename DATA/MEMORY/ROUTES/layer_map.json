@@ -1,0 +1,22 @@
+{
+  "AETHER": {
+    "role": "meaning / compression / continuity",
+    "routes_to": ["UAER", "AAE", "AE1OF1"]
+  },
+  "UAER": {
+    "role": "pre-interpretation intake / classification",
+    "routes_to": ["AAE", "AENET", "B43-RU5"]
+  },
+  "AAE": {
+    "role": "analogy / cross-domain mapping",
+    "routes_to": ["AETHER", "AENET", "B43-RU5"]
+  },
+  "AENET": {
+    "role": "routing membrane",
+    "routes_to": ["DOMAINS", "GCR", "EXECUTION"]
+  },
+  "AE1OF1": {
+    "role": "HUD / operator interface",
+    "routes_to": ["OPERATOR"]
+  }
+}

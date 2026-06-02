@@ -1,0 +1,27 @@
+{
+  "pipeline": "JUTSUBOYZZ",
+  "mode": "manual_operator_gated",
+  "required_fields": [
+    "job_id",
+    "type",
+    "asset",
+    "action",
+    "status"
+  ],
+  "allowed_types": [
+    "content",
+    "audio",
+    "video",
+    "text",
+    "data",
+    "general"
+  ],
+  "allowed_actions": [
+    "IT systems work",
+    "security lab routing",
+    "tooling development",
+    "infrastructure support"
+  ],
+  "required_status": "queued",
+  "status": "ready"
+}

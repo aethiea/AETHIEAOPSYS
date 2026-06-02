@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ -f /mnt/h/AETHIEAOPSYS/ENV/SHELL/aethiea_env.sh ]; then
+  # shellcheck source=/mnt/h/AETHIEAOPSYS/ENV/SHELL/aethiea_env.sh
+  . /mnt/h/AETHIEAOPSYS/ENV/SHELL/aethiea_env.sh
+fi
+
+ROOT="${AETH_ROOT:-${AETHIEA:-/mnt/h/AETHIEAOPSYS}}"
+status=0
+
+check_usb_path() {
+  local label="$1"
+  local value="${2:-}"
+
+  if [ -z "$value" ]; then
+    printf '%-14s -> MISSING\n' "$label"
+    status=1
+    return
+  fi
+
+  case "$value" in
+    "$ROOT"|"$ROOT"/*)
+      printf '%-14s -> OK %s\n' "$label" "$value"
+      ;;
+    *)
+      printf '%-14s -> OFF-USB %s\n' "$label" "$value"
+      status=1
+      ;;
+  esac
+}
+
+echo "=== AEUSB ROUTE CHECK ==="
+echo "HOST          -> $(hostname)"
+echo "ROOT          -> $ROOT"
+
+test -d "$ROOT" || { echo "ROOT DIR      -> FAIL"; exit 1; }
+test -f "$ROOT/.aeth_root" || { echo "ROOT MARK     -> FAIL"; exit 1; }
+echo "ROOT MARK     -> OK"
+
+check_usb_path "AETHIEA" "${AETHIEA:-}"
+check_usb_path "AETH_ROOT" "${AETH_ROOT:-}"
+check_usb_path "AEUSB" "${AEUSB:-}"
+check_usb_path "OLLAMA_MODELS" "${OLLAMA_MODELS:-}"
+check_usb_path "HF_HOME" "${HF_HOME:-}"
+check_usb_path "HF_HUB_CACHE" "${HF_HUB_CACHE:-}"
+check_usb_path "PIP_CACHE_DIR" "${PIP_CACHE_DIR:-}"
+check_usb_path "NPM_CACHE" "${NPM_CONFIG_CACHE:-}"
+check_usb_path "WRANGLER_HOME" "${WRANGLER_HOME:-}"
+
+case ":$PATH:" in
+  *":$ROOT/TOOLIO/bin:"*) echo "PATH TOOLIO/bin -> OK" ;;
+  *) echo "PATH TOOLIO/bin -> MISSING"; status=1 ;;
+esac
+
+case ":$PATH:" in
+  *":$ROOT/TOOLIO:"*) echo "PATH TOOLIO     -> OK" ;;
+  *) echo "PATH TOOLIO     -> MISSING"; status=1 ;;
+esac
+
+case ":$PATH:" in
+  *":$ROOT/APT/bin:"*) echo "PATH APT/bin    -> OK" ;;
+  *) echo "PATH APT/bin    -> MISSING"; status=1 ;;
+esac
+
+for name in aeth aeusb codex ollama-ae hf-ae hermes cloudflared wrangler cloudflare-ae; do
+  resolved="$(command -v "$name" 2>/dev/null || true)"
+  if [ -n "$resolved" ]; then
+    case "$resolved" in
+      "$ROOT"/*) printf '%-14s -> OK %s\n' "$name" "$resolved" ;;
+      *) printf '%-14s -> HOST %s\n' "$name" "$resolved" ;;
+    esac
+  else
+    printf '%-14s -> MISSING\n' "$name"
+  fi
+done
+
+echo "STATUS        -> $([ "$status" -eq 0 ] && echo USB_NATIVE_ROUTED || echo NEEDS_ATTENTION)"
+exit "$status"

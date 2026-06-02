@@ -1,0 +1,13 @@
+{
+  "role": "private ministry trust",
+  "gcr_zone": ["VAULT"],
+  "allowed": [
+    "internal doctrine",
+    "private ecclesiastical function"
+  ],
+  "not_allowed": [
+    "public exposure",
+    "direct platform interaction",
+    "commingled flows with FOR_PROFIT or NONPROFIT"
+  ]
+}

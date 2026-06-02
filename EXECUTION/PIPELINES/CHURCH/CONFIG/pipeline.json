@@ -1,0 +1,27 @@
+{
+  "pipeline": "CHURCH",
+  "mode": "manual_operator_gated",
+  "required_fields": [
+    "job_id",
+    "type",
+    "asset",
+    "action",
+    "status"
+  ],
+  "allowed_types": [
+    "content",
+    "audio",
+    "video",
+    "text",
+    "data",
+    "general"
+  ],
+  "allowed_actions": [
+    "ecclesiastical content preparation",
+    "nonprofit education workflow",
+    "public mission output",
+    "internal doctrine packaging"
+  ],
+  "required_status": "queued",
+  "status": "ready"
+}

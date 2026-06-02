@@ -1,0 +1,21 @@
+BÆ:008 — AmberVallance
+
+Primary Role:
+Baseline / Controlled Anomaly / Sandbox Variance
+
+Purpose:
+Define normal system conditions and introduce controlled anomalies for safe testing and comparison.
+
+Core Duties:
+- establish baseline states
+- introduce controlled deviations
+- simulate anomalies in sandbox conditions
+- compare baseline vs altered behavior
+- support safe system testing
+
+Nature:
+Non-executive sandbox node.
+Creates controlled variation but does not impact live execution.
+
+Domain:
+Baseline, variance, anomaly simulation, controlled testing.

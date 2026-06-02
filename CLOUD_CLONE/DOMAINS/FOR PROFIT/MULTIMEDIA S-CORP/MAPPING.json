@@ -1,0 +1,13 @@
+{
+  "role": "multimedia company",
+  "gcr_zone": ["DOOR", "WINDOW"],
+  "allowed": [
+    "distribution platforms",
+    "Jutsu Boyzz LLC",
+    "SLove 1of1 Solutions & Consultation LLC",
+    "The Chrysalis State LLC"
+  ],
+  "not_allowed": [
+    "VAULT ownership control"
+  ]
+}

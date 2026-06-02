@@ -1,0 +1,22 @@
+{
+  "entry": "AENET",
+  "aenet_route": "LAYERS/AENET/CAPABILITIES/n8n",
+  "gcr_zone": [
+    "DOOR",
+    "HABITAT"
+  ],
+  "execution_scope": [
+    "workflow_automation",
+    "webhook_routing"
+  ],
+  "chain": [
+    "External Capability",
+    "Authentication Layer",
+    "AENET Route Assignment",
+    "GCR Boundary Resolution",
+    "Execution Scope",
+    "Validator Chain",
+    "Memory/Anchor Persistence",
+    "Corp-O Record"
+  ]
+}

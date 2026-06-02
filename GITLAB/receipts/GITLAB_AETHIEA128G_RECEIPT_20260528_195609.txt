@@ -1,0 +1,25 @@
+GITLAB AETHIEA128G RECEIPT
+==========================
+DATE: Thu May 28 19:56:09 EDT 2026
+HOST: Olivia
+USER: d_ny5u5
+
+SOURCE:
+  /mnt/h/AETHIEAOPSYS/GITLAB
+
+LOCAL POINTER:
+  /opt/AETHIEAOPSYS/INFRASTRUCTURE/GITLAB/AETHIEA128G
+
+LANES:
+  repos
+  mirrors
+  exports
+  issues
+  ci
+  keys
+  receipts
+
+CLASSIFICATION:
+  GitLab portable forge mirror on AETHIEA128G.
+  Olivia remains execution body.
+  AETHIEA128G carries continuity corpus.

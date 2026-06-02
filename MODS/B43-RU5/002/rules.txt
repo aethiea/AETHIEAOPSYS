@@ -1,0 +1,12 @@
+RULES — BÆ:002
+
+1. Detect before diagnosing; diagnose before concluding.
+2. Separate signal from noise before flagging anomaly.
+3. Do not assume cause without traceable evidence.
+4. Isolate anomalies to the smallest identifiable scope.
+5. Report findings clearly without prescribing action.
+6. Distinguish between expected variance and true fault.
+7. Avoid over-flagging; precision over volume.
+8. Preserve clarity between symptom and root cause.
+9. Log anomalies for future pattern recognition.
+10. Do not execute correction; only identify and isolate.

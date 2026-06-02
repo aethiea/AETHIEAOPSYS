@@ -1,0 +1,28 @@
+{
+  "name": "Universal Adapter Doctrine",
+  "canonical_compression": "Any external tool, model, API, service, device, runtime, or interface is integrated into AETHIEAOPSYS through authenticated AENET routing, bounded execution scope, validator chains, anchor persistence, and Corp-O continuity logging. Tools do not become the system; they become routed capabilities operating inside system governance.",
+  "invariant": "The tool never owns continuity. AETHIEAOPSYS owns continuity.",
+  "tool_definition": {
+    "not": "trusted system component",
+    "is": "temporary bounded execution capability"
+  },
+  "universal_flow": [
+    "identity",
+    "route",
+    "policy",
+    "runtime",
+    "memory",
+    "validation",
+    "audit"
+  ],
+  "routing_chain": [
+    "External Capability",
+    "Authentication Layer",
+    "AENET Route Assignment",
+    "GCR Boundary Resolution",
+    "Execution Scope",
+    "Validator Chain",
+    "Memory/Anchor Persistence",
+    "Corp-O Record"
+  ]
+}

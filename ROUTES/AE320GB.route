@@ -1,0 +1,21 @@
+AE320GB ROUTE
+
+Host drive letter: I:
+WSL mount path: /mnt/i
+Heavy body path: /mnt/i/AETHIEAOPSYS
+
+Role:
+Expanded heavy-body habitat for AETHIEAOPSYS.
+
+Authority:
+AEUSB remains runtime authority.
+AE320GB carries heavy workloads, models, caches, mirrors, repositories, backups, expanded corpus material, and build artifacts.
+
+Membrane:
+I: enters WSL at /mnt/i through drvfs.
+
+Canonical compression:
+AEUSB wakes.
+AE320GB works.
+RUBIII hosts.
+Corp-O receipts.

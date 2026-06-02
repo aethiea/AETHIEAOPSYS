@@ -1,0 +1,14 @@
+{
+  "worker": "aethernet",
+  "status": "ONLINE",
+  "canonical_url": "https://aethernet.thematriculation.workers.dev",
+  "endpoints": {
+    "status": "https://aethernet.thematriculation.workers.dev/status",
+    "capabilities": "https://aethernet.thematriculation.workers.dev/capabilities",
+    "ask": "https://aethernet.thematriculation.workers.dev/ask"
+  },
+  "custom_domain": {
+    "status": "pending",
+    "preferred": "aethernet.thematriculation.cc"
+  }
+}

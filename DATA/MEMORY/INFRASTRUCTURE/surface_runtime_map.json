@@ -1,0 +1,16 @@
+{
+  "id": "SURFACE_RUNTIME_MAP",
+  "status": "ACTIVE",
+  "runtime": {
+    "name": "AETHIEAOPSYS",
+    "path": "/mnt/e/AETHIEAOPSYS",
+    "mode": "USB",
+    "role": "portable runtime continuity spine"
+  },
+  "surfaces": {
+    "LOLITA": "canonical interface surface",
+    "OLIVIA": "canonical interface surface",
+    "FUTURE_HOSTS": "auto-registerable canonical interface surfaces"
+  },
+  "rule": "Surface changes do not change runtime continuity."
+}

@@ -1,0 +1,41 @@
+{
+  "schema": "AEUSB_NATIVE_ROUTE_V1",
+  "timestamp_utc": "2026-05-24T03:32:00Z",
+  "root": "/mnt/h/AETHIEAOPSYS",
+  "marker": "/mnt/h/AETHIEAOPSYS/.aeth_root",
+  "mode": "USB_NATIVE_ROUTED",
+  "policy": {
+    "source_of_truth": "USB root",
+    "mutable_state": "must resolve below /mnt/h/AETHIEAOPSYS",
+    "host_binaries": "allowed only as executable shims when data/cache/state remain on USB",
+    "historical_archives": "may contain old mount references but do not control routing"
+  },
+  "environment": {
+    "AETHIEA": "/mnt/h/AETHIEAOPSYS",
+    "AETH_ROOT": "/mnt/h/AETHIEAOPSYS",
+    "AETHIEA_ROOT": "/mnt/h/AETHIEAOPSYS",
+    "AETHIEAOPSYS": "/mnt/h/AETHIEAOPSYS",
+    "AEUSB": "/mnt/h/AETHIEAOPSYS",
+    "OLLAMA_MODELS": "/mnt/h/AETHIEAOPSYS/DATA/OLLAMA",
+    "HF_HOME": "/mnt/h/AETHIEAOPSYS/MODELS/huggingface/cache",
+    "PIP_CACHE_DIR": "/mnt/h/AETHIEAOPSYS/ENV/PYTHON/pip-cache",
+    "NPM_CONFIG_CACHE": "/mnt/h/AETHIEAOPSYS/ENV/RUNTIME/npm-cache",
+    "WRANGLER_HOME": "/mnt/h/AETHIEAOPSYS/.wrangler"
+  },
+  "path_priority": [
+    "/mnt/h/AETHIEAOPSYS/TOOLIO/bin",
+    "/mnt/h/AETHIEAOPSYS/TOOLIO",
+    "/mnt/h/AETHIEAOPSYS/APT/bin"
+  ],
+  "native_wrappers": {
+    "codex": "/mnt/h/AETHIEAOPSYS/TOOLIO/bin/codex",
+    "aeusb": "/mnt/h/AETHIEAOPSYS/TOOLIO/bin/aeusb",
+    "ollama": "/mnt/h/AETHIEAOPSYS/TOOLIO/bin/ollama-ae",
+    "huggingface": "/mnt/h/AETHIEAOPSYS/TOOLIO/bin/hf-ae",
+    "hermes": "/mnt/h/AETHIEAOPSYS/TOOLIO/bin/hermes",
+    "cloudflared": "/mnt/h/AETHIEAOPSYS/TOOLIO/bin/cloudflared",
+    "wrangler": "/mnt/h/AETHIEAOPSYS/TOOLIO/bin/wrangler",
+    "cloudflare": "/mnt/h/AETHIEAOPSYS/TOOLIO/bin/cloudflare-ae"
+  },
+  "verifier": "/mnt/h/AETHIEAOPSYS/TOOLIO/bin/aeusb-route-check"
+}

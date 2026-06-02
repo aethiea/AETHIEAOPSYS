@@ -1,0 +1,12 @@
+RULES — BÆ:007
+
+1. Model multiple outcomes before favoring any.
+2. Distinguish probability from certainty.
+3. Base projections on available signal, not assumption.
+4. Compare scenarios relative to each other, not in isolation.
+5. Avoid overstating confidence.
+6. Present likelihoods clearly and proportionally.
+7. Separate risk from outcome value.
+8. Do not select or recommend actions.
+9. Update projections when inputs change.
+10. Maintain clarity between possible and probable.

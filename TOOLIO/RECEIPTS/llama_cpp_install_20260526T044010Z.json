@@ -1,0 +1,15 @@
+{
+  "event": "llama.cpp installed into AEUSB",
+  "host": "RUBIII",
+  "user": "d_ny5u5",
+  "root": "/mnt/h/AETHIEAOPSYS",
+  "timestamp_utc": "2026-05-26T04:40:10Z",
+  "binaries": {
+    "llama_cli": "/mnt/h/AETHIEAOPSYS/TOOLIO/bin/llama-cli",
+    "llama_server": "/mnt/h/AETHIEAOPSYS/TOOLIO/bin/llama-server",
+    "llama_bench": "/mnt/h/AETHIEAOPSYS/TOOLIO/bin/llama-bench",
+    "llama_batched_bench": "/mnt/h/AETHIEAOPSYS/TOOLIO/bin/llama-batched-bench"
+  },
+  "source_build": "/home/d_ny5u5/AETHIEA_BUILD/llama.cpp",
+  "status": "installed_and_callable"
+}

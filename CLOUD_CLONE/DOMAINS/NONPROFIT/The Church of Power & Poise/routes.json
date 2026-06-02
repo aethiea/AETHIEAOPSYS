@@ -1,0 +1,31 @@
+{
+  "schema": "X:O:FIT",
+  "domain": "NONPROFIT/The Church of Power & Poise",
+  "pipeline": "CHURCH",
+  "meaning": "ministry / ecclesiastical lane",
+  "routing": {
+    "input": "EXECUTION/PIPELINES/CHURCH/INPUT",
+    "process": "EXECUTION/PIPELINES/CHURCH/PROCESS",
+    "output": "EXECUTION/PIPELINES/CHURCH/OUTPUT"
+  },
+  "xofit": {
+    "X": [
+      "BINDING.json",
+      "MAPPING.json",
+      "config.json"
+    ],
+    "O": [
+      "routes.json"
+    ],
+    "FIT": [
+      "README.md"
+    ]
+  },
+  "constraints": [
+    "Do not mingle domains",
+    "Route by capacity",
+    "Preserve ownership and authority separation",
+    "Append, do not overwrite"
+  ],
+  "timestamp_utc": "20260502T234127Z"
+}

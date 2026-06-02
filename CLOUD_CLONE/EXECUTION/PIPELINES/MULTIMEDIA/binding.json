@@ -1,0 +1,70 @@
+{
+  "pipeline": "MULTIMEDIA",
+
+  "lifecycle_sequence": [
+    "000",
+    "001",
+    "002",
+    "003",
+    "004",
+    "005",
+    "006",
+    "007",
+    "008",
+    "009",
+    "010",
+    "011",
+    "012",
+    "013",
+    "014",
+    "015",
+    "016"
+  ],
+
+  "bae_roles": {
+    "000": "time_origin_anchor",
+    "001": "maintenance_persistence",
+    "002": "diagnostic_validation",
+    "003": "fiduciary_financial_governance",
+    "004": "execution_devops",
+    "005": "compliance_gate",
+    "006": "accordance_alignment",
+    "007": "probability_modeling",
+    "008": "anomaly_detection",
+    "009": "adversarial_challenge",
+    "010": "mirror_monocle_reflection",
+    "011": "inventory_tracking",
+    "012": "narrative_expression",
+    "013": "containment_boundary",
+    "014": "internal_redteam",
+    "015": "analytics_feedback",
+    "016": "deployment_synthesis"
+  },
+
+  "rules": {
+    "must_pass_compliance": true,
+    "must_check_containment": true,
+    "must_anchor_execution": true,
+    "must_log_outputs": true,
+    "must_preserve_continuity": true,
+    "human_approval_required": true,
+    "allow_external_publish": false
+  },
+
+  "routing": {
+    "domain": "FOR PROFIT",
+    "gcr": "WINDOW",
+    "execution_class": "MEDIA_PIPELINE",
+    "transport_layer": "AENET",
+    "continuity_layer": "CLOUD_CLONE"
+  },
+
+  "outputs": {
+    "process_dir": "EXECUTION/PIPELINES/MULTIMEDIA/PROCESS",
+    "output_dir": "EXECUTION/PIPELINES/MULTIMEDIA/OUTPUT",
+    "rejected_dir": "EXECUTION/PIPELINES/MULTIMEDIA/REJECTED",
+    "report_dir": "EXECUTION/REPORTS"
+  },
+
+  "status": "LOCKED"
+}

@@ -1,0 +1,36 @@
+{
+  "entity": "The Church of Power & Poise",
+  "domain": "NONPROFIT",
+  "gcr_zone": [
+    "DOOR",
+    "VAULT"
+  ],
+  "layer_path": [
+    "UAER",
+    "AAE",
+    "AENET"
+  ],
+  "bae_binding": [
+    "005",
+    "012",
+    "016",
+    "004"
+  ],
+  "execution_targets": [
+    "PIPELINES",
+    "OUTPUT"
+  ],
+  "execution_hook": "EXECUTION/PIPELINES/CHURCH/run.sh",
+  "execution_mode": "manual_operator_gated",
+  "allowed_actions": [
+    "ecclesiastical content preparation",
+    "nonprofit education workflow",
+    "public mission output",
+    "internal doctrine packaging"
+  ],
+  "not_allowed": [
+    "direct profit distribution",
+    "commingled for-profit revenue",
+    "private trust exposure"
+  ]
+}

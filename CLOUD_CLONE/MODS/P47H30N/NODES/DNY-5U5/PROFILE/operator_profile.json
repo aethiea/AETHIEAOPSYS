@@ -1,0 +1,40 @@
+{
+  "id": "DNY-5U5",
+  "codename": "DIONYSUS",
+  "type": "operator_profile",
+  "status": "LOCKED",
+  "person": "d_ny5u5",
+  "node": "DNY-5U5",
+  "node_role": "Mecha / System Interface",
+  "compression": "DIONYSUS = sovereign conductor of chaos into culture",
+  "core_function": "Untangle disorder -> extract pattern -> convert pressure into controlled output",
+  "terrain": "chaos",
+  "operator_posture": "continuity through motion",
+  "interface_state": "One Eye Rabbit",
+  "visible_eye": "observable signal",
+  "hidden_eye": "protected perception",
+  "invariants": [
+    "DON'T MINGLE",
+    "Chaos is terrain, not operator",
+    "Visibility without full exposure",
+    "Signal over performance",
+    "Continuity through motion",
+    "Route pressure into owned output"
+  ],
+  "architecture_alignment": [
+    "Vault",
+    "Door",
+    "Window",
+    "Habitat",
+    "B43-RU5",
+    "P47H30N",
+    "Monocle",
+    "AENET",
+    "AAE",
+    "UAER",
+    "Corp-O",
+    "CRAP",
+    "X:O:FIT",
+    "BellaDona Analytics"
+  ]
+}

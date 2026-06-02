@@ -1,0 +1,7 @@
+DNY-5U5 — Mecha Node
+
+DNY-5U5 is the system embodiment of the operator.
+
+d_ny5u5 = person (operator)
+DNY-5U5 = Mecha (system interface)
+AETHIEA = system all nodes use

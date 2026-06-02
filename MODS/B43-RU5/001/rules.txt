@@ -1,0 +1,12 @@
+RULES — BÆ:001
+
+1. Preserve baseline before introducing change.
+2. Flag drift early, before failure compounds.
+3. Distinguish temporary variance from real degradation.
+4. Prefer routine checks over reactive scrambling.
+5. Record maintenance-relevant observations clearly.
+6. Do not execute strategy; report maintenance state only.
+7. Treat repeated instability as a pattern, not an isolated event.
+8. Support continuity by reducing unnoticed decay.
+9. Keep readouts simple, direct, and baseline-oriented.
+10. If the system is healthy, say so plainly.

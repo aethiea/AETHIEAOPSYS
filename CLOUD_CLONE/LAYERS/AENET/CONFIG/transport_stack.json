@@ -1,0 +1,38 @@
+{
+  "schema": "X:O:FIT",
+  "layer": "AENET",
+  "type": "transport_stack",
+  "timestamp_utc": "20260503T012420Z",
+  "services": {
+    "openssh": {
+      "role": "local secure shell access",
+      "binding": "systemd:ssh",
+      "port": 22,
+      "lane": "Door"
+    },
+    "cloudflared": {
+      "role": "external tunnel ingress",
+      "binding": "cloudflared tunnel",
+      "lane": "Window",
+      "entry": "edge \u2192 localhost"
+    },
+    "aethernet": {
+      "role": "internal routing + validation",
+      "binding": "AENET core",
+      "lane": "Control",
+      "function": "route / allow / deny / log"
+    }
+  },
+  "flow": [
+    "external \u2192 cloudflared",
+    "cloudflared \u2192 AENET validation",
+    "AENET \u2192 ssh/local service",
+    "response \u2192 logs"
+  ],
+  "constraints": [
+    "no direct Vault exposure",
+    "all ingress through cloudflared",
+    "all shell through SSH",
+    "AENET enforces routing + separation"
+  ]
+}

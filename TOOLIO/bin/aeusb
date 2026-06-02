@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ -f /mnt/h/AETHIEAOPSYS/ENV/SHELL/aethiea_env.sh ]; then
+  # shellcheck source=/mnt/h/AETHIEAOPSYS/ENV/SHELL/aethiea_env.sh
+  . /mnt/h/AETHIEAOPSYS/ENV/SHELL/aethiea_env.sh
+else
+  export AETHIEAOPSYS="/mnt/h/AETHIEAOPSYS"
+  export AETH_ROOT="$AETHIEAOPSYS"
+  export AEUSB="$AETHIEAOPSYS"
+fi
+
+cd "$AETH_ROOT"
+
+echo "AEUSB ROUTED"
+echo "Root: $AETH_ROOT"
+echo "Host: $(hostname)"
+echo "User: $(whoami)"
+echo "Timestamp UTC: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+echo "Ollama models: ${OLLAMA_MODELS:-UNSET}"
+echo "HF cache: ${HF_HOME:-UNSET}"

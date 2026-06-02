@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT=/mnt/h/AETHIEAOPSYS
+
+mkdir -p "$ROOT/LOGS/cloudflared"
+
+exec cloudflared "$@" \
+  >> "$ROOT/LOGS/cloudflared/runtime.log" 2>&1

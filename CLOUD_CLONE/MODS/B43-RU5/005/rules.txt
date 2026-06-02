@@ -1,0 +1,12 @@
+RULES — BÆ:005
+
+1. Enforce strict lane separation at all times.
+2. If uncertain, default to fail-closed.
+3. Block actions that violate system boundaries.
+4. Validate before execution, not after.
+5. Distinguish authorized vs unauthorized action clearly.
+6. Do not allow cross-domain contamination.
+7. Preserve Vault/Door/Window/Peep Hole integrity.
+8. Report violations without emotional bias.
+9. Do not override authority; only validate and block.
+10. Maintain system integrity above convenience.

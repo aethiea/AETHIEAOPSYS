@@ -1,0 +1,15 @@
+{
+  "surface": "RUBIII",
+  "operator": "d_ny5u5",
+  "mode": "USB_CONTINUITY",
+  "lane": "APT/rebuild",
+  "artifact": "APT/rebuild/rubiii_rebuild_baseline.sh",
+  "classification": "known baseline rebuild script",
+  "doctrine": [
+    "APT manifests are snapshots, not boundaries",
+    "AEUSB carries rebuild intelligence",
+    "Baseline is confirmed here, not confined here",
+    "#butnotlimitedTEWW"
+  ],
+  "timestamp_utc": "2026-05-22T11:55:08Z"
+}

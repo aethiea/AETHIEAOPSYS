@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ -f /mnt/h/AETHIEAOPSYS/ENV/SHELL/aethiea_env.sh ]; then
+  # shellcheck source=/mnt/h/AETHIEAOPSYS/ENV/SHELL/aethiea_env.sh
+  . /mnt/h/AETHIEAOPSYS/ENV/SHELL/aethiea_env.sh
+fi
+
+CODEX_JS="${AETH_ROOT:-/mnt/h/AETHIEAOPSYS}/ENV/RUNTIME/npm-global/node_modules/@openai/codex/bin/codex.js"
+
+if [ ! -f "$CODEX_JS" ]; then
+  echo "USB CODEX PACKAGE MISSING: $CODEX_JS"
+  echo "Install it with:"
+  echo "npm --cache /tmp/aeusb-npm-cache --prefix /mnt/h/AETHIEAOPSYS/ENV/RUNTIME/npm-global install --no-bin-links @openai/codex"
+  exit 127
+fi
+
+exec node "$CODEX_JS" "$@"

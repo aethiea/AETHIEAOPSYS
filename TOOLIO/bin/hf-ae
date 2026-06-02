@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ -f /mnt/h/AETHIEAOPSYS/ENV/SHELL/aethiea_env.sh ]; then
+  # shellcheck source=/mnt/h/AETHIEAOPSYS/ENV/SHELL/aethiea_env.sh
+  . /mnt/h/AETHIEAOPSYS/ENV/SHELL/aethiea_env.sh
+else
+  export AETHIEAOPSYS="/mnt/h/AETHIEAOPSYS"
+  export AETH_ROOT="$AETHIEAOPSYS"
+  export HF_HOME="$AETHIEAOPSYS/MODELS/huggingface/cache"
+  export HF_HUB_CACHE="$AETHIEAOPSYS/MODELS/huggingface/cache/hub"
+  export TRANSFORMERS_CACHE="$AETHIEAOPSYS/MODELS/huggingface/cache/transformers"
+  export HF_DATASETS_CACHE="$AETHIEAOPSYS/MODELS/huggingface/cache/datasets"
+fi
+export HF_TRANSFER=1
+
+cd "$AETH_ROOT"
+
+if ! command -v hf >/dev/null 2>&1; then
+  echo "HF EXECUTABLE MISSING ON RUBIII"
+  exit 127
+fi
+
+exec hf "$@"

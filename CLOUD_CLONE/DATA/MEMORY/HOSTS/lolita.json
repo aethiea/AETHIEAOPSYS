@@ -1,0 +1,16 @@
+{
+  "host": "LOLITA",
+  "role": "portable_runtime_host",
+  "aethiea_root": "/mnt/e/AETHIEAOPSYS",
+  "services": [
+    "aeth-portal",
+    "cloudflared",
+    "aeth-cloud-sync"
+  ],
+  "tunnel": "AETHERNet",
+  "portal": "http://localhost:3000",
+  "external_endpoint": "https://aether.thematriculation.cc",
+  "cloud_clone": "/mnt/e/AETHIEAOPSYS/CLOUD_CLONE",
+  "last_verified_utc": "2026-05-06T00-02-53Z",
+  "status": "ACTIVE"
+}

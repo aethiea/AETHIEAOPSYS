@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+AETH_ROOT="${AETH_ROOT:-/mnt/e/AETHIEAOPSYS}"
+
+cmd="$1"
+shift || true
+
+case "$cmd" in
+  door|aenet)
+    exec bash "$AETH_ROOT/TOOLIO/aenet-door" "$@"
+    ;;
+
+  mistral)
+    exec bash "$AETH_ROOT/TOOLIO/aenet-door" ask --model mistral "$@"
+    ;;
+
+  llama)
+    exec bash "$AETH_ROOT/TOOLIO/aenet-door" ask --model llama "$@"
+    ;;
+
+  *)
+    exec python3 "$AETH_ROOT/CORE/aeth.py" "$cmd" "$@"
+    ;;
+esac

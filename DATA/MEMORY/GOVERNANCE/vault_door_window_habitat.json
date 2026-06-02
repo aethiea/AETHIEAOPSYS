@@ -1,0 +1,23 @@
+{
+  "id": "GOVERNANCE_LAYER_MAP",
+  "status": "ACTIVE",
+  "layers": {
+    "Vault": {
+      "role": "ownership, continuity, protected IP, archives, governance logic",
+      "primary_expression": "The Matriculation Business Trust"
+    },
+    "Door": {
+      "role": "contracts, licensing, vendors, platforms, institutional interaction",
+      "primary_expression": "The Matriculation Multimedia Inc."
+    },
+    "Window": {
+      "role": "public media, audience routing, commentary, cultural expression",
+      "primary_expression": "public-facing Matriculation media ecosystem"
+    },
+    "Habitat": {
+      "role": "execution environments, tools, shells, surfaces, runtime operations",
+      "primary_expression": "AETHIEAOPSYS on USB rendered through surfaces"
+    }
+  },
+  "law": "Ownership, operation, expression, and execution remain coordinated but not mingled."
+}

@@ -1,0 +1,7 @@
+{
+  "domain": "huggingface",
+  "role": "model_distribution",
+  "classification": "door_layer",
+  "ownership": "for_profit",
+  "execution": "external_optional"
+}

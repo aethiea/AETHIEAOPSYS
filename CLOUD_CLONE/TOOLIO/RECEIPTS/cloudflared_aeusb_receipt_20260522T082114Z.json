@@ -1,0 +1,22 @@
+{
+  "tool": "cloudflared",
+  "surface": "RUBIII",
+  "operator": "d_ny5u5",
+  "mode": "USB_CONTINUITY",
+  "classification": "AEUSB-carried edge tunnel client",
+  "physical_usb_path": "/mnt/h/AETHIEAOPSYS/TOOLIO/bin/cloudflared",
+  "runtime_path": "/opt/AETHIEAOPSYS/TOOLIO/bin/cloudflared",
+  "active_path_priority": "AEUSB_TOOLIO_FIRST",
+  "host_fallback_path": "/usr/local/bin/cloudflared",
+  "verified_command_path": "/mnt/h/AETHIEAOPSYS/TOOLIO/bin/cloudflared",
+  "verified_version": "cloudflared version 2026.5.0 (built 2026-05-13-11:24 UTC)",
+  "doctrine": [
+    "AEUSB carries the tool",
+    "Host may provide fallback execution",
+    "When AETHIEA wakes, AEUSB version wins",
+    "Host supports but does not own",
+    "Confirmed here, not confined here",
+    "#butnotlimitedTEWW"
+  ],
+  "timestamp_utc": "2026-05-22T08:21:15Z"
+}

@@ -1,0 +1,12 @@
+{
+  "role": "solutions / consultation",
+  "gcr_zone": ["DOOR"],
+  "allowed": [
+    "external clients",
+    "MULTIMEDIA S-CORP",
+    "Jutsu Boyzz LLC"
+  ],
+  "not_allowed": [
+    "VAULT ownership control"
+  ]
+}

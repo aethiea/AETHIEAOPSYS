@@ -1,0 +1,11 @@
+{
+  "timestamp_utc": "2026-05-06T00-02-53Z",
+  "layer": "AENET",
+  "cloudflare_role": "external_door_edge_ingress_egress",
+  "routes": {
+    "aether.thematriculation.cc": "http://localhost:3000",
+    "ssh.thematriculation.cc": "ssh://localhost:22",
+    "labelle.thematriculation.cc": "mapped_service_pending_verification"
+  },
+  "status": "LOCKED"
+}

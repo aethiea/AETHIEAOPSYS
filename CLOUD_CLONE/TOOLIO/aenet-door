@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+BASE="https://aethernet.thematriculation.workers.dev"
+
+cmd="$1"
+shift || true
+
+case "$cmd" in
+  status)
+    curl -s "$BASE/status"
+    ;;
+  capabilities)
+    curl -s "$BASE/capabilities"
+    ;;
+  models)
+    curl -s "$BASE/models"
+    ;;
+  ask)
+    MODEL="llama"
+    PROVIDER="workers-ai"
+
+    while [[ "$1" == --* ]]; do
+      case "$1" in
+        --model)
+          MODEL="$2"
+          shift 2
+          ;;
+        --provider)
+          PROVIDER="$2"
+          shift 2
+          ;;
+        *)
+          break
+          ;;
+      esac
+    done
+
+    PROMPT="$*"
+
+    curl -s "$BASE/ask" \
+      -H "Content-Type: application/json" \
+      -d "{\"provider\":\"$PROVIDER\",\"model\":\"$MODEL\",\"prompt\":\"$PROMPT\"}"
+    ;;
+  *)
+    echo "usage: aenet-door {status|capabilities|models|ask [--provider workers-ai] [--model llama|mistral|gemma] \"prompt\"}"
+    ;;
+esac
+
+echo

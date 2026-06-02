@@ -1,0 +1,7 @@
+1. d_ny5u5 is the person.
+2. DNY-5U5 is the Mecha.
+3. AETHIEA is the system all nodes use.
+4. AETHIEAOPSYS is the runtime body.
+5. Hosts provide execution only.
+6. No node is AETHIEA.
+7. DON’T MINGLE.

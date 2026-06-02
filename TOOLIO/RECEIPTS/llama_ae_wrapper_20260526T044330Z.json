@@ -1,0 +1,16 @@
+{
+  "event": "llama-ae wrapper installed",
+  "host": "RUBIII",
+  "user": "d_ny5u5",
+  "root": "/mnt/h/AETHIEAOPSYS",
+  "timestamp_utc": "2026-05-26T04:43:30Z",
+  "wrapper": "/mnt/h/AETHIEAOPSYS/TOOLIO/bin/llama-ae",
+  "model_dir": "/mnt/h/AETHIEAOPSYS/MODELS/llama.cpp",
+  "routes": {
+    "cli": "/mnt/h/AETHIEAOPSYS/TOOLIO/bin/llama-cli",
+    "server": "/mnt/h/AETHIEAOPSYS/TOOLIO/bin/llama-server",
+    "bench": "/mnt/h/AETHIEAOPSYS/TOOLIO/bin/llama-bench",
+    "batched_bench": "/mnt/h/AETHIEAOPSYS/TOOLIO/bin/llama-batched-bench"
+  },
+  "status": "LLAMA_AE_WRAPPER_ROUTED"
+}

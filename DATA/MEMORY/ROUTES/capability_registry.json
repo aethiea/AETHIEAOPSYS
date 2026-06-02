@@ -1,0 +1,419 @@
+{
+  "updated_at_utc": "2026-05-07T13-46-27Z",
+  "doctrine": "Universal Adapter Doctrine",
+  "continuity_owner": "AETHIEAOPSYS",
+  "tools": {
+    "chatgpt": {
+      "id": "chatgpt",
+      "name": "chatgpt",
+      "registered_at_utc": "2026-05-07T13-46-22Z",
+      "status": "registered",
+      "doctrine": "Universal Adapter Doctrine",
+      "classification": "authenticated_routed_capability",
+      "continuity_owner": "AETHIEAOPSYS",
+      "tool_owns_continuity": false,
+      "human_operator_authority": "required_for_execution",
+      "type": "ai_model_client",
+      "provider": "openai",
+      "auth": {
+        "mode": "environment_or_secret_reference",
+        "secret_value_stored": false,
+        "auth_ref": "OPENAI_API_KEY"
+      },
+      "routing": {
+        "entry": "AENET",
+        "aenet_route": "LAYERS/AENET/CAPABILITIES/chatgpt",
+        "gcr_zone": [
+          "DOOR",
+          "PEEP_HOLE"
+        ],
+        "execution_scope": [
+          "reasoning",
+          "drafting",
+          "code_assist",
+          "analysis"
+        ],
+        "chain": [
+          "External Capability",
+          "Authentication Layer",
+          "AENET Route Assignment",
+          "GCR Boundary Resolution",
+          "Execution Scope",
+          "Validator Chain",
+          "Memory/Anchor Persistence",
+          "Corp-O Record"
+        ]
+      },
+      "memory": {
+        "policy": "write summaries and anchors only; no hidden memory authority",
+        "writes_to": [
+          "DATA/MEMORY/CAPABILITIES/chatgpt/registry.json",
+          "DATA/MEMORY/CAPABILITIES/chatgpt/state.json",
+          "DATA/MEMORY/ANCHORS/<timestamp>.json"
+        ],
+        "raw_logs_to": "LOGS/CAPABILITIES/chatgpt/"
+      },
+      "validation": {
+        "validators": [
+          "json_syntax",
+          "route_integrity",
+          "no_secret_persistence"
+        ],
+        "pass_requires": [
+          "route exists",
+          "GCR scope declared",
+          "execution scope declared",
+          "no secret values stored",
+          "operator authority preserved"
+        ]
+      },
+      "audit": {
+        "corp_o_record_required": true,
+        "anchor_required": true,
+        "report_required": true
+      }
+    },
+    "codex": {
+      "id": "codex",
+      "name": "codex",
+      "registered_at_utc": "2026-05-07T13-46-23Z",
+      "status": "registered",
+      "doctrine": "Universal Adapter Doctrine",
+      "classification": "authenticated_routed_capability",
+      "continuity_owner": "AETHIEAOPSYS",
+      "tool_owns_continuity": false,
+      "human_operator_authority": "required_for_execution",
+      "type": "terminal_ai_agent",
+      "provider": "openai",
+      "auth": {
+        "mode": "environment_or_secret_reference",
+        "secret_value_stored": false,
+        "auth_ref": "OPENAI_API_KEY"
+      },
+      "routing": {
+        "entry": "AENET",
+        "aenet_route": "LAYERS/AENET/CAPABILITIES/codex",
+        "gcr_zone": [
+          "HABITAT",
+          "DOOR"
+        ],
+        "execution_scope": [
+          "code_editing",
+          "repo_analysis",
+          "terminal_assist"
+        ],
+        "chain": [
+          "External Capability",
+          "Authentication Layer",
+          "AENET Route Assignment",
+          "GCR Boundary Resolution",
+          "Execution Scope",
+          "Validator Chain",
+          "Memory/Anchor Persistence",
+          "Corp-O Record"
+        ]
+      },
+      "memory": {
+        "policy": "log commands, diffs, summaries, and anchors",
+        "writes_to": [
+          "DATA/MEMORY/CAPABILITIES/codex/registry.json",
+          "DATA/MEMORY/CAPABILITIES/codex/state.json",
+          "DATA/MEMORY/ANCHORS/<timestamp>.json"
+        ],
+        "raw_logs_to": "LOGS/CAPABILITIES/codex/"
+      },
+      "validation": {
+        "validators": [
+          "python_compile",
+          "json_syntax",
+          "route_integrity",
+          "human_approval_gate"
+        ],
+        "pass_requires": [
+          "route exists",
+          "GCR scope declared",
+          "execution scope declared",
+          "no secret values stored",
+          "operator authority preserved"
+        ]
+      },
+      "audit": {
+        "corp_o_record_required": true,
+        "anchor_required": true,
+        "report_required": true
+      }
+    },
+    "ollama": {
+      "id": "ollama",
+      "name": "ollama",
+      "registered_at_utc": "2026-05-07T13-46-26Z",
+      "status": "registered",
+      "doctrine": "Universal Adapter Doctrine",
+      "classification": "authenticated_routed_capability",
+      "continuity_owner": "AETHIEAOPSYS",
+      "tool_owns_continuity": false,
+      "human_operator_authority": "required_for_execution",
+      "type": "local_model_runtime",
+      "provider": "local",
+      "auth": {
+        "mode": "environment_or_secret_reference",
+        "secret_value_stored": false,
+        "auth_ref": null
+      },
+      "routing": {
+        "entry": "AENET",
+        "aenet_route": "LAYERS/AENET/CAPABILITIES/ollama",
+        "gcr_zone": [
+          "HABITAT",
+          "VAULT"
+        ],
+        "execution_scope": [
+          "local_inference",
+          "offline_reasoning"
+        ],
+        "chain": [
+          "External Capability",
+          "Authentication Layer",
+          "AENET Route Assignment",
+          "GCR Boundary Resolution",
+          "Execution Scope",
+          "Validator Chain",
+          "Memory/Anchor Persistence",
+          "Corp-O Record"
+        ]
+      },
+      "memory": {
+        "policy": "local-only unless explicitly exported",
+        "writes_to": [
+          "DATA/MEMORY/CAPABILITIES/ollama/registry.json",
+          "DATA/MEMORY/CAPABILITIES/ollama/state.json",
+          "DATA/MEMORY/ANCHORS/<timestamp>.json"
+        ],
+        "raw_logs_to": "LOGS/CAPABILITIES/ollama/"
+      },
+      "validation": {
+        "validators": [
+          "route_integrity",
+          "model_state_check"
+        ],
+        "pass_requires": [
+          "route exists",
+          "GCR scope declared",
+          "execution scope declared",
+          "no secret values stored",
+          "operator authority preserved"
+        ]
+      },
+      "audit": {
+        "corp_o_record_required": true,
+        "anchor_required": true,
+        "report_required": true
+      }
+    },
+    "n8n": {
+      "id": "n8n",
+      "name": "n8n",
+      "registered_at_utc": "2026-05-07T13-46-26Z",
+      "status": "registered",
+      "doctrine": "Universal Adapter Doctrine",
+      "classification": "authenticated_routed_capability",
+      "continuity_owner": "AETHIEAOPSYS",
+      "tool_owns_continuity": false,
+      "human_operator_authority": "required_for_execution",
+      "type": "automation_runtime",
+      "provider": "self_hosted_or_cloud",
+      "auth": {
+        "mode": "environment_or_secret_reference",
+        "secret_value_stored": false,
+        "auth_ref": "N8N_API_KEY"
+      },
+      "routing": {
+        "entry": "AENET",
+        "aenet_route": "LAYERS/AENET/CAPABILITIES/n8n",
+        "gcr_zone": [
+          "DOOR",
+          "HABITAT"
+        ],
+        "execution_scope": [
+          "workflow_automation",
+          "webhook_routing"
+        ],
+        "chain": [
+          "External Capability",
+          "Authentication Layer",
+          "AENET Route Assignment",
+          "GCR Boundary Resolution",
+          "Execution Scope",
+          "Validator Chain",
+          "Memory/Anchor Persistence",
+          "Corp-O Record"
+        ]
+      },
+      "memory": {
+        "policy": "log workflow id, input class, output class, and result anchor",
+        "writes_to": [
+          "DATA/MEMORY/CAPABILITIES/n8n/registry.json",
+          "DATA/MEMORY/CAPABILITIES/n8n/state.json",
+          "DATA/MEMORY/ANCHORS/<timestamp>.json"
+        ],
+        "raw_logs_to": "LOGS/CAPABILITIES/n8n/"
+      },
+      "validation": {
+        "validators": [
+          "webhook_scope_check",
+          "route_integrity",
+          "human_approval_gate"
+        ],
+        "pass_requires": [
+          "route exists",
+          "GCR scope declared",
+          "execution scope declared",
+          "no secret values stored",
+          "operator authority preserved"
+        ]
+      },
+      "audit": {
+        "corp_o_record_required": true,
+        "anchor_required": true,
+        "report_required": true
+      }
+    },
+    "runway": {
+      "id": "runway",
+      "name": "runway",
+      "registered_at_utc": "2026-05-07T13-46-26Z",
+      "status": "registered",
+      "doctrine": "Universal Adapter Doctrine",
+      "classification": "authenticated_routed_capability",
+      "continuity_owner": "AETHIEAOPSYS",
+      "tool_owns_continuity": false,
+      "human_operator_authority": "required_for_execution",
+      "type": "media_generation_api",
+      "provider": "runway",
+      "auth": {
+        "mode": "environment_or_secret_reference",
+        "secret_value_stored": false,
+        "auth_ref": "RUNWAY_API_KEY"
+      },
+      "routing": {
+        "entry": "AENET",
+        "aenet_route": "LAYERS/AENET/CAPABILITIES/runway",
+        "gcr_zone": [
+          "WINDOW",
+          "DOOR"
+        ],
+        "execution_scope": [
+          "video_generation",
+          "visual_asset_processing"
+        ],
+        "chain": [
+          "External Capability",
+          "Authentication Layer",
+          "AENET Route Assignment",
+          "GCR Boundary Resolution",
+          "Execution Scope",
+          "Validator Chain",
+          "Memory/Anchor Persistence",
+          "Corp-O Record"
+        ]
+      },
+      "memory": {
+        "policy": "store prompts, output metadata, asset references, and license notes",
+        "writes_to": [
+          "DATA/MEMORY/CAPABILITIES/runway/registry.json",
+          "DATA/MEMORY/CAPABILITIES/runway/state.json",
+          "DATA/MEMORY/ANCHORS/<timestamp>.json"
+        ],
+        "raw_logs_to": "LOGS/CAPABILITIES/runway/"
+      },
+      "validation": {
+        "validators": [
+          "asset_route_check",
+          "metadata_check",
+          "no_secret_persistence"
+        ],
+        "pass_requires": [
+          "route exists",
+          "GCR scope declared",
+          "execution scope declared",
+          "no secret values stored",
+          "operator authority preserved"
+        ]
+      },
+      "audit": {
+        "corp_o_record_required": true,
+        "anchor_required": true,
+        "report_required": true
+      }
+    },
+    "huggingface": {
+      "id": "huggingface",
+      "name": "huggingface",
+      "registered_at_utc": "2026-05-07T13-46-27Z",
+      "status": "registered",
+      "doctrine": "Universal Adapter Doctrine",
+      "classification": "authenticated_routed_capability",
+      "continuity_owner": "AETHIEAOPSYS",
+      "tool_owns_continuity": false,
+      "human_operator_authority": "required_for_execution",
+      "type": "model_hub_api",
+      "provider": "huggingface",
+      "auth": {
+        "mode": "environment_or_secret_reference",
+        "secret_value_stored": false,
+        "auth_ref": "HF_TOKEN"
+      },
+      "routing": {
+        "entry": "AENET",
+        "aenet_route": "LAYERS/AENET/CAPABILITIES/huggingface",
+        "gcr_zone": [
+          "HABITAT",
+          "DOOR"
+        ],
+        "execution_scope": [
+          "model_download",
+          "inference",
+          "dataset_reference"
+        ],
+        "chain": [
+          "External Capability",
+          "Authentication Layer",
+          "AENET Route Assignment",
+          "GCR Boundary Resolution",
+          "Execution Scope",
+          "Validator Chain",
+          "Memory/Anchor Persistence",
+          "Corp-O Record"
+        ]
+      },
+      "memory": {
+        "policy": "store model refs, hashes, and source metadata",
+        "writes_to": [
+          "DATA/MEMORY/CAPABILITIES/huggingface/registry.json",
+          "DATA/MEMORY/CAPABILITIES/huggingface/state.json",
+          "DATA/MEMORY/ANCHORS/<timestamp>.json"
+        ],
+        "raw_logs_to": "LOGS/CAPABILITIES/huggingface/"
+      },
+      "validation": {
+        "validators": [
+          "model_ref_check",
+          "hash_check",
+          "route_integrity"
+        ],
+        "pass_requires": [
+          "route exists",
+          "GCR scope declared",
+          "execution scope declared",
+          "no secret values stored",
+          "operator authority preserved"
+        ]
+      },
+      "audit": {
+        "corp_o_record_required": true,
+        "anchor_required": true,
+        "report_required": true
+      }
+    }
+  }
+}

@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+if [ -f /mnt/h/AETHIEAOPSYS/ENV/SHELL/aethiea_env.sh ]; then
+  # shellcheck source=/mnt/h/AETHIEAOPSYS/ENV/SHELL/aethiea_env.sh
+  . /mnt/h/AETHIEAOPSYS/ENV/SHELL/aethiea_env.sh
+else
+  export AETHIEA="${AETHIEA:-/mnt/h/AETHIEAOPSYS}"
+  export AETH_ROOT="${AETH_ROOT:-$AETHIEA}"
+  export AETHIEA_MODE="${AETHIEA_MODE:-USB_NATIVE_ROUTED}"
+  export AETHIEA_SURFACE="${AETHIEA_SURFACE:-$(hostname)}"
+fi
+
+cd "$AETHIEA" || exit 1
+
+echo "AETHIEA UP"
+echo "HOST    -> $(hostname)"
+echo "SURFACE -> $AETHIEA_SURFACE"
+echo "MODE    -> $AETHIEA_MODE"
+echo "ROOT    -> $AETHIEA"
+
+test -f .aeth_root && echo "ROOT OK -> .aeth_root"
+
+if [ -f ENV/SURFACES/register_surface.sh ]; then
+  bash ENV/SURFACES/register_surface.sh "$AETHIEA_SURFACE" "USB_NATIVE_ROUTED" "$AETHIEA" || true
+fi
+
+aeusb-route-check || true
+aeth status || true

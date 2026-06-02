@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="${AETH_ROOT:-/mnt/h/AETHIEAOPSYS}"
+if [ -f "$ROOT/ENV/SHELL/aethiea_env.sh" ]; then
+  # shellcheck source=/mnt/h/AETHIEAOPSYS/ENV/SHELL/aethiea_env.sh
+  . "$ROOT/ENV/SHELL/aethiea_env.sh"
+fi
+
+export WRANGLER_HOME="${WRANGLER_HOME:-$ROOT/.wrangler}"
+export CLOUDFLARE_ACCOUNT_ID="${CLOUDFLARE_ACCOUNT_ID:-062cfb070858f437afa2591f462e9cda}"
+
+WORKER_DIR="$ROOT/LAYERS/AENET/CLOUDFLARE/WORKERS/aethernet"
+TUNNEL_RUNNER="$ROOT/TOOLIO/cloudflared/run-aethernet"
+TUNNEL_LOG="$ROOT/LOGS/cloudflared/AETHERNet.log"
+TUNNEL_PID="$ROOT/RUN/cloudflared/AETHERNet.pid"
+
+case "${1:-status}" in
+  status)
+    echo "cloudflared -> $(command -v cloudflared || true)"
+    cloudflared --version 2>/dev/null || true
+    echo "wrangler    -> $(command -v wrangler || true)"
+    wrangler --version 2>/dev/null || true
+    echo "worker_dir  -> $WORKER_DIR"
+    if pgrep -f "cloudflared.*AETHERNet.token" >/dev/null 2>&1; then
+      echo "AETHERNet   -> RUNNING"
+    else
+      echo "AETHERNet   -> STOPPED"
+    fi
+    ;;
+  start)
+    mkdir -p "$(dirname "$TUNNEL_LOG")"
+    nohup "$TUNNEL_RUNNER" > "$TUNNEL_LOG" 2>&1 &
+    echo "AETHERNet started -> $!"
+    ;;
+  stop)
+    if [ -s "$TUNNEL_PID" ]; then
+      kill "$(cat "$TUNNEL_PID")" 2>/dev/null || true
+    fi
+    pkill -f "cloudflared.*AETHERNet.token" 2>/dev/null || true
+    echo "AETHERNet stopped"
+    ;;
+  logs)
+    tail -n "${2:-80}" "$TUNNEL_LOG" 2>/dev/null || true
+    ;;
+  info)
+    exec cloudflared tunnel info AETHERNet
+    ;;
+  worker)
+    shift
+    cd "$WORKER_DIR"
+    exec wrangler "$@"
+    ;;
+  tunnel)
+    shift
+    exec cloudflared "$@"
+    ;;
+  *)
+    echo "usage: cloudflare-ae [status|start|stop|logs [n]|info|worker <wrangler args...>|tunnel <cloudflared args...>]" >&2
+    exit 2
+    ;;
+esac

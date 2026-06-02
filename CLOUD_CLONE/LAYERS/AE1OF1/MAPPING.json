@@ -1,0 +1,13 @@
+{
+  "layer": "AE1OF1",
+  "role": "HUD / operator interface",
+  "function": [
+    "display system state",
+    "translate system status",
+    "surface operator readouts",
+    "support interface clarity"
+  ],
+  "execution_support": true,
+  "endpoint_required": true,
+  "execution_authority": "operator_gated"
+}

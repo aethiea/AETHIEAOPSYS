@@ -1,0 +1,23 @@
+RUNPOD ROUTE
+
+Role:
+Elastic cloud GPU / AI compute chamber for AETHIEAOPSYS.
+
+Authority:
+AEUSB remains continuity authority.
+RunPod provides rented execution surface only.
+
+Use:
+- GPU pods for containerized heavy workloads
+- Serverless endpoints for burst inference
+- Public endpoints for pre-deployed models
+- Flash/local-to-remote functions where useful
+
+Storage relation:
+AE320GB holds local heavy body, models, mirrors, builds, and cache.
+RunPod holds temporary or rented cloud execution state unless deliberately mirrored.
+
+Rule:
+No cloud provider becomes the body.
+No runtime surface becomes authority.
+Corp-O receipts all meaningful execution.

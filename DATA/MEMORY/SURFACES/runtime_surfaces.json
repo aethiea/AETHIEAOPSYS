@@ -1,0 +1,16 @@
+{
+  "runtime": "AETHIEAOPSYS",
+  "runtime_root": "/mnt/e/AETHIEAOPSYS",
+  "mode": "USB",
+  "surfaces": {
+    "LOLITA": {
+      "type": "canonical_interface_surface",
+      "relationship": "renders_runtime"
+    },
+    "OLIVIA": {
+      "type": "canonical_interface_surface",
+      "relationship": "renders_runtime"
+    }
+  },
+  "law": "Hosts provide execution only. Continuity belongs to AETHIEAOPSYS."
+}

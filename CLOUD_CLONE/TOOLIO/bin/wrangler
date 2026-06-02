@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="${AETH_ROOT:-/mnt/h/AETHIEAOPSYS}"
+if [ -f "$ROOT/ENV/SHELL/aethiea_env.sh" ]; then
+  # shellcheck source=/mnt/h/AETHIEAOPSYS/ENV/SHELL/aethiea_env.sh
+  . "$ROOT/ENV/SHELL/aethiea_env.sh"
+fi
+
+export WRANGLER_HOME="${WRANGLER_HOME:-$ROOT/.wrangler}"
+export NPM_CONFIG_CACHE="${NPM_CONFIG_CACHE:-$ROOT/ENV/RUNTIME/npm-cache}"
+export CLOUDFLARE_ACCOUNT_ID="${CLOUDFLARE_ACCOUNT_ID:-062cfb070858f437afa2591f462e9cda}"
+
+WRANGLER_CLI="$ROOT/ENV/RUNTIME/npm-global/node_modules/wrangler/wrangler-dist/cli.js"
+if [ ! -f "$WRANGLER_CLI" ]; then
+  echo "wrangler USB install missing: $WRANGLER_CLI" >&2
+  exit 127
+fi
+
+exec node "$WRANGLER_CLI" "$@"

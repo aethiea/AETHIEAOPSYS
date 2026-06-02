@@ -1,0 +1,9 @@
+name = "aethernet"
+main = "src/index.js"
+compatibility_date = "2026-05-15"
+
+[vars]
+AENET_NAME = "AENET_EDGE"
+
+[ai]
+binding = "AI"

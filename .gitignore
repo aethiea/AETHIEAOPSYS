@@ -1,0 +1,186 @@
+# AETHIEAOPSYS Git Boundary
+
+# Secrets / credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*_ed25519
+*_rsa
+id_ed25519*
+id_rsa*
+.ssh/
+secrets/
+credentials/
+tokens/
+*.token
+.netrc
+
+# Platform auth / local cloud cache
+.wrangler/
+.cloudflare/
+.hcloud/
+*wrangler-account*
+*HF_TOKEN*
+*HCLOUD_TOKEN*
+*CLOUDFLARE_API_TOKEN*
+*RUNPOD_API_KEY*
+*OPENAI_API_KEY*
+*GITHUB_TOKEN*
+*GITLAB_TOKEN*
+
+# Private corpus / custody / raw memory
+DATA/MEMORY/CUSTODY/
+DATA/MEMORY/PRIVATE/
+DATA/MEMORY/RAW/
+DATA/VAULT/
+GCR/VAULT/
+REJECTED/
+LOGS/AUDIT/
+
+# Cloud clone raw memory flood
+CLOUD_CLONE/DATA/MEMORY/ANCHORS/
+CLOUD_CLONE/DATA/MEMORY/CUSTODY/
+CLOUD_CLONE/DATA/MEMORY/RAW/
+CLOUD_CLONE/DATA/MEMORY/PRIVATE/
+
+# Heavy/runtime lanes
+MODELS/
+HEAVY/
+CACHE/
+APT/cache/
+APT/packages/
+APT/IMAGES/
+*.ext4
+*.gguf
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.onnx
+*.ckpt
+*.zip
+*.tar
+*.tar.gz
+*.7z
+*.iso
+*.img
+*.vhd
+*.vhdx
+
+# Build/runtime residue
+node_modules/
+__pycache__/
+*.pyc
+dist/
+build/
+.cache/
+tmp/
+temp/
+*.log
+*.pid
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# Broken repair residue
+TEMP/REPAIRS/
+
+# Runtime package/cache bodies
+ENV/RUNTIME/npm-cache/
+ENV/RUNTIME/npm-global/node_modules/
+ENV/RUNTIME/npm-global/package-lock.json
+ENV/RUNTIME/npm-global/package.json
+
+# Runtime logs and generated logs
+LOGS/
+*.log
+
+# Cloudflare local auth/cache/token material
+**/.wrangler/
+**/wrangler-account.json
+TOOLIO/cloudflared/*.token
+TOOLIO/cloudflared/*.yml
+
+# Model/cache bodies
+MODELS/huggingface/cache/
+MODELS/huggingface/downloads/
+MODELS/llama.cpp/
+*.gguf
+
+# Temporary / partial installs / repair residue
+TEMP/
+*.partial.*
+*.broken.*
+*.bak.*
+
+# Pipeline generated process/output/log/archive material
+EXECUTION/PIPELINES/*/LOGS/
+EXECUTION/PIPELINES/*/LOGS_ARCHIVE_*/
+EXECUTION/PIPELINES/*/OUTPUT/
+EXECUTION/PIPELINES/*/PROCESS/
+EXECUTION/PIPELINES/*/REJECTED_ARCHIVE_*/
+EXECUTION/PIPELINE_ARCHIVE/
+EXECUTION/REPORTS/
+EXECUTION/RUNTIME/
+
+# Audit / custody / raw proof lanes stay Corpus-side
+DATA/MEMORY/CUSTODY/
+CLOUD_CLONE/DATA/MEMORY/ANCHORS/
+CLOUD_CLONE/DATA/MEMORY/CUSTODY/
+LOGS/AUDIT/
+REJECTED/
+
+# Generated memory/state surfaces
+CLOUD_CLONE/DATA/MEMORY/SNAPSHOTS/
+CLOUD_CLONE/DATA/MEMORY/STATE/
+CLOUD_CLONE/DATA/MEMORY/SESSIONS/
+
+# Keep these Cloud Clone route maps trackable:
+# CLOUD_CLONE/DATA/MEMORY/ROUTES/
+# CLOUD_CLONE/DATA/MEMORY/HOSTS/
+# CLOUD_CLONE/DATA/MEMORY/NODES/
+
+# Cloud Clone generated pipeline state
+CLOUD_CLONE/EXECUTION/PIPELINES/*/OUTPUT/
+CLOUD_CLONE/EXECUTION/PIPELINES/*/PROCESS/
+CLOUD_CLONE/EXECUTION/PIPELINES/*/REJECTED_ARCHIVE_*/
+CLOUD_CLONE/EXECUTION/PIPELINE_ARCHIVE/
+CLOUD_CLONE/DOMAINS/*/*/OUTPUT/
+CLOUD_CLONE/DOMAINS/*/*/PROCESS/
+CLOUD_CLONE/DOMAINS/*/*/REJECTED_ARCHIVE_*/
+
+# Root DATA generated memory / proof flood
+DATA/MEMORY/ANCHORS/
+DATA/MEMORY/SNAPSHOTS/
+DATA/MEMORY/STATE/
+DATA/MEMORY/SESSIONS/
+DATA/CONTINUITY_CONSOLIDATED/
+DATA/CORP-O/
+DATA/HERMES/auth.lock
+
+# Root domain generated outputs
+DOMAINS/*/*/OUTPUT/
+DOMAINS/*/*/PROCESS/
+DOMAINS/*/*/REJECTED_ARCHIVE_*/
+
+# FINAL ROOT DATA EXCLUSION — DO NOT PUSH CORPUS FLOOD
+DATA/MEMORY/ANCHORS/
+DATA/MEMORY/SNAPSHOTS/
+DATA/MEMORY/STATE/
+DATA/MEMORY/SESSIONS/
+DATA/CONTINUITY_CONSOLIDATED/
+DATA/CORP-O/
+DATA/HERMES/auth.lock
+
+# ROOT DOMAIN GENERATED OUTPUTS
+DOMAINS/*/*/OUTPUT/
+DOMAINS/*/*/PROCESS/
+DOMAINS/*/*/REJECTED_ARCHIVE_*/

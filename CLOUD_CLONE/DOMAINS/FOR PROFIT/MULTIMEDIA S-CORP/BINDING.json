@@ -1,0 +1,36 @@
+{
+  "entity": "MULTIMEDIA S-CORP",
+  "domain": "FOR PROFIT",
+  "gcr_zone": [
+    "DOOR",
+    "WINDOW"
+  ],
+  "layer_path": [
+    "UAER",
+    "AAE",
+    "AENET"
+  ],
+  "bae_binding": [
+    "015",
+    "016",
+    "004",
+    "005"
+  ],
+  "execution_targets": [
+    "PIPELINES",
+    "OUTPUT",
+    "EXPORTS"
+  ],
+  "allowed_actions": [
+    "content routing",
+    "media production",
+    "distribution preparation",
+    "metadata staging"
+  ],
+  "not_allowed": [
+    "commingled nonprofit revenue",
+    "private trust exposure"
+  ],
+  "execution_hook": "EXECUTION/PIPELINES/MULTIMEDIA/run.sh",
+  "execution_mode": "manual_operator_gated"
+}

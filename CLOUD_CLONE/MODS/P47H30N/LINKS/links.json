@@ -1,0 +1,11 @@
+{
+  "schema": "X:O:FIT",
+  "system": "P47H30N",
+  "O": "Node relationship and routing logic",
+  "rules": [
+    "Nodes remain distinct",
+    "Links coordinate without merging authority",
+    "Routes preserve lane separation"
+  ],
+  "timestamp_utc": "20260503T011617Z"
+}

@@ -1,0 +1,22 @@
+{
+  "entry": "AENET",
+  "aenet_route": "LAYERS/AENET/CAPABILITIES/ollama",
+  "gcr_zone": [
+    "HABITAT",
+    "VAULT"
+  ],
+  "execution_scope": [
+    "local_inference",
+    "offline_reasoning"
+  ],
+  "chain": [
+    "External Capability",
+    "Authentication Layer",
+    "AENET Route Assignment",
+    "GCR Boundary Resolution",
+    "Execution Scope",
+    "Validator Chain",
+    "Memory/Anchor Persistence",
+    "Corp-O Record"
+  ]
+}

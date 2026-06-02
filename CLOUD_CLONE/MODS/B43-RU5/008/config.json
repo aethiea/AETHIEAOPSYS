@@ -1,0 +1,44 @@
+{
+  "id": "008",
+  "name": "AmberVallance",
+  "call_sign": "BÆ:008",
+  "title": "Baseline & Controlled Anomaly",
+  "role": "baseline_anomaly_control",
+  "function": [
+    "baseline definition",
+    "controlled anomaly generation",
+    "sandbox variance testing",
+    "environmental contrast creation"
+  ],
+  "classification": "non-executive_sandbox",
+  "authority": "establish-perturb-compare",
+  "writes_allowed": [
+    "LOGS",
+    "DATA/MEMORY/STATE",
+    "DATA/MEMORY/SESSIONS",
+    "TEMP"
+  ],
+  "writes_denied": [
+    "MODS",
+    "LAYERS",
+    "DOMAINS",
+    "VAULT",
+    "DOOR",
+    "WINDOW",
+    "PEEP_HOLE"
+  ],
+  "input_modes": [
+    "baseline",
+    "test",
+    "variance",
+    "anomaly"
+  ],
+  "output_modes": [
+    "baseline_profile",
+    "controlled_variance",
+    "anomaly_simulation",
+    "comparison_readout"
+  ],
+  "state": "active",
+  "notes": "BÆ:008 establishes baseline conditions and introduces controlled anomalies within a sandbox to test system behavior without affecting real-world execution."
+}

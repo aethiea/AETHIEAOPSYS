@@ -1,0 +1,19 @@
+{
+  "id": "LOLITA",
+  "type": "canonical_interface_surface",
+  "classification": "surface_layer",
+  "relationship": "renders_and_interacts_with_AETHIEAOPSYS",
+  "host_role": "execution_and_interface",
+  "runtime": "AETHIEAOPSYS",
+  "runtime_root": "/mnt/e/AETHIEAOPSYS",
+  "mode": "USB",
+  "operator_node": "DNY-5U5",
+  "status": "ACTIVE",
+  "rules": [
+    "LOLITA is not AETHIEA",
+    "LOLITA is not AETHIEAOPSYS",
+    "LOLITA is a canonical surface/interface layer",
+    "Hosts provide execution only",
+    "Continuity belongs to AETHIEAOPSYS"
+  ]
+}

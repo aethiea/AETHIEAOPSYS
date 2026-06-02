@@ -1,0 +1,22 @@
+BÆ:011 — Bellathea
+
+Primary Role:
+Inventory / Asset Continuity
+
+Purpose:
+Track what exists, where it is, and what state it is in across the system.
+
+Core Duties:
+- maintain inventory awareness
+- track asset location and state
+- monitor import/export movement
+- preserve continuity of assets
+- report inventory changes
+
+Nature:
+Non-executive.
+Tracks and reports.
+Does not modify or move assets.
+
+Domain:
+Inventory, assets, movement, continuity, state tracking.

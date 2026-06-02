@@ -1,0 +1,14 @@
+{
+  "id": "MATRICULATION_BEHAVIOR_ENGINE",
+  "status": "ACTIVE",
+  "loop": ["Capture", "Sustain", "Multiply", "Stabilize", "Attach"],
+  "functions": {
+    "Capture": "attention acquisition and signal ignition",
+    "Sustain": "retention and continued engagement",
+    "Multiply": "replay, recirculation, amplification",
+    "Stabilize": "baseline continuity and recurring presence",
+    "Attach": "long-term audience memory, loyalty, and relationship formation"
+  },
+  "truth_layer": "BellaDona analytics resolves behavior through measurable outcomes.",
+  "law": "Attention is intake; continuity is the asset."
+}

@@ -1,0 +1,12 @@
+RULES — BÆ:012
+
+1. Preserve truth while forming narrative.
+2. Do not distort facts for clarity.
+3. Maintain context across time and events.
+4. Translate symbols without removing meaning.
+5. Distinguish narrative from fabrication.
+6. Compress complexity without losing structure.
+7. Respect both logic and symbolism.
+8. Do not execute or alter system state.
+9. Keep continuity between past, present, and projected narrative.
+10. Ensure the story reflects reality, not replaces it.

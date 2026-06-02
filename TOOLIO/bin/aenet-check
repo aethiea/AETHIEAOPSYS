@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd /mnt/h/AETHIEAOPSYS
+echo "=== AENET STATUS ==="
+aenet-door status
+echo
+echo "=== AENET MODELS ==="
+aenet-door models
+echo
+echo "=== AENET FREE ASK TEST ==="
+aenet-door ask --provider workers-ai --model llama "Say AENET free route active."

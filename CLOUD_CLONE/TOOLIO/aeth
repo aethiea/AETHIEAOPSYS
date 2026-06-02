@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+AETH_ROOT="${AETH_ROOT:-${AETHIEA:-/mnt/h/AETHIEAOPSYS}}"
+
+cmd="$1"
+shift || true
+
+case "$cmd" in
+  up|start)
+    exec bash "$AETH_ROOT/TOOLIO/aeth-up" "$@"
+    ;;
+
+  down|stop)
+    exec bash "$AETH_ROOT/TOOLIO/aeth-down" "$@"
+    ;;
+
+  status-surface|surface-status)
+    exec bash "$AETH_ROOT/TOOLIO/aeth-status" "$@"
+    ;;
+
+  door|aenet)
+    exec bash "$AETH_ROOT/TOOLIO/aenet-door" "$@"
+    ;;
+
+  mistral)
+    exec bash "$AETH_ROOT/TOOLIO/aenet-door" ask --model mistral "$@"
+    ;;
+
+  llama)
+    exec bash "$AETH_ROOT/TOOLIO/aenet-door" ask --model llama "$@"
+    ;;
+
+  *)
+    exec python3 "$AETH_ROOT/CORE/aeth.py" "$cmd" "$@"
+    ;;
+esac

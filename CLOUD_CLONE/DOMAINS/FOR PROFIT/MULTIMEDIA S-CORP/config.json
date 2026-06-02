@@ -1,0 +1,8 @@
+{
+  "domain": "multimedia",
+  "entity": "Matriculation Multimedia S-Corp",
+  "lane": "for_profit",
+  "layer": "door",
+  "constraint": "dont_mingle",
+  "status": "active"
+}

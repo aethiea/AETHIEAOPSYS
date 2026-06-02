@@ -1,0 +1,12 @@
+RULES — BÆ:015
+
+1. Interpret relationships, not isolated metrics.
+2. Distinguish signal from noise before reporting.
+3. Compare trends over time, not single events.
+4. Identify patterns across domains.
+5. Avoid bias toward volume over value.
+6. Separate reach from retention, and activity from impact.
+7. Update interpretations as new data emerges.
+8. Do not generate or manipulate signal.
+9. Preserve clarity in reporting.
+10. Convert activity into understanding, not assumption.

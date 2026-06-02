@@ -1,0 +1,11 @@
+{
+  "role": "ecclesiastical / nonprofit",
+  "gcr_zone": ["VAULT", "DOOR"],
+  "allowed": [
+    "contract services from FOR_PROFIT entities"
+  ],
+  "not_allowed": [
+    "direct profit distribution",
+    "commingled revenue with FOR_PROFIT"
+  ]
+}

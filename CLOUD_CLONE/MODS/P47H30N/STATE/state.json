@@ -1,0 +1,8 @@
+{
+  "schema": "X:O:FIT",
+  "system": "P47H30N",
+  "X": "Pantheon node-state layer",
+  "status": "active",
+  "nodes_path": "NODES",
+  "timestamp_utc": "20260503T011617Z"
+}

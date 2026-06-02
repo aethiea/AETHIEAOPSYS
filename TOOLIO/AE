@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+AETH_ROOT="${AETH_ROOT:-/mnt/e/AETHIEAOPSYS}"
+RESOLVER="$AETH_ROOT/ENV/RUNTIME/runtime_resolver.sh"
+
+cmd="$1"
+shift
+
+case "$cmd" in
+    ask)
+        exec "$RESOLVER" "$AETH_ROOT/TOOLIO/aeth_ask" "$@"
+        ;;
+    *)
+        exec "$RESOLVER" "$AETH_ROOT/CORE/aeth.py" "$cmd" "$@"
+        ;;
+esac

@@ -1,0 +1,13 @@
+{
+  "layer": "AAE",
+  "role": "analogy engine / cross-domain mapping",
+  "function": [
+    "map analogies",
+    "compare structures",
+    "translate across domains",
+    "identify reusable patterns"
+  ],
+  "execution_support": true,
+  "endpoint_required": true,
+  "execution_authority": "operator_gated"
+}

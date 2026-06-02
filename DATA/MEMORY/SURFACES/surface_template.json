@@ -1,0 +1,9 @@
+{
+  "type": "canonical_interface_surface",
+  "classification": "surface_layer",
+  "relationship": "renders_and_interacts_with_AETHIEAOPSYS",
+  "host_role": "execution_and_interface",
+  "runtime": "AETHIEAOPSYS",
+  "operator_node": "DNY-5U5",
+  "law": "Hosts provide execution only. Continuity belongs to AETHIEAOPSYS."
+}

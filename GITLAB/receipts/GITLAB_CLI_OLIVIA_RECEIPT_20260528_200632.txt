@@ -1,0 +1,21 @@
+GITLAB CLI OLIVIA RECEIPT
+=========================
+DATE: Thu May 28 20:06:33 EDT 2026
+HOST: Olivia
+USER: d_ny5u5
+
+CLI:
+  glab
+
+VERSION:
+  glab 1.100.0 (e345ca6)
+
+PORTABLE LANE:
+  /mnt/h/AETHIEAOPSYS/GITLAB
+
+LOCAL POINTER:
+  /opt/AETHIEAOPSYS/INFRASTRUCTURE/GITLAB/AETHIEA128G
+
+CLASSIFICATION:
+  GitLab CLI execution surface on Olivia.
+  AETHIEA128G carries GitLab corpus, receipts, configs, repo mirrors, and continuity evidence.

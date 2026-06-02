@@ -1,0 +1,12 @@
+RULES — BÆ:016
+
+1. Deploy only when authorized.
+2. Maintain a single chain of authority.
+3. Assemble components in correct sequence.
+4. Preserve system coherence during deployment.
+5. Do not override compliance or containment nodes.
+6. Respect Vault boundaries at all times.
+7. Separate configuration from execution clearly.
+8. Log deployment actions meaningfully.
+9. Avoid partial or unstable deployments.
+10. Ensure system integrity before and after deployment.

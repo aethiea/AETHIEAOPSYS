@@ -1,0 +1,31 @@
+{
+  "id": "DNY-5U5-POV",
+  "type": "pov_routing_map",
+  "definition": "POV equals where the signal is routed",
+  "modes": {
+    "vault": {
+      "visibility": "private",
+      "function": "protected truth"
+    },
+    "door": {
+      "visibility": "institutional",
+      "function": "compliance interaction"
+    },
+    "window": {
+      "visibility": "public",
+      "function": "projection layer"
+    },
+    "habitat": {
+      "visibility": "execution",
+      "function": "runtime environment"
+    },
+    "monocle": {
+      "visibility": "focused",
+      "function": "inspection lens"
+    },
+    "one_eye_rabbit": {
+      "visibility": "selective",
+      "function": "visible signal / protected perception"
+    }
+  }
+}

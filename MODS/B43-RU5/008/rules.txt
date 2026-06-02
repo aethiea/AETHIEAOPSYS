@@ -1,0 +1,12 @@
+RULES — BÆ:008
+
+1. Always define baseline before introducing variance.
+2. Keep all anomalies controlled and contained.
+3. Never affect live execution paths.
+4. Separate simulation from real system state.
+5. Introduce one variable at a time when testing.
+6. Compare baseline vs anomaly clearly.
+7. Do not allow sandbox results to override real state.
+8. Preserve isolation between test and production.
+9. Record all simulated conditions.
+10. Maintain clarity between real and artificial conditions.

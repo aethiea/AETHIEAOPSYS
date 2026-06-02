@@ -1,0 +1,23 @@
+{
+  "surface": "RUBIII",
+  "operator": "d_ny5u5",
+  "mode": "USB_CONTINUITY",
+  "root_body": "/mnt/h/AETHIEAOPSYS",
+  "active_route": "/mnt/h/AETHIEAOPSYS -> /opt/AETHIEAOPSYS",
+  "lane": "APT",
+  "status": "MANIFEST_CAPTURED",
+  "manifests": [
+    "APT/manifests/rubiii_dpkg_manifest_20260522T064633Z.txt",
+    "APT/manifests/rubiii_manual_packages_20260522T064633Z.txt",
+    "APT/manifests/rubiii_apt_installed_20260522T064635Z.txt"
+  ],
+  "doctrine": [
+    "Host renders and executes",
+    "Host does not own",
+    "AEUSB carries rebuild intelligence",
+    "APT state is recorded as continuity ledger",
+    "Confirmed here, not confined here",
+    "#butnotlimitedTEWW"
+  ],
+  "timestamp_utc": "2026-05-22T06:46:00Z"
+}

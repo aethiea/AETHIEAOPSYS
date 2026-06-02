@@ -1,0 +1,31 @@
+{
+  "schema": "AETHIEA.guard.report.v1",
+  "snapshot": "DATA/MEMORY/SNAPSHOTS/GUARD/2026-05-07T00-43-00Z_snapshot.json",
+  "timestamp_utc": "2026-05-07T00-43-00Z",
+  "root": "/mnt/e/AETHIEAOPSYS",
+  "command": "echo SNAPSHOT_TEST",
+  "returncode": 0,
+  "status": "PASS",
+  "started_utc": "2026-05-07T00:43:00.252829+00:00",
+  "ended_utc": "2026-05-07T00:43:00.501461+00:00",
+  "stdout": "SNAPSHOT_TEST\n",
+  "stderr": "",
+  "runtime_duties": [
+    "execute",
+    "capture_stdout",
+    "capture_stderr",
+    "check_return_code",
+    "write_report",
+    "write_anchor",
+    "sync_cloud"
+  ],
+  "hashes": {
+    "report_sha256": "9a107a3a4a64710934307d47a7df42ac163961274ecd097a41f84e86dfa13715",
+    "log_sha256": "e3fc63f026bb21d3e9398ac6a6cd98b203217c86a6e176e42e6a65fe093aed3d",
+    "anchor_sha256": "891d7d7a17a29bfbe0ea7147cefcb46631f493aab76e781408f521bcbf31a100"
+  },
+  "cloud_sync": {
+    "status": "PASS",
+    "returncode": 0
+  }
+}

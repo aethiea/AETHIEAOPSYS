@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="${AETH_ROOT:-/mnt/h/AETHIEAOPSYS}"
+if [ -f "$ROOT/ENV/SHELL/aethiea_env.sh" ]; then
+  # shellcheck source=/mnt/h/AETHIEAOPSYS/ENV/SHELL/aethiea_env.sh
+  . "$ROOT/ENV/SHELL/aethiea_env.sh"
+fi
+
+TOKEN_FILE="$ROOT/TOOLIO/cloudflared/AETHERNet.token"
+CONFIG_FILE="$ROOT/TOOLIO/cloudflared/AETHERNet.yml"
+LOG_DIR="$ROOT/LOGS/cloudflared"
+PID_FILE="$ROOT/RUN/cloudflared/AETHERNet.pid"
+
+if [ ! -s "$TOKEN_FILE" ]; then
+  echo "missing tunnel token file: $TOKEN_FILE" >&2
+  exit 1
+fi
+
+mkdir -p "$LOG_DIR" "$(dirname "$PID_FILE")"
+
+exec "$ROOT/TOOLIO/bin/cloudflared" \
+  --config "$CONFIG_FILE" \
+  --no-autoupdate \
+  --pidfile "$PID_FILE" \
+  --logfile "$LOG_DIR/AETHERNet.cloudflared.log" \
+  tunnel run \
+  --token-file "$TOKEN_FILE"

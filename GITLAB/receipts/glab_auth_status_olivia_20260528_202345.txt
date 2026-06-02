@@ -1,0 +1,7 @@
+gitlab.com
+  ✓ Logged in to gitlab.com as project_82660486_bot_f54def13ff10bbc5165418aa83dea259 (/home/d_ny5u5/snap/glab/5950/.config/glab-cli/config.yml)
+  ✓ Git operations for gitlab.com configured to use ssh protocol.
+  ✓ API calls for gitlab.com are made over https protocol.
+  ✓ REST API Endpoint: https://gitlab.com/api/v4/
+  ✓ GraphQL Endpoint: https://gitlab.com/api/graphql/
+  ✓ Token found: **************************

@@ -1,0 +1,13 @@
+{
+  "id": "DNY-5U5",
+  "name": "DNY-5U5",
+  "type": "operator_node",
+  "status": "LOCKED",
+  "person": "d_ny5u5",
+  "role": "Mecha / System Embodiment",
+  "system_binding": {
+    "uses": "AETHIEA",
+    "body": "AETHIEAOPSYS",
+    "host": "runtime only"
+  }
+}

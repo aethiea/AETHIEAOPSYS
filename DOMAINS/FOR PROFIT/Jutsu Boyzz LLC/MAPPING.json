@@ -1,0 +1,12 @@
+{
+  "role": "IT sector",
+  "gcr_zone": ["HABITAT", "DOOR"],
+  "allowed": [
+    "MULTIMEDIA S-CORP",
+    "SLove 1of1 Solutions & Consultation LLC"
+  ],
+  "not_allowed": [
+    "VAULT ownership control",
+    "direct financial routing"
+  ]
+}
