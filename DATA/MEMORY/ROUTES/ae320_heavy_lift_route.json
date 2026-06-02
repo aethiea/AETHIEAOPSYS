@@ -1,0 +1,10 @@
+{
+  "route": "AE320GB_HEAVY_LIFT",
+  "created_utc": "20260602T232610Z",
+  "authority_body": "/mnt/h/AETHIEAOPSYS",
+  "heavy_body": "/mnt/i/AETHIEAOPSYS",
+  "mount": "/mnt/i",
+  "role": "mass_cache_models_images_builds_mirrors_captures",
+  "invariant": "AEUSB defines structure; AE320 carries weight",
+  "component_heavy_root": "/mnt/i/AETHIEAOPSYS/HEAVY/TOOLIO"
+}

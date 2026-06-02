@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+AEUSB="/mnt/h/AETHIEAOPSYS"
+AE320="/mnt/i/AETHIEAOPSYS"
+
+echo "=== AETHIEA HEAVY ROUTE ==="
+echo "authority=$AEUSB"
+echo "heavy=$AE320"
+echo
+
+find "$AE320/HEAVY/TOOLIO" -maxdepth 3 -type d 2>/dev/null | sed "s#^$AE320#AE320#g" | sort || true

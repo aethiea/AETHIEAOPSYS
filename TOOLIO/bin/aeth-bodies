@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+AEUSB="/mnt/h/AETHIEAOPSYS"
+AE320="/mnt/i/AETHIEAOPSYS"
+
+echo "=== AETHIEA BODY MAP ==="
+
+if [ -f "$AEUSB/.aeth_root" ]; then
+  echo "AEUSB AUTHORITY: OK -> $AEUSB"
+else
+  echo "AEUSB AUTHORITY: MISSING -> $AEUSB"
+fi
+
+if [ -f "$AE320/.aeth_heavy_body" ] || [ -f "$AE320/AE320GB_HEAVY_BODY" ]; then
+  echo "AE320 HEAVY: OK -> $AE320"
+else
+  echo "AE320 HEAVY: MISSING -> $AE320"
+fi
+
+echo
+echo "=== MOUNTS ==="
+df -h /mnt/h /mnt/i 2>/dev/null || true
+
+echo
+echo "=== ROUTES ==="
+[ -f "$AEUSB/ROUTES/AE320GB.route" ] && cat "$AEUSB/ROUTES/AE320GB.route" || true
