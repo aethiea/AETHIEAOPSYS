@@ -1,0 +1,9 @@
+{
+  "component": "AEDUCK",
+  "route": "AEUSB->PICO_HID",
+  "authority": "/mnt/h/AETHIEAOPSYS",
+  "heavy": "/mnt/i/AETHIEAOPSYS/HEAVY/TOOLIO/HID/AEDUCK",
+  "payload_authority": "TOOLIO/HID/AEDUCK/payloads",
+  "receipt_path": "TOOLIO/HID/AEDUCK/receipts",
+  "created_utc": "20260602T232610Z"
+}

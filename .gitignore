@@ -187,3 +187,24 @@ DOMAINS/*/*/REJECTED_ARCHIVE_*/
 
 # WSL-native autosync runner lives in ~/.aethiea_git/bin, not AEUSB
 TOOLIO/bin/aegit-autosync
+
+# AETHIEA component heavy bodies stay off Git
+HEAVY/
+TOOLIO/HID/*/builds/
+TOOLIO/HID/*/exports/
+TOOLIO/HID/*/logs/
+TOOLIO/HID/*/firmware_cache/
+TOOLIO/HID/*/images/
+TOOLIO/HID/*/sdcard_backups/
+
+# Device images / firmware / captures / lab exports
+*.uf2
+*.img
+*.iso
+*.pcap
+*.pcapng
+*.cap
+*.wav
+*.iq
+*.bin
+*.raw

@@ -1,0 +1,18 @@
+{
+  "registry": "AETHIEA_TOOL_COMPONENT_REGISTRY",
+  "created_utc": "20260602T232610Z",
+  "authority_root": "/mnt/h/AETHIEAOPSYS",
+  "heavy_root": "/mnt/i/AETHIEAOPSYS/HEAVY/TOOLIO",
+  "rule": "Tools install into AETHIEAOPSYS; tools do not become separate bodies.",
+  "classes": {
+    "HID": ["AEDUCK", "AEBUNNY"],
+    "RF": [],
+    "WIFI": [],
+    "LLM": [],
+    "CLOUD": [],
+    "AUTOMATION": [],
+    "IDENTITY": [],
+    "FORENSICS": [],
+    "DEV": []
+  }
+}

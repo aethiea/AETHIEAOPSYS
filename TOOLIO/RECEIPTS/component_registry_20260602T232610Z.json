@@ -1,0 +1,8 @@
+{
+  "receipt": "component_registry_initialized",
+  "created_utc": "20260602T232610Z",
+  "authority_root": "/mnt/h/AETHIEAOPSYS",
+  "heavy_root": "/mnt/i/AETHIEAOPSYS",
+  "components": ["AEDUCK", "AEBUNNY"],
+  "commands": ["aeth-bodies", "aeth-heavy-route", "aeth-components"]
+}

@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+AEUSB="/mnt/h/AETHIEAOPSYS"
+
+echo "=== AETHIEA COMPONENTS ==="
+
+if [ -f "$AEUSB/TOOLIO/COMPONENTS/registry.json" ]; then
+  cat "$AEUSB/TOOLIO/COMPONENTS/registry.json"
+else
+  echo "No component registry found."
+fi
+
+echo
+echo "=== COMPONENT MANIFESTS ==="
+find "$AEUSB/TOOLIO" -path "*/manifest.json" -maxdepth 6 -type f 2>/dev/null | sort

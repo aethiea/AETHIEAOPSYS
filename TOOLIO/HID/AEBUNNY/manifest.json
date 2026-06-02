@@ -1,0 +1,23 @@
+{
+  "component": "AEBUNNY",
+  "class": "Pi Zero USB gadget appliance",
+  "created_utc": "20260602T232610Z",
+  "authority_root": "/mnt/h/AETHIEAOPSYS",
+  "heavy_root": "/mnt/i/AETHIEAOPSYS/HEAVY/TOOLIO/HID/AEBUNNY",
+  "aeusb_paths": {
+    "docs": "TOOLIO/HID/AEBUNNY/docs",
+    "payloads": "TOOLIO/HID/AEBUNNY/payloads",
+    "scripts": "TOOLIO/HID/AEBUNNY/scripts",
+    "manifests": "TOOLIO/HID/AEBUNNY/manifests",
+    "routes": "TOOLIO/HID/AEBUNNY/routes",
+    "receipts": "TOOLIO/HID/AEBUNNY/receipts"
+  },
+  "heavy_paths": {
+    "images": "/mnt/i/AETHIEAOPSYS/HEAVY/TOOLIO/HID/AEBUNNY/images",
+    "sdcard_backups": "/mnt/i/AETHIEAOPSYS/HEAVY/TOOLIO/HID/AEBUNNY/sdcard_backups",
+    "builds": "/mnt/i/AETHIEAOPSYS/HEAVY/TOOLIO/HID/AEBUNNY/builds",
+    "exports": "/mnt/i/AETHIEAOPSYS/HEAVY/TOOLIO/HID/AEBUNNY/exports",
+    "logs": "/mnt/i/AETHIEAOPSYS/HEAVY/TOOLIO/HID/AEBUNNY/logs"
+  },
+  "status": "component_registered"
+}

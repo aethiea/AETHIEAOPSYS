@@ -1,0 +1,22 @@
+{
+  "component": "AEDUCK",
+  "class": "Pico HID appliance",
+  "created_utc": "20260602T232610Z",
+  "authority_root": "/mnt/h/AETHIEAOPSYS",
+  "heavy_root": "/mnt/i/AETHIEAOPSYS/HEAVY/TOOLIO/HID/AEDUCK",
+  "aeusb_paths": {
+    "docs": "TOOLIO/HID/AEDUCK/docs",
+    "payloads": "TOOLIO/HID/AEDUCK/payloads",
+    "scripts": "TOOLIO/HID/AEDUCK/scripts",
+    "manifests": "TOOLIO/HID/AEDUCK/manifests",
+    "routes": "TOOLIO/HID/AEDUCK/routes",
+    "receipts": "TOOLIO/HID/AEDUCK/receipts"
+  },
+  "heavy_paths": {
+    "firmware_cache": "/mnt/i/AETHIEAOPSYS/HEAVY/TOOLIO/HID/AEDUCK/firmware_cache",
+    "builds": "/mnt/i/AETHIEAOPSYS/HEAVY/TOOLIO/HID/AEDUCK/builds",
+    "exports": "/mnt/i/AETHIEAOPSYS/HEAVY/TOOLIO/HID/AEDUCK/exports",
+    "logs": "/mnt/i/AETHIEAOPSYS/HEAVY/TOOLIO/HID/AEDUCK/logs"
+  },
+  "status": "component_registered"
+}

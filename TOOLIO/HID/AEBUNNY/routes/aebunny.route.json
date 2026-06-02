@@ -1,0 +1,9 @@
+{
+  "component": "AEBUNNY",
+  "route": "AEUSB->PI_ZERO_GADGET",
+  "authority": "/mnt/h/AETHIEAOPSYS",
+  "heavy": "/mnt/i/AETHIEAOPSYS/HEAVY/TOOLIO/HID/AEBUNNY",
+  "payload_authority": "TOOLIO/HID/AEBUNNY/payloads",
+  "receipt_path": "TOOLIO/HID/AEBUNNY/receipts",
+  "created_utc": "20260602T232610Z"
+}
