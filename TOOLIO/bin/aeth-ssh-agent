@@ -14,10 +14,16 @@ else
 fi
 
 echo
-echo "Loading key:"
-echo "$KEY"
+echo "Checking loaded keys..."
 
-ssh-add "$KEY"
+if ssh-add -l 2>/dev/null | grep -q "$(ssh-keygen -lf "$KEY" | awk '{print $2}')"; then
+  echo "Key already loaded:"
+  echo "$KEY"
+else
+  echo "Loading key:"
+  echo "$KEY"
+  ssh-add "$KEY"
+fi
 
 echo
 echo "Loaded keys:"
