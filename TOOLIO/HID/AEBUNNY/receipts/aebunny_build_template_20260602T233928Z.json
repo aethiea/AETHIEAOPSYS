@@ -1,0 +1,8 @@
+{
+  "component": "AEBUNNY",
+  "build": "bootstrap_gadget_template",
+  "created_utc": "20260602T233928Z",
+  "source": "/mnt/h/AETHIEAOPSYS/TOOLIO/HID/AEBUNNY/templates/gadget",
+  "output": "/mnt/i/AETHIEAOPSYS/HEAVY/TOOLIO/HID/AEBUNNY/builds/bootstrap/20260602T233928Z",
+  "route": "AEUSB template -> AE320 build"
+}

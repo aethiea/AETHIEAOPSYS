@@ -1,0 +1,1 @@
+Add modules-load=dwc2,g_ether after rootwait for USB Ethernet gadget mode when building an authorized AEBUNNY image.
