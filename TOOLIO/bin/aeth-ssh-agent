@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+KEY="${1:-$HOME/.ssh/id_ed25519}"
+
+echo "=== AETHIEA SSH AGENT ==="
+
+if [ -z "${SSH_AUTH_SOCK:-}" ]; then
+  echo "Starting ssh-agent..."
+  eval "$(ssh-agent -s)"
+else
+  echo "ssh-agent socket already present:"
+  echo "$SSH_AUTH_SOCK"
+fi
+
+echo
+echo "Loading key:"
+echo "$KEY"
+
+ssh-add "$KEY"
+
+echo
+echo "Loaded keys:"
+ssh-add -l
