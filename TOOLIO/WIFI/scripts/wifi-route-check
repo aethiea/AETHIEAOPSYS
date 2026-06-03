@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+AEUSB="/mnt/h/AETHIEAOPSYS"
+AE320="/mnt/i/AETHIEAOPSYS"
+
+echo "=== WIFI ROUTE CHECK ==="
+test -d "$AEUSB/TOOLIO/WIFI" && echo "authority: OK"
+test -f "$AEUSB/TOOLIO/WIFI/manifests/wifi.manifest.json" && echo "manifest: OK"
+test -f "$AEUSB/TOOLIO/WIFI/routes/wifi.route.json" && echo "route: OK"
+
+for d in captures scans configs builds exports logs; do
+  test -d "$AE320/HEAVY/TOOLIO/WIFI/$d" && echo "$d: OK"
+done

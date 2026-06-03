@@ -1,0 +1,8 @@
+{
+  "component": "WIFI",
+  "class": "wireless_network_component",
+  "authority_root": "/mnt/h/AETHIEAOPSYS/TOOLIO/WIFI",
+  "heavy_root": "/mnt/i/AETHIEAOPSYS/HEAVY/TOOLIO/WIFI",
+  "lanes": ["captures", "scans", "configs", "builds", "exports", "logs"],
+  "rule": "AEUSB defines; AE320 carries mass"
+}
