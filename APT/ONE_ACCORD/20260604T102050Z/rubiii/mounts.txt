@@ -1,0 +1,7 @@
+Filesystem      Size  Used Avail Use% Mounted on
+H:              117G   11G  106G   9% /mnt/h
+I:              299G  117M  298G   1% /mnt/i
+C:\             238G  195G   44G  82% /mnt/c
+D:\             466G   49G  418G  11% /mnt/d
+E:\             290G   80G  211G  28% /mnt/e
+F:\             176G  767M  176G   1% /mnt/f

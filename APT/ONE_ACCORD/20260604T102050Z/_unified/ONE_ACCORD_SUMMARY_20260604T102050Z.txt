@@ -1,0 +1,16 @@
+ONE_ACCORD_APT_UNIFICATION
+STAMP_UTC=20260604T102050Z
+ACTIVE_SURFACE=RUBIII
+AEUSB=/mnt/h/AETHIEAOPSYS
+AEXHD=/mnt/i/AETHIEAOPSYS
+
+RUBIII_APT_COUNT=1093
+RUBIII_MANUAL_COUNT=32
+
+AEUSB_APT_FILES=66
+AEXHD_APT_FILES=1
+OLIVIA_REFERENCED_FILES=5
+LOLITA_REFERENCED_FILES=1
+
+NOTE=RUBIII native apt was exported live. OLIVIA and LOLITA are represented by existing AEUSB manifests until those surfaces are booted and exported natively.
+RULE=DON'T MINGLE: native installs stay surface-native; AEUSB/AEXHD carry receipts, manifests, rebuild scripts, and mirrors.
