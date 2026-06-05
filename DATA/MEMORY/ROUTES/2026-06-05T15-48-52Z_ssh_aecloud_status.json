@@ -1,0 +1,42 @@
+{
+  "node": "SSH_AECLOUD_STATUS",
+  "body": "/mnt/h/AETHIEAOPSYS",
+  "surface": "RUBIII",
+  "mode": "USB_CONTINUITY",
+  "ssh": {
+    "toolchain": "present",
+    "ssh_directory": "present",
+    "ssh_config": "present",
+    "public_key_lanes": [
+      "aethieaos_hf_ed25519.pub",
+      "aethieaos_gitlab_ed25519.pub",
+      "id_ed25519.pub",
+      "aethieaos_github_ed25519.pub"
+    ],
+    "private_key_exposure": "none"
+  },
+  "cloudflared_mesh": {
+    "lanes": [
+      "AETHERNet",
+      "AETHERNet_local",
+      "AETHERPort",
+      "corpus-ssh"
+    ],
+    "live_connector_proven": "AETHERNet_local",
+    "persistent_process_confirmed": false
+  },
+  "aecloud": {
+    "cloudflare_inventory": "present",
+    "hcloud_cli_route": "present",
+    "hetzner_logs": "present",
+    "runpod_route_log": "present",
+    "aeth_ssh_agent": "present"
+  },
+  "programming_law": [
+    "Do not overwrite certs.",
+    "Do not overwrite tokens.",
+    "Do not overwrite SSH keys.",
+    "Do not overwrite existing tunnel credentials.",
+    "Create launchers and ledgers around existing authority."
+  ]
+}

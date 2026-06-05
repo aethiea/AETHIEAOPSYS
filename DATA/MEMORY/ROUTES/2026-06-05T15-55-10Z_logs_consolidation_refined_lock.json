@@ -1,0 +1,23 @@
+{
+  "node": "LOGS_CONSOLIDATION_REFINED_LOCK",
+  "body": "/mnt/h/AETHIEAOPSYS",
+  "surface": "RUBIII",
+  "status": "locked",
+  "rule": "LOGS is the consolidated runtime evidence folder, while lane-level logs may remain inside their execution lanes.",
+  "membranes": {
+    "TOOLIO": "tools and launchers",
+    "TOOLIO/RECEIPTS": "tool custody and install receipts",
+    "RUN": "pid and runtime handles",
+    "LOGS": "consolidated runtime proof",
+    "DATA/MEMORY/ANCHORS": "timestamped continuity receipts",
+    "DATA/MEMORY/ROUTES": "route meaning, state ledgers, and system interpretation",
+    "EXECUTION/PIPELINES/*/LOGS": "local lane-level pipeline logs"
+  },
+  "law": [
+    "Do not mingle source, runtime proof, receipts, anchors, and route ledgers.",
+    "Root LOGS is consolidated runtime evidence.",
+    "Lane LOGS may exist when the lane produces its own process logs.",
+    "Do not store private keys, raw tokens, cert contents, API secrets, or raw credentials in LOGS.",
+    "Do not paste token-bearing process output into public records."
+  ]
+}
