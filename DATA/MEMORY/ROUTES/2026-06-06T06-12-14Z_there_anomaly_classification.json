@@ -1,0 +1,18 @@
+{
+  "node": "THERE_ANOMALY_CLASSIFICATION",
+  "body": "/mnt/h/AETHIEAOPSYS",
+  "target": "There",
+  "classification": "empty stray root artifact",
+  "file_type": "zero-byte file",
+  "directory": false,
+  "secret_exposure": "none detected by filename scan",
+  "operative_status": "not part of controlled AETHIEA root ecology",
+  "ana_action": "preserve inspection proof, mark as anomaly, route out of root into REJECTED/anomalies",
+  "law": [
+    "Inspect first.",
+    "Classify second.",
+    "Route third.",
+    "Do not delete without provenance.",
+    "Root ecology should contain controlled organs only."
+  ]
+}
