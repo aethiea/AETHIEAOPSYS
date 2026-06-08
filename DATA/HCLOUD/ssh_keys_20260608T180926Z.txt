@@ -1,0 +1,2 @@
+ID          NAME             FINGERPRINT                                       AGE
+113494551   RUBIII-d_ny5u5   ca:7f:a5:76:8f:a5:5d:13:c8:c5:6d:df:c8:58:f4:84   4m

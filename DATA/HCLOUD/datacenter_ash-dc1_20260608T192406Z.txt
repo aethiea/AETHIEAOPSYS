@@ -1,0 +1,50 @@
+ID:		5
+ID:		5
+Name:		ash-dc1
+Description:	Ashburn virtual DC 1
+Location:
+  Name:		ash
+  Description:	Ashburn, VA
+  Country:	US
+  City:		Ashburn, VA
+  Latitude:	39.045821
+  Longitude:	-77.487073
+Server Types:
+  Available:
+  - ID:		 96
+    Name:	 ccx13
+    Description: CCX13 Dedicated CPU
+  Supported:
+  - ID:		 24
+    Name:	 cpx31
+    Description: CPX 31
+  - ID:		 25
+    Name:	 cpx41
+    Description: CPX 41
+  - ID:		 96
+    Name:	 ccx13
+    Description: CCX13 Dedicated CPU
+  - ID:		 22
+    Name:	 cpx11
+    Description: CPX 11
+  - ID:		 26
+    Name:	 cpx51
+    Description: CPX 51
+  - ID:		 99
+    Name:	 ccx43
+    Description: CCX43 Dedicated CPU
+  - ID:		 100
+    Name:	 ccx53
+    Description: CCX53 Dedicated CPU
+  - ID:		 98
+    Name:	 ccx33
+    Description: CCX33 Dedicated CPU
+  - ID:		 101
+    Name:	 ccx63
+    Description: CCX63 Dedicated CPU
+  - ID:		 97
+    Name:	 ccx23
+    Description: CCX23 Dedicated CPU
+  - ID:		 23
+    Name:	 cpx21
+    Description: CPX 21

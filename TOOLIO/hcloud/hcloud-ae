@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+LOG_DIR="/mnt/h/AETHIEAOPSYS/LOGS/HCLOUD"
+mkdir -p "$LOG_DIR"
+
+case "${1:-}" in
+  version|--version|-v|help|--help|-h)
+    exec /usr/bin/hcloud "$@"
+    ;;
+esac
+
+: "${HCLOUD_TOKEN:?HCLOUD_TOKEN not set. Run: read -s HCLOUD_TOKEN && export HCLOUD_TOKEN}"
+
+echo "$(date -u +%FT%TZ) HCLOUD ROUTE → hcloud $*" >> "$LOG_DIR/hcloud.log"
+exec /usr/bin/hcloud "$@"

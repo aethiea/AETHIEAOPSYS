@@ -1,0 +1,7 @@
+ID   NAME        DESCRIPTION                   LOCATION
+2    nbg1-dc3    Nuremberg 1 virtual DC 3      nbg1
+3    hel1-dc2    Helsinki 1 virtual DC 2       hel1
+4    fsn1-dc14   Falkenstein 1 virtual DC 14   fsn1
+5    ash-dc1     Ashburn virtual DC 1          ash
+6    hil-dc1     Hillsboro virtual DC 1        hil
+7    sin-dc1     Singapore virtual DC 1        sin

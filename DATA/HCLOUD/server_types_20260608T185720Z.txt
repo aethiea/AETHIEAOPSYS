@@ -1,0 +1,26 @@
+ID    NAME    CORES   CPU TYPE    ARCHITECTURE   MEMORY     DISK     STORAGE TYPE   TRAFFIC
+22    cpx11   2       shared      x86            2.0 GB     40 GB    local          0 TB
+23    cpx21   3       shared      x86            4.0 GB     80 GB    local          0 TB
+24    cpx31   4       shared      x86            8.0 GB     160 GB   local          0 TB
+25    cpx41   8       shared      x86            16.0 GB    240 GB   local          0 TB
+26    cpx51   16      shared      x86            32.0 GB    360 GB   local          0 TB
+45    cax11   2       shared      arm            4.0 GB     40 GB    local          0 TB
+93    cax21   4       shared      arm            8.0 GB     80 GB    local          0 TB
+94    cax31   8       shared      arm            16.0 GB    160 GB   local          0 TB
+95    cax41   16      shared      arm            32.0 GB    320 GB   local          0 TB
+96    ccx13   2       dedicated   x86            8.0 GB     80 GB    local          0 TB
+97    ccx23   4       dedicated   x86            16.0 GB    160 GB   local          0 TB
+98    ccx33   8       dedicated   x86            32.0 GB    240 GB   local          0 TB
+99    ccx43   16      dedicated   x86            64.0 GB    360 GB   local          0 TB
+100   ccx53   32      dedicated   x86            128.0 GB   600 GB   local          0 TB
+101   ccx63   48      dedicated   x86            192.0 GB   960 GB   local          0 TB
+108   cpx12   1       shared      x86            2.0 GB     40 GB    local          0 TB
+109   cpx22   2       shared      x86            4.0 GB     80 GB    local          0 TB
+110   cpx32   4       shared      x86            8.0 GB     160 GB   local          0 TB
+111   cpx42   8       shared      x86            16.0 GB    320 GB   local          0 TB
+112   cpx52   12      shared      x86            24.0 GB    480 GB   local          0 TB
+113   cpx62   16      shared      x86            32.0 GB    640 GB   local          0 TB
+114   cx23    2       shared      x86            4.0 GB     40 GB    local          0 TB
+115   cx33    4       shared      x86            8.0 GB     80 GB    local          0 TB
+116   cx43    8       shared      x86            16.0 GB    160 GB   local          0 TB
+117   cx53    16      shared      x86            32.0 GB    320 GB   local          0 TB

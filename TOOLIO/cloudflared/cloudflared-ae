@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT=/mnt/h/AETHIEAOPSYS
+ROOT="/mnt/h/AETHIEAOPSYS"
+LOG_DIR="$ROOT/LOGS/CLOUDFLARED"
+mkdir -p "$LOG_DIR"
 
-mkdir -p "$ROOT/LOGS/cloudflared"
+echo "$(date -u +%FT%TZ) CLOUDFLARED ROUTE → cloudflared $*" >> "$LOG_DIR/cloudflared.log"
 
-exec cloudflared "$@" \
-  >> "$ROOT/LOGS/cloudflared/runtime.log" 2>&1
+exec cloudflared "$@"
