@@ -1,0 +1,126 @@
+#!/usr/bin/env bash
+set -u
+
+ROOT="/mnt/h/AETHIEAOPSYS"
+BOOT_LOG="$ROOT/LOGS/BOOT/aevps_startup.log"
+BOOT_STATUS="$ROOT/DATA/BOOT/AEVPS_STARTUP_STATUS.md"
+SECRET_FILE="$HOME/.config/aethiea/secrets/hcloud.env"
+AGENT_ENV="$HOME/.config/aethiea/run/ssh-agent.env"
+
+mkdir -p "$ROOT/LOGS/BOOT" "$ROOT/DATA/BOOT" "$HOME/.config/aethiea/run" "$HOME/.ssh"
+
+log() {
+  echo "$(date -u +%FT%TZ) $*" | tee -a "$BOOT_LOG"
+}
+
+log "AEVPS STARTUP BEGIN"
+
+HCLOUD_STATE="UNKNOWN"
+SERVER_STATE="unknown"
+TUNNEL_STATE="unknown"
+SSH_AGENT_STATE="unknown"
+
+if [ -f "$SECRET_FILE" ]; then
+  . "$SECRET_FILE" 2>/dev/null || true
+  if [ -n "${HCLOUD_TOKEN:-}" ]; then
+    log "HCLOUD secret loaded length=${#HCLOUD_TOKEN}"
+  else
+    log "HCLOUD secret file exists but token empty"
+  fi
+else
+  log "HCLOUD secret file missing: $SECRET_FILE"
+fi
+
+CONFIG="$HOME/.ssh/config"
+TMP="$HOME/.ssh/config.aevps.tmp"
+
+touch "$CONFIG"
+chmod 600 "$CONFIG"
+
+awk '
+  /# BEGIN AEVPS-001/ {skip=1; next}
+  /# END AEVPS-001/ {skip=0; next}
+  skip!=1 {print}
+' "$CONFIG" > "$TMP"
+
+cat >> "$TMP" <<EOF
+# BEGIN AEVPS-001
+Host aevps-001
+  HostName 5.161.63.237
+  User root
+  IdentityFile ~/.ssh/id_ed25519
+  IdentitiesOnly yes
+  ServerAliveInterval 30
+  ServerAliveCountMax 3
+# END AEVPS-001
+EOF
+
+mv "$TMP" "$CONFIG"
+chmod 600 "$CONFIG"
+log "SSH alias ensured: aevps-001 -> 5.161.63.237"
+
+if [ -f "$AGENT_ENV" ]; then
+  . "$AGENT_ENV" 2>/dev/null || true
+fi
+
+if ssh-add -l >/dev/null 2>&1; then
+  SSH_AGENT_STATE="KEY_LOADED"
+  log "ssh-agent has loaded key"
+else
+  eval "$(ssh-agent -s)" >/dev/null
+  {
+    echo "export SSH_AUTH_SOCK='$SSH_AUTH_SOCK'"
+    echo "export SSH_AGENT_PID='$SSH_AGENT_PID'"
+  } > "$AGENT_ENV"
+  chmod 600 "$AGENT_ENV"
+  SSH_AGENT_STATE="AGENT_READY_KEY_LOCKED"
+  log "ssh-agent started; key needs unlock once per session"
+fi
+
+systemctl --user daemon-reload >/dev/null 2>&1 || true
+
+if systemctl --user list-unit-files aevps-tunnel.service >/dev/null 2>&1; then
+  systemctl --user enable aevps-tunnel.service >/dev/null 2>&1 || true
+  systemctl --user restart aevps-tunnel.service >/dev/null 2>&1 || systemctl --user start aevps-tunnel.service >/dev/null 2>&1 || true
+  TUNNEL_STATE="$(systemctl --user is-active aevps-tunnel.service 2>/dev/null || echo unknown)"
+  log "Cloudflare tunnel service state=$TUNNEL_STATE"
+else
+  TUNNEL_STATE="missing"
+  log "Cloudflare tunnel service missing: aevps-tunnel.service"
+fi
+
+if command -v hcloud-ae >/dev/null 2>&1 && hcloud-ae server describe aevps-001 >/tmp/aevps_startup_hcloud.txt 2>/tmp/aevps_startup_hcloud.err; then
+  HCLOUD_STATE="OK"
+  SERVER_STATE="$(grep -m1 '^Status:' /tmp/aevps_startup_hcloud.txt | awk '{print $2}')"
+  log "hcloud-ae OK server_status=${SERVER_STATE:-unknown}"
+else
+  HCLOUD_STATE="FAILED"
+  SERVER_STATE="unknown"
+  log "hcloud-ae check failed"
+fi
+
+cat > "$BOOT_STATUS" <<EOF
+# AEVPS STARTUP STATUS
+
+Timestamp UTC: $(date -u +%FT%TZ)
+Root: $ROOT
+Host Surface: RUBIII
+Server: aevps-001
+IPv4: 5.161.63.237
+
+HCLOUD: $HCLOUD_STATE
+Server Status: $SERVER_STATE
+Cloudflare Tunnel Service: $TUNNEL_STATE
+SSH Agent: $SSH_AGENT_STATE
+
+Doctrine: Host executes. AEUSB carries. Host does not own.
+EOF
+
+log "receipt written: $BOOT_STATUS"
+log "AEVPS STARTUP COMPLETE"
+
+if [ "$SSH_AGENT_STATE" = "AGENT_READY_KEY_LOCKED" ]; then
+  echo
+  echo "Startup is active. Unlock SSH once with:"
+  echo "  ssh-add ~/.ssh/id_ed25519"
+fi
