@@ -1,0 +1,4 @@
+surface	canonical	live	primary_root	primary_root_state	alt_roots_state	edge_segment
+RUBIII	YES	YES	/mnt/h/AETHIEAOPSYS	MOUNTED	/mnt/i/AETHIEAOPSYS=MOUNTED;/home/d_ny5u5/AETHIEAOPSYS=MOUNTED;	Cloudflare/AEVPS when active
+LOLITA	YES	NO	/home/d_ny5u5/AETHIEA	NOT_MOUNTED_THIS_SHELL	/mnt/e/AETHIEAOPSYS=NOT_MOUNTED;	Cloudflare only when routed
+OLIVIA	YES	NO	/opt/AETHIEAOPSYS	MOUNTED	/mnt/h/AETHIEAOPSYS when AEUSB mounted=NOT_MOUNTED;	Cloudflare only when routed

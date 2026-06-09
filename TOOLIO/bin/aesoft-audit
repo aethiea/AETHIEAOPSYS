@@ -1,0 +1,87 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+AUTH="/mnt/h/AETHIEAOPSYS"
+STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
+HOST="$(hostname 2>/dev/null || echo UNKNOWN)"
+
+OUT="/tmp/aesoft_audit_${HOST}_${STAMP}.tsv"
+STATUS="$AUTH/DATA/RUNTIME/AESOFT_AUDIT_STATUS.md"
+
+mkdir -p "$AUTH/DATA/RUNTIME" "$AUTH/PROGRAMS/VERIFY"
+
+{
+  printf "software\tcommand\tstate\tpath\tversion_probe\n"
+
+  check() {
+    name="$1"
+    cmd="$2"
+    version_cmd="${3:-$2 --version}"
+
+    if command -v "$cmd" >/dev/null 2>&1; then
+      path="$(command -v "$cmd")"
+      version="$(bash -lc "$version_cmd" 2>&1 | head -1 | tr '\t' ' ' || true)"
+      printf "%s\t%s\tFOUND\t%s\t%s\n" "$name" "$cmd" "$path" "$version"
+    else
+      printf "%s\t%s\tMISSING\t\t\n" "$name" "$cmd"
+    fi
+  }
+
+  check "Git" "git" "git --version"
+  check "Hetzner CLI" "hcloud" "hcloud version"
+  check "Node.js" "node" "node --version"
+  check "npm" "npm" "npm --version"
+  check "Python" "python3" "python3 --version"
+  check "pip" "pip3" "pip3 --version"
+  check "OpenSSH" "ssh" "ssh -V"
+  check "rsync" "rsync" "rsync --version"
+  check "curl" "curl" "curl --version"
+  check "wget" "wget" "wget --version"
+  check "systemctl" "systemctl" "systemctl --version"
+  check "FUSE" "fusermount3" "fusermount3 --version"
+  check "Docker" "docker" "docker --version"
+  check "Cloudflared" "cloudflared" "cloudflared --version"
+  check "Prometheus" "prometheus" "prometheus --version"
+  check "Grafana" "grafana-server" "grafana-server -v"
+  check "Rust Cargo" "cargo" "cargo --version"
+  check "Rust Compiler" "rustc" "rustc --version"
+  check "rclone" "rclone" "rclone version"
+  check "Redis" "redis-server" "redis-server --version"
+  check "Postgres" "psql" "psql --version"
+  check "JuiceFS" "juicefs" "juicefs version"
+  check "Fabric" "fabric" "fabric --version"
+  check "jq" "jq" "jq --version"
+  check "yq" "yq" "yq --version"
+} > "$OUT"
+
+SHA="$(sha256sum "$OUT" | awk '{print $1}')"
+
+for root in /mnt/h/AETHIEAOPSYS /mnt/i/AETHIEAOPSYS /home/d_ny5u5/AETHIEAOPSYS; do
+  [ -d "$root" ] || continue
+  mkdir -p "$root/PROGRAMS/VERIFY" "$root/DATA/RUNTIME"
+  cp "$OUT" "$root/PROGRAMS/VERIFY/"
+done
+
+cat > "$STATUS" <<EOF
+# AESOFT AUDIT STATUS
+
+Timestamp UTC: $(date -u +%FT%TZ)
+Host: $HOST
+Receipt: $(basename "$OUT")
+SHA256: $SHA
+
+Rule:
+Software is audited as callable capacity, not just package presence.
+EOF
+
+for root in /mnt/i/AETHIEAOPSYS /home/d_ny5u5/AETHIEAOPSYS; do
+  [ -d "$root" ] || continue
+  cp "$STATUS" "$root/DATA/RUNTIME/AESOFT_AUDIT_STATUS.md"
+done
+
+echo "=== AESOFT AUDIT ==="
+column -t -s $'\t' "$OUT"
+
+echo
+echo "=== STATUS ==="
+cat "$STATUS"

@@ -1,0 +1,19 @@
+program	category	ae_role	status	install_surface	authority_level	notes
+JuiceFS	filesystem	AEFS engine candidate	candidate	local,xhd,cloud	service layer	object storage + metadata + cache
+AEFS	filesystem	ÆOpSys filesystem membrane	core	all	system layer	name of our filesystem lane
+BetterStack	observability	external incident witness	optional	cloud	service layer	uptime/log/status layer
+Prometheus	observability	metrics spine	core	local,vps,docker	service layer	internal metrics collector
+Grafana	observability	observation glass	core	local,vps,docker	service layer	dashboard/window
+Cloudflare	edge	edge/r2/tunnel/workers	core	cloud	edge layer	already part of ÆCLOUD/AETHERNET
+Proxmox	virtualization	host chamber	candidate	local,dedicated	host layer	vm/lxc membrane
+Docker	container	service capsule	core	local,vps,proxmox	service layer	container runtime
+OpenSSH	access	command bridge	core	all	command layer	ssh spine
+localhost	access	private service room	core	local	private surface	first exposure surface
+hcloud	cloud-cli	Hetzner command surface	core	local,usb,vps	provider cli	VPS control
+Hetzner	cloud	remote always-on compute body	core	cloud	host surface	VPS muscle
+RunPod	cloud-gpu	ephemeral GPU worker	candidate	cloud	compute surface	model/job burst
+GitHub	repo	code ledger/public provenance	core	local,cloud	repo layer	source mirror/collab
+GitLab	forge	private CI/CD factory	candidate	local,vps,cloud	forge layer	runners/registry/pipelines
+Rust	language	compiled ÆCLI spine	elevated	local,usb,vps	build layer	native binaries
+Oracle/OCI	cloud	enterprise cloud/database/storage surface	candidate	cloud	provider surface	redundant cloud node
+Fabric	ai-cli	pattern metabolizer	candidate	local,usb	knowledge layer	external knowledge to patterns

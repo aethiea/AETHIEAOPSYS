@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+AUTH="/mnt/h/AETHIEAOPSYS"
+REG="$AUTH/DATA/MEMORY/SURFACES/registry.tsv"
+STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
+HOST="$(hostname 2>/dev/null || echo UNKNOWN)"
+USER_NAME="$(whoami 2>/dev/null || echo UNKNOWN)"
+
+OUT="/tmp/aesurface_status_${HOST}_${STAMP}.tsv"
+STATUS="$AUTH/DATA/RUNTIME/AESURFACE_STATUS.md"
+
+mkdir -p "$AUTH/DATA/RUNTIME"
+
+{
+  printf "surface\tcanonical\tlive\tprimary_root\tprimary_root_state\talt_roots_state\tedge_segment\n"
+
+  tail -n +2 "$REG" | while IFS=$'\t' read -r surface canonical role primary_root alt_roots edge state_rule; do
+    if [ "$surface" = "$HOST" ]; then
+      live="YES"
+    else
+      live="NO"
+    fi
+
+    if [ -d "$primary_root" ]; then
+      primary_state="MOUNTED"
+    else
+      primary_state="NOT_MOUNTED_THIS_SHELL"
+    fi
+
+    alt_state=""
+    IFS=';' read -ra alts <<< "$alt_roots"
+    for a in "${alts[@]}"; do
+      if [ -d "$a" ]; then
+        alt_state="${alt_state}${a}=MOUNTED;"
+      else
+        alt_state="${alt_state}${a}=NOT_MOUNTED;"
+      fi
+    done
+
+    printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\n" \
+      "$surface" "$canonical" "$live" "$primary_root" "$primary_state" "$alt_state" "$edge"
+  done
+} > "$OUT"
+
+SHA="$(sha256sum "$OUT" | awk '{print $1}')"
+
+for root in /mnt/h/AETHIEAOPSYS /mnt/i/AETHIEAOPSYS /home/d_ny5u5/AETHIEAOPSYS; do
+  [ -d "$root" ] || continue
+  mkdir -p "$root/DATA/RUNTIME"
+  cp "$OUT" "$root/DATA/RUNTIME/"
+done
+
+cat > "$STATUS" <<EOF
+# AESURFACE STATUS
+
+Timestamp UTC: $(date -u +%FT%TZ)
+Current Host: $HOST
+Current User: $USER_NAME
+Registry: $REG
+Runtime Receipt: $(basename "$OUT")
+SHA256: $SHA
+
+Rule:
+Canonical surfaces are remembered.
+Live state is witnessed per shell.
+Not live does not mean unknown.
+EOF
+
+for root in /mnt/i/AETHIEAOPSYS /home/d_ny5u5/AETHIEAOPSYS; do
+  [ -d "$root" ] || continue
+  mkdir -p "$root/DATA/RUNTIME"
+  cp "$STATUS" "$root/DATA/RUNTIME/AESURFACE_STATUS.md"
+done
+
+echo "=== AESURFACE STATUS ==="
+column -t -s $'\t' "$OUT"
+
+echo
+echo "=== STATUS ==="
+cat "$STATUS"

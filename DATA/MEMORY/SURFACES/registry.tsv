@@ -1,0 +1,4 @@
+surface	canonical	role	primary_root	last_known_alt_roots	edge_segment	state_rule
+RUBIII	YES	Windows/WSL execution bridge and current receipt-writing surface	/mnt/h/AETHIEAOPSYS	/mnt/i/AETHIEAOPSYS;/home/d_ny5u5/AETHIEAOPSYS	Cloudflare/AEVPS when active	live only when hostname/session proves RUBIII
+LOLITA	YES	local/laptop/interface/build surface	/home/d_ny5u5/AETHIEA	/mnt/e/AETHIEAOPSYS	Cloudflare only when routed	canonical even when not live
+OLIVIA	YES	resident /opt build-governance-execution surface	/opt/AETHIEAOPSYS	/mnt/h/AETHIEAOPSYS when AEUSB mounted	Cloudflare only when routed	canonical even when not live
