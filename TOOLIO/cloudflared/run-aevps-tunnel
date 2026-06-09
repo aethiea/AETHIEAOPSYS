@@ -8,5 +8,4 @@ TUNNEL_ID="8b52d381-a5e5-464a-a5cf-67951b475be0"
 mkdir -p "$LOG_DIR"
 
 echo "$(date -u +%FT%TZ) AEVPS/CLOUDFLARED tunnel start requested → $TUNNEL_ID" >> "$LOG_DIR/cloudflared.log"
-
 exec cloudflared tunnel run "$TUNNEL_ID"

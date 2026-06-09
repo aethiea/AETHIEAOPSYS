@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="/mnt/h/AETHIEAOPSYS"
+SECRET_DIR="$HOME/.config/aethiea/secrets"
+SECRET_FILE="$SECRET_DIR/hcloud.env"
+LOG="$ROOT/LOGS/HCLOUD/hcloud.log"
+STATUS="$ROOT/DATA/HCLOUD/KEY_STATUS.md"
+
+mkdir -p "$SECRET_DIR" "$ROOT/LOGS/HCLOUD" "$ROOT/DATA/HCLOUD"
+chmod 700 "$SECRET_DIR"
+
+echo "=== AEVPS / HCLOUD KEY INSTALL ==="
+echo "Paste the Hetzner HCLOUD token into this terminal only."
+echo "It will not be printed. It will be stored host-local at:"
+echo "$SECRET_FILE"
+echo
+
+read -rsp "HCLOUD_TOKEN: " HCLOUD_TOKEN
+echo
+
+HCLOUD_TOKEN="$(printf '%s' "$HCLOUD_TOKEN" | tr -d '\r\n[:space:]')"
+
+if [ -z "$HCLOUD_TOKEN" ]; then
+  echo "No token entered. Aborting." >&2
+  exit 1
+fi
+
+cat > "$SECRET_FILE" <<EOF
+export HCLOUD_TOKEN='$HCLOUD_TOKEN'
+EOF
+
+chmod 600 "$SECRET_FILE"
+
+TOKEN_LEN="$(bash -lc "source '$SECRET_FILE'; echo \${#HCLOUD_TOKEN}")"
+
+echo "Token stored."
+echo "Token length: $TOKEN_LEN"
+echo "Testing hcloud route..."
+echo
+
+if hcloud-ae location list >/tmp/aevps_hcloud_test_locations.txt 2>/tmp/aevps_hcloud_test_error.txt; then
+  RESULT="ACTIVE"
+  echo "HCLOUD AUTH: ACTIVE"
+  cat /tmp/aevps_hcloud_test_locations.txt
+
+  cat > "$STATUS" <<EOF
+# HCLOUD KEY STATUS
+
+Timestamp: $(date -u +%FT%TZ)
+Authority Body: /mnt/h/AETHIEAOPSYS
+Host Surface: RUBIII
+Secret File: $SECRET_FILE
+Token Length: $TOKEN_LEN
+Status: ACTIVE
+Test: hcloud-ae location list
+Doctrine: Host executes. AEUSB carries. Host does not own.
+EOF
+
+  echo "$(date -u +%FT%TZ) HCLOUD KEY INSTALLED VERIFIED — ACTIVE token_length=$TOKEN_LEN" >> "$LOG"
+else
+  RESULT="FAILED"
+  echo "HCLOUD AUTH: FAILED"
+  cat /tmp/aevps_hcloud_test_error.txt
+
+  cat > "$STATUS" <<EOF
+# HCLOUD KEY STATUS
+
+Timestamp: $(date -u +%FT%TZ)
+Authority Body: /mnt/h/AETHIEAOPSYS
+Host Surface: RUBIII
+Secret File: $SECRET_FILE
+Token Length: $TOKEN_LEN
+Status: FAILED
+Test: hcloud-ae location list
+Doctrine: Host executes. AEUSB carries. Host does not own.
+EOF
+
+  echo "$(date -u +%FT%TZ) HCLOUD KEY INSTALL TEST FAILED token_length=$TOKEN_LEN" >> "$LOG"
+  exit 1
+fi
+
+echo
+echo "Receipt written:"
+echo "$STATUS"
+echo
+echo "Next verification commands:"
+echo "  hcloud-ae server describe aevps-001"
+echo "  aevps-status"

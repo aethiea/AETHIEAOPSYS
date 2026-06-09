@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="/mnt/h/AETHIEAOPSYS"
+AEVPS_NAME="${AEVPS_NAME:-aevps-001}"
+STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
+
+mkdir -p "$ROOT/DATA/HCLOUD" "$ROOT/DATA/CLOUDFLARED" "$ROOT/LOGS/HCLOUD" "$ROOT/LOGS/CLOUDFLARED"
+
+echo "=== AEVPS STATUS ==="
+echo "Time: $(date -u +%FT%TZ)"
+echo "Root: $ROOT"
+echo "Server: $AEVPS_NAME"
+echo
+
+echo "[HCLOUD]"
+if hcloud-ae location list > "$ROOT/DATA/HCLOUD/locations_${STAMP}.txt"; then
+  echo "hcloud auth: OK"
+else
+  echo "hcloud auth: FAILED"
+fi
+echo
+
+echo "[SERVER DESCRIBE]"
+hcloud-ae server describe "$AEVPS_NAME" | tee "$ROOT/DATA/HCLOUD/server_describe_${AEVPS_NAME}_${STAMP}.txt" || true
+echo
+
+echo "[SERVER LIST]"
+hcloud-ae server list | tee "$ROOT/DATA/HCLOUD/servers_${STAMP}.txt" || true
+echo
+
+echo "[FIREWALL LIST]"
+hcloud-ae firewall list | tee "$ROOT/DATA/HCLOUD/firewalls_${STAMP}.txt" || true
+echo
+
+echo "[CLOUDFLARED TUNNELS]"
+cloudflared-ae tunnel list | tee "$ROOT/DATA/CLOUDFLARED/tunnels_${STAMP}.txt" || true
+echo
+
+echo "[TUNNEL SERVICE]"
+systemctl --user status aevps-tunnel.service --no-pager || true
+echo
+
+echo "[SSH TEST]"
+ssh -o BatchMode=yes -o ConnectTimeout=5 "$AEVPS_NAME" 'echo AEVPS_SSH_OK && hostname && uname -a' || true

@@ -3,8 +3,8 @@ set -euo pipefail
 
 ROOT="/mnt/h/AETHIEAOPSYS"
 LOG_DIR="$ROOT/LOGS/CLOUDFLARED"
+
 mkdir -p "$LOG_DIR"
 
 echo "$(date -u +%FT%TZ) CLOUDFLARED ROUTE → cloudflared $*" >> "$LOG_DIR/cloudflared.log"
-
 exec cloudflared "$@"
