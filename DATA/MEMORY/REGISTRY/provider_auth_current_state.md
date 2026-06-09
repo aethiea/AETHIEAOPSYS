@@ -1,0 +1,160 @@
+# PROVIDER AUTH CURRENT STATE
+
+Timestamp: 2026-06-08T21:25:54Z
+Host Surface: RUBIII
+Operator: d_ny5u5
+Authority Body: /mnt/h/AETHIEAOPSYS
+
+## Vault
+Vault Env: /mnt/h/AETHIEAOPSYS/VAULT/SECRETS/aethiea.env
+API Tokens In Vault: NOT YET
+Account References In Vault: YES
+
+## Current Shell
+HCLOUD_TOKEN: PRESENT BY ENV
+AEVPS_SSH_KEY: PRESENT BY ENV
+
+## GitHub
+Status: CONNECTED
+Account: aethiea
+CLI: gh
+Protocol: ssh
+Credential Store: /home/d_ny5u5/.config/gh/hosts.yml
+Raw Token In Vault: NO
+Runtime Status: ACTIVE
+
+## GitLab
+Status: NOT PROVEN ON RUBIII
+CLI: glab missing
+Token In Vault: NO
+
+## Hugging Face
+Status: PARTIAL / SSH LANE PRESENT
+HF SSH Private Key: /home/d_ny5u5/.ssh/aethieaos_hf_ed25519
+HF SSH Public Key: /home/d_ny5u5/.ssh/aethieaos_hf_ed25519.pub
+HF_TOKEN In Vault: NO
+CLI: hf present, huggingface-cli deprecated
+Runtime Proof Needed: hf auth whoami
+
+## Cloudflare
+Status: CONNECTED
+cloudflared credential JSON: PRESENT
+AETHERNet: LIVE
+AETHERNet_local: EXISTS
+AETHERPort: EXISTS
+CLOUDFLARE_API_TOKEN In Vault: NO
+Runtime Tunnel Auth: ACTIVE THROUGH CLOUDFLARED CREDS
+
+## Hetzner / HCLOUD
+Status: CONNECTED
+AEVPS: DEPLOYED VERIFIED
+Server: aevps-001
+Server ID: 138336699
+IPv4: 5.161.63.237
+Datacenter: ash-dc1
+HCLOUD_TOKEN In Current Shell: YES
+HCLOUD_TOKEN In Vault: NO
+Custody Warning: prior token was exposed in pasted transcript; rotate and store new token only in Vault
+
+## Doctrine
+Connected does not always mean Vault-loaded.
+Vault-loaded does not always mean shell-exported.
+Shell-exported does not always mean persistent.
+Provider tools may auth through CLI stores, SSH keys, tunnel JSON, or env tokens.
+Secrets must not be printed into DATA, LOGS, Obsidian, Git, or chat.
+DON'T MINGLE.
+
+## Runtime Proof Update — 2026-06-08T21:29:31Z
+
+Hugging Face:
+- hf auth whoami: NOT LOGGED IN
+- HF SSH private key: PRESENT
+- HF SSH public key: PRESENT
+- HF_TOKEN in Vault: NO
+
+GitLab:
+- glab: MISSING
+- GitLab CLI auth: NOT PROVEN
+
+Current controlling truth:
+- GitHub connected by gh credential store.
+- Cloudflare connected by cloudflared credential JSON.
+- Hetzner connected by current shell HCLOUD_TOKEN.
+- Hugging Face has SSH lane but no hf CLI login.
+- GitLab needs glab install/auth or alternate git remote proof.
+
+## Hugging Face HTTPS Auth Update — 2026-06-08T22:01:39Z
+
+HF_TOKEN in Vault: PRESENT
+HF Auth Mode: HTTPS TOKEN
+HF SSH Key: STILL PRESENT, but not controlling current HTTPS route
+Runtime Proof: hf auth whoami / git ls-remote HTTPS
+Doctrine:
+- HTTPS token auth is runtime credential access.
+- SSH key lane remains separate.
+- Vault stores the token.
+- Logs do not print token value.
+- DON'T MINGLE.
+
+## ANA Patch — HF HTTPS Auth Status Correction — 2026-06-08T22:14:06Z
+
+Correction:
+- Prior line "HF HTTPS AUTH ROUTE UPDATED" is route intent, not completed authentication.
+- Public HTTPS git ls-remote succeeded, but that is not private account auth proof.
+- hf auth whoami failed because HF_TOKEN was invalid / wrong shape.
+- Controlling proof remains: hf auth whoami must succeed.
+- HF HTTPS auth is NOT PROVEN until real hf_ token is loaded and accepted.
+- HF SSH key lane remains present separately.
+- AETHER does not certify auth completion without terminal proof.
+
+Authority:
+- Operator controls credential.
+- Vault stores credential only when valid.
+- Terminal verifies runtime.
+- Corpus records correction.
+- DON'T MINGLE.
+
+## ANA Patch — HF HTTPS Auth Status Correction — 2026-06-08T22:14:31Z
+
+Correction:
+- Prior line "HF HTTPS AUTH ROUTE UPDATED" is route intent, not completed authentication.
+- Public HTTPS git ls-remote succeeded, but that is not private account auth proof.
+- hf auth whoami failed because HF_TOKEN was invalid / wrong shape.
+- Controlling proof remains: hf auth whoami must succeed.
+- HF HTTPS auth is NOT PROVEN until real hf_ token is loaded and accepted.
+- HF SSH key lane remains present separately.
+- AETHER does not certify auth completion without terminal proof.
+
+Authority:
+- Operator controls credential.
+- Vault stores credential only when valid.
+- Terminal verifies runtime.
+- Corpus records correction.
+- DON'T MINGLE.
+
+## ANA Patch — HF HTTPS Auth Status Correction — 2026-06-08T22:15:48Z
+
+Correction:
+- Prior line "HF HTTPS AUTH ROUTE UPDATED" is route intent, not completed authentication.
+- Public HTTPS git ls-remote succeeded, but that is not private account auth proof.
+- hf auth whoami failed because HF_TOKEN was invalid / wrong shape.
+- Controlling proof remains: hf auth whoami must succeed.
+- HF HTTPS auth is NOT PROVEN until real hf_ token is loaded and accepted.
+- HF SSH key lane remains present separately.
+- AETHER does not certify auth completion without terminal proof.
+
+Authority:
+- Operator controls credential.
+- Vault stores credential only when valid.
+- Terminal verifies runtime.
+- Corpus records correction.
+- DON'T MINGLE.
+
+## Current Controlling HF Status — 2026-06-08T22:20:28Z
+
+HF HTTPS public route: WORKS
+HF private account auth: NOT PROVEN
+HF CLI: NOT LOGGED IN
+Controlling proof required: hf auth whoami
+Duplicate ANA entries above are historical correction noise and are superseded by this controlling status.
+DON'T MINGLE.

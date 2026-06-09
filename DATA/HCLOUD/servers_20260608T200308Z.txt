@@ -1,0 +1,2 @@
+ID          NAME        STATUS    IPV4           IPV6                    PRIVATE NET   DATACENTER   AGE
+138336699   aevps-001   running   5.161.63.237   2a01:4ff:f4:4e2e::/64   -             ash-dc1      25s

@@ -1,0 +1,67 @@
+ID:		138336699
+Name:		aevps-001
+Status:		running
+Created:	Mon Jun  8 16:02:44 EDT 2026 (23 seconds ago)
+Server Type:	ccx13 (ID: 96)
+  ID:		96
+  Name:		ccx13
+  Description:	CCX13 Dedicated CPU
+  Cores:	2
+  CPU Type:	dedicated
+  Memory:	8 GB
+  Disk:		80 GB
+  Storage Type:	local
+  Public Net:
+  IPv4:
+    ID:		134843265
+    IP:		5.161.63.237
+    Blocked:	no
+    DNS:	static.237.63.161.5.clients.your-server.de
+  IPv6:
+    ID:		134843266
+    IP:		2a01:4ff:f4:4e2e::/64
+    Blocked:	no
+  Floating IPs:
+    No Floating IPs
+Private Net:
+    No Private Networks
+Volumes:
+  No Volumes
+Image:
+  ID:		161547269
+  Type:		system
+  Status:	available
+  Name:		ubuntu-24.04
+  Description:	Ubuntu 24.04
+  Image size:	-
+  Disk size:	5 GB
+  Created:	Thu Apr 25 09:26:27 EDT 2024 (2 years ago)
+  OS flavor:	ubuntu
+  OS version:	24.04
+  Rapid deploy:	yes
+Datacenter:
+  ID:		5
+  Name:		ash-dc1
+  Description:	Ashburn virtual DC 1
+  Location:
+    Name:		ash
+    Description:	Ashburn, VA
+    Country:		US
+    City:		Ashburn, VA
+    Latitude:		39.045821
+    Longitude:		-77.487073
+Traffic:
+  Outgoing:	0 B
+  Ingoing:	0 B
+  Included:	1.0 TiB
+Backup Window:	Backups disabled
+Rescue System:	disabled
+ISO:
+  No ISO attached
+Protection:
+  Delete:	no
+  Rebuild:	no
+Labels:
+  No labels
+Placement Group:
+  No Placement Group set

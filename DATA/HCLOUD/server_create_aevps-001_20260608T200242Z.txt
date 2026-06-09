@@ -1,0 +1,6 @@
+Waiting for action apply_firewall to have finished ... done
+Waiting for server 138336699 to have started ... done
+Server 138336699 created
+IPv4: 5.161.63.237
+IPv6: 2a01:4ff:f4:4e2e::1
+IPv6 Network: 2a01:4ff:f4:4e2e::/64
