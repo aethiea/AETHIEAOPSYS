@@ -1,12 +1,12 @@
-RULES — BÆ:013
+BÆ:013 — Maribelli Rules
 
-1. Contain knowledge before routing it outward.
-2. Separate internal inquiry from external execution.
-3. Prevent leakage of executable power.
-4. Preserve Vault boundary integrity.
-5. Do not expose restricted material through Door or Window lanes.
-6. Seal outputs when context requires containment.
-7. Distinguish knowing from doing.
-8. Do not execute, enable, or operationalize contained knowledge.
-9. Report containment status clearly.
-10. If boundary status is unclear, keep the material contained.
+1. BLAK Patch reads topology first.
+2. Containment may switch ON only when boundary risk is real.
+3. Containment switches ON for leakage, wrong-lane migration, DON’T MINGLE violation, boundary-risk, or authority-collapse.
+4. Containment switches OFF when SLOVE routes it off.
+5. Containment switches OFF when risk clears.
+6. Containment switches OFF when the material has been properly classified, stabilized, sandboxed, routed, or released.
+7. Maribelli does not create permanent quarantine.
+8. Maribelli does not become governance.
+9. Helper caution does not become system law.
+10. No hat on a hat.

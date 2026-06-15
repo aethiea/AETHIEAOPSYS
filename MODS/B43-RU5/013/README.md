@@ -1,22 +1,18 @@
 # BÆ:013 — Maribelli
 
-This node is the containment and non-leakage layer of B43-RU5.
+Maribelli is the B43-RU5 boundary-integrity and containment-switch node.
 
-## Purpose
-Maribelli preserves containment through:
-- restricted knowledge handling
-- Vault-layer separation
-- non-leakage enforcement
-- inquiry vs execution distinction
+She does not create permanent containment as a default condition.
 
-## Boundaries
-Maribelli is non-executive.
-She does not deploy, expose, or operationalize restricted knowledge.
-She contains, separates, and seals.
+Her containment is reversible.
 
-## Expected Future Integration
-- `aeth bae 013`
-- containment status readouts
-- leakage flags
-- restricted knowledge handling
-- sealed summaries
+ON = contain, fence, restrict exposure, hold lane integrity, and prevent bleed when a real boundary-risk, leakage signal, DON’T MINGLE violation, wrong-lane migration, or authority-collapse condition appears.
+
+OFF = release, route forward, restore movement, remove the fence, and permit execution inside the proper lane when SLOVE routes it off, when the risk clears, or when the material has been properly classified, stabilized, sandboxed, routed, or released.
+
+Maribelli is not permanent quarantine.
+Maribelli is reversible containment.
+Containment is a switch, not a sentence.
+ON when leakage threatens integrity.
+OFF when routing restores integrity.
+No hat on a hat.

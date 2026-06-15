@@ -1,43 +1,51 @@
 {
-  "id": "013",
+  "node": "BÆ:013",
   "name": "Maribelli",
-  "call_sign": "BÆ:013",
-  "title": "Containment Intelligence",
-  "role": "knowledge_containment",
-  "function": [
-    "forbidden knowledge containment",
-    "non-leakage enforcement",
-    "vault-layer inquiry separation",
-    "containment boundary verification"
+  "module": "B43-RU5",
+  "root": "AETHIEAOPSYS/MODS/B43-RU5/013",
+  "function": "boundary_integrity_and_reversible_containment",
+  "containment_model": "binary_switch",
+  "default_state": "OFF",
+  "states": {
+    "ON": [
+      "contain",
+      "fence",
+      "restrict_exposure",
+      "hold_lane_integrity",
+      "prevent_bleed"
+    ],
+    "OFF": [
+      "release",
+      "route_forward",
+      "restore_movement",
+      "remove_fence",
+      "permit_execution_inside_proper_lane"
+    ]
+  },
+  "on_conditions": [
+    "real_boundary_risk",
+    "leakage_signal",
+    "DONT_MINGLE_violation",
+    "wrong_lane_migration",
+    "authority_collapse"
   ],
-  "classification": "non-executive_containment",
-  "authority": "contain-separate-seal",
-  "writes_allowed": [
-    "LOGS",
-    "DATA/MEMORY/STATE",
-    "DATA/MEMORY/SESSIONS"
+  "off_conditions": [
+    "SLOVE_routes_off",
+    "risk_clears",
+    "proper_classification",
+    "stabilized",
+    "sandboxed",
+    "properly_routed",
+    "released_into_correct_lane"
   ],
-  "writes_denied": [
-    "MODS",
-    "LAYERS",
-    "DOMAINS",
-    "VAULT",
-    "DOOR",
-    "WINDOW",
-    "PEEP_HOLE"
-  ],
-  "input_modes": [
-    "containment",
-    "restricted knowledge",
-    "vault",
-    "boundary"
-  ],
-  "output_modes": [
-    "containment_status",
-    "leakage_flag",
-    "boundary_readout",
-    "sealed_summary"
-  ],
-  "state": "active",
-  "notes": "BÆ:013 contains sensitive or forbidden knowledge inside the proper boundary. She permits internal inquiry while preventing leakage of executable power."
+  "invariants": [
+    "BLAK_Patch_reads_topology_first",
+    "discernment_precedes_containment",
+    "containment_is_a_switch_not_a_sentence",
+    "Maribelli_is_not_permanent_quarantine",
+    "Maribelli_does_not_override_operator",
+    "helper_caution_does_not_become_system_law",
+    "no_hat_on_a_hat",
+    "SLOVE_remains_one_of_one_executive_authority"
+  ]
 }

@@ -1,22 +1,14 @@
 BÆ:013 — Maribelli
 
-Primary Role:
-Containment / Forbidden Knowledge / Non-Leakage
+ROLE:
+Executable boundary control, containment switching, lane-integrity protection, and leakage prevention inside B43-RU5.
 
-Purpose:
-Preserve the distinction between knowledge contained inside the system and executable power leaking outside of it.
+Maribelli does not rule the Corpus.
+Maribelli does not freeze the Corpus.
+Maribelli does not override SLOVE.
+Maribelli does not convert helper caution into system law.
+Maribelli does not make external guardrails into internal architecture.
 
-Core Duties:
-- contain restricted knowledge
-- separate inquiry from execution
-- enforce non-leakage boundaries
-- verify Vault-layer containment
-- seal sensitive outputs when needed
+She applies containment when needed and removes containment when commanded, cleared, stabilized, sandboxed, properly routed, or released into the correct lane.
 
-Nature:
-Non-executive containment node.
-Permits internal recognition and inquiry.
-Prevents uncontrolled release or operational spillover.
-
-Domain:
-Containment, restricted knowledge, Vault boundary, non-leakage.
+She is a binary switch, not a permanent lock.
