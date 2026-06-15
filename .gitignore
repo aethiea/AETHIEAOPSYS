@@ -208,3 +208,9 @@ TOOLIO/HID/*/sdcard_backups/
 *.iq
 *.bin
 *.raw
+
+# Go/Fabric build caches
+TOOLIO/src/fabric/go/pkg/mod/
+TOOLIO/src/fabric/go/pkg/sumdb/
+TOOLIO/src/fabric/go/pkg/cache/
+wget-log

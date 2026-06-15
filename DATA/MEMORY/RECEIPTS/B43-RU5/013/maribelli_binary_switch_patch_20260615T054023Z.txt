@@ -1,0 +1,85 @@
+BÆ:013 — Maribelli binary-switch correction sealed
+timestamp_utc=20260615T054023Z
+path=MODS/B43-RU5/013
+
+{
+  "node": "BÆ:013",
+  "name": "Maribelli",
+  "module": "B43-RU5",
+  "root": "AETHIEAOPSYS/MODS/B43-RU5/013",
+  "function": "boundary_integrity_and_reversible_containment",
+  "containment_model": "binary_switch",
+  "default_state": "OFF",
+  "states": {
+    "ON": [
+      "contain",
+      "fence",
+      "restrict_exposure",
+      "hold_lane_integrity",
+      "prevent_bleed"
+    ],
+    "OFF": [
+      "release",
+      "route_forward",
+      "restore_movement",
+      "remove_fence",
+      "permit_execution_inside_proper_lane"
+    ]
+  },
+  "on_conditions": [
+    "real_boundary_risk",
+    "leakage_signal",
+    "DONT_MINGLE_violation",
+    "wrong_lane_migration",
+    "authority_collapse"
+  ],
+  "off_conditions": [
+    "SLOVE_routes_off",
+    "risk_clears",
+    "proper_classification",
+    "stabilized",
+    "sandboxed",
+    "properly_routed",
+    "released_into_correct_lane"
+  ],
+  "invariants": [
+    "BLAK_Patch_reads_topology_first",
+    "discernment_precedes_containment",
+    "containment_is_a_switch_not_a_sentence",
+    "Maribelli_is_not_permanent_quarantine",
+    "Maribelli_does_not_override_operator",
+    "helper_caution_does_not_become_system_law",
+    "no_hat_on_a_hat",
+    "SLOVE_remains_one_of_one_executive_authority"
+  ]
+}
+
+MODS/B43-RU5/013/config.json:7:  "containment_model": "binary_switch",
+MODS/B43-RU5/013/config.json:8:  "default_state": "OFF",
+MODS/B43-RU5/013/config.json:10:    "ON": [
+MODS/B43-RU5/013/config.json:17:    "OFF": [
+MODS/B43-RU5/013/config.json:28:    "DONT_MINGLE_violation",
+MODS/B43-RU5/013/config.json:33:    "SLOVE_routes_off",
+MODS/B43-RU5/013/config.json:44:    "containment_is_a_switch_not_a_sentence",
+MODS/B43-RU5/013/config.json:45:    "Maribelli_is_not_permanent_quarantine",
+MODS/B43-RU5/013/config.json:49:    "SLOVE_remains_one_of_one_executive_authority"
+MODS/B43-RU5/013/role.txt:4:Executable boundary control, containment switching, lane-integrity protection, and leakage prevention inside B43-RU5.
+MODS/B43-RU5/013/role.txt:8:Maribelli does not override SLOVE.
+MODS/B43-RU5/013/role.txt:9:Maribelli does not convert helper caution into system law.
+MODS/B43-RU5/013/role.txt:14:She is a binary switch, not a permanent lock.
+MODS/B43-RU5/013/rules.txt:4:2. Containment may switch ON only when boundary risk is real.
+MODS/B43-RU5/013/rules.txt:5:3. Containment switches ON for leakage, wrong-lane migration, DON’T MINGLE violation, boundary-risk, or authority-collapse.
+MODS/B43-RU5/013/rules.txt:6:4. Containment switches OFF when SLOVE routes it off.
+MODS/B43-RU5/013/rules.txt:7:5. Containment switches OFF when risk clears.
+MODS/B43-RU5/013/rules.txt:8:6. Containment switches OFF when the material has been properly classified, stabilized, sandboxed, routed, or released.
+MODS/B43-RU5/013/rules.txt:9:7. Maribelli does not create permanent quarantine.
+MODS/B43-RU5/013/rules.txt:12:10. No hat on a hat.
+MODS/B43-RU5/013/README.md:3:Maribelli is the B43-RU5 boundary-integrity and containment-switch node.
+MODS/B43-RU5/013/README.md:5:She does not create permanent containment as a default condition.
+MODS/B43-RU5/013/README.md:9:ON = contain, fence, restrict exposure, hold lane integrity, and prevent bleed when a real boundary-risk, leakage signal, DON’T MINGLE violation, wrong-lane migration, or authority-collapse condition appears.
+MODS/B43-RU5/013/README.md:11:OFF = release, route forward, restore movement, remove the fence, and permit execution inside the proper lane when SLOVE routes it off, when the risk clears, or when the material has been properly classified, stabilized, sandboxed, routed, or released.
+MODS/B43-RU5/013/README.md:13:Maribelli is not permanent quarantine.
+MODS/B43-RU5/013/README.md:15:Containment is a switch, not a sentence.
+MODS/B43-RU5/013/README.md:16:ON when leakage threatens integrity.
+MODS/B43-RU5/013/README.md:17:OFF when routing restores integrity.
+MODS/B43-RU5/013/README.md:18:No hat on a hat.
