@@ -214,3 +214,6 @@ TOOLIO/src/fabric/go/pkg/mod/
 TOOLIO/src/fabric/go/pkg/sumdb/
 TOOLIO/src/fabric/go/pkg/cache/
 wget-log
+
+# Quarantined loose binaries
+DATA/QUARANTINE/BINARIES/

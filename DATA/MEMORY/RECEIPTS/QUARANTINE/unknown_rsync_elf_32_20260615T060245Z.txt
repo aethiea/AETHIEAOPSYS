@@ -1,0 +1,13 @@
+AETHIEA loose binary quarantine receipt
+timestamp_utc=20260615T060245Z
+source=/mnt/h/AETHIEAOPSYS/32
+route=DATA/QUARANTINE/BINARIES/unknown_rsync_elf_32_20260615T060245Z
+reason=loose root ELF rsync-family binary not identical to /usr/bin/rsync
+
+32: ELF 64-bit LSB pie executable, x86-64, version 1 (GNU/Linux), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, BuildID[sha1]=fcfd814d98db7308893533fd950c33d7a6e6894a, for GNU/Linux 3.2.0, stripped
+
+dad8551ac404669ef8e6077af95fbda09a3177842b93ea555d50d6a5c2b68e6d  32
+
+system_rsync=/usr/bin/rsync
+/usr/bin/rsync: ELF 64-bit LSB pie executable, x86-64, version 1 (GNU/Linux), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, BuildID[sha1]=2c614fbf8f610946913b8d200b47986718d9349b, for GNU/Linux 3.2.0, stripped
+92faeb9388dc94801b6af10160f09f553dbdfe72952a90d11b686c2814b54831  /usr/bin/rsync
