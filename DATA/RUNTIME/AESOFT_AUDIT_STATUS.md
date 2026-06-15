@@ -1,9 +1,9 @@
 # AESOFT AUDIT STATUS
 
-Timestamp UTC: 2026-06-09T19:44:55Z
+Timestamp UTC: 2026-06-15T06:40:42Z
 Host: RUBIII
-Receipt: aesoft_audit_RUBIII_20260609T194450Z.tsv
-SHA256: 263ce2b5881fa1f03597f0e1fe3f0698fb0d4b09d282d4054ad019db091a476a
+Receipt: aesoft_audit_RUBIII_20260615T064028Z.tsv
+SHA256: 15b9122d180d66f9db25d1d1787444d13610443db2ae5356109d2072811d49d4
 
 Rule:
 Software is audited as callable capacity, not just package presence.
