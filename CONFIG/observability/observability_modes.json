@@ -1,0 +1,37 @@
+{
+  "system": "AETHIEAOPSYS",
+  "lane": "observability",
+  "status": "registered",
+  "tools": {
+    "prometheus": {
+      "role": "metrics collection",
+      "command": "prometheus",
+      "mode": ["local_only", "cloudflare_edge", "proxmox_contained"]
+    },
+    "grafana": {
+      "role": "dashboard and visualization",
+      "command_current": "grafana-server",
+      "command_future": "grafana server",
+      "mode": ["local_only", "cloudflare_edge", "proxmox_contained"]
+    }
+  },
+  "modes": {
+    "local_only": {
+      "role": "trusted cockpit",
+      "exposure": "localhost or private LAN",
+      "rule": "Default mode. No public exposure."
+    },
+    "cloudflare_edge": {
+      "role": "controlled remote access membrane",
+      "exposure": "Cloudflare Tunnel / Access only",
+      "rule": "Expose dashboards only through identity, policy, and tunnel controls."
+    },
+    "proxmox_contained": {
+      "role": "isolated lab/runtime body",
+      "exposure": "VM/LXC/VLAN-contained service",
+      "rule": "Contain observability workloads when isolation or lab routing is required."
+    }
+  },
+  "non_collapse_rule": "Local, Cloudflare, and Proxmox modes may be used interchangeably, but they must remain distinguishable by route, receipt, and exposure boundary.",
+  "doctrine": "Observe the body. Do not become the body. Host executes. AEUSB carries. Host does not own."
+}

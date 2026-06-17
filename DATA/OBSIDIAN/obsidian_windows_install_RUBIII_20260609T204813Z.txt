@@ -1,0 +1,18 @@
+﻿=== OBSIDIAN WINDOWS INSTALL PROOF ===
+Timestamp: 2026-06-09T20:48:13.8997312-04:00
+Host: RUBIII
+User: ronni
+
+=== WINGET ===
+    -                                                                                                                               -     \                                                                                                                           Name     Id                Version Source ------------------------------------------ Obsidian Obsidian.Obsidian 1.12.7  winget
+
+=== VAULT PATHS ===
+H:\AETHIEAOPSYS\DATA\OBSIDIAN exists: True
+I:\AETHIEAOPSYS\HEAVY\OBSIDIAN exists: True
+Lane file H exists: True
+Lane file I exists: True
+
+=== LOCK ===
+Obsidian is the Windows GUI window into the AEUSB doctrine vault.
+It is not the filesystem body.
+It is not the authority root.

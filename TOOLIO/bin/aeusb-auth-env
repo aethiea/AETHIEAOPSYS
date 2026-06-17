@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# AETHIEA AEUSB Callable Auth Env Loader
+# Host executes. AEUSB carries auth. Host does not own.
+
+ROOT="/mnt/h/AETHIEAOPSYS"
+AUTH="$ROOT/VAULT/AUTH/CALLABLE"
+ENV_DIR="$AUTH/ENV"
+ENV_FILE="$ENV_DIR/aeusb.env"
+
+[ -d "$AUTH" ] || return 0 2>/dev/null || exit 0
+
+# Optional operator-managed env file.
+# Format:
+#   export NAME='value'
+# Keep this file private and ignored.
+if [ -f "$ENV_FILE" ]; then
+  . "$ENV_FILE"
+fi
+
+# glab/snap enforces 0600 on config.yml. AEUSB mounts may report 0777.
+# Build a runtime copy from AEUSB custody on wake.
+if [ -x /mnt/h/AETHIEAOPSYS/TOOLIO/bin/aeusb-glab-runtime ]; then
+  /mnt/h/AETHIEAOPSYS/TOOLIO/bin/aeusb-glab-runtime || true
+fi
+
+# Common CLI hints. These do not expose secrets.
+[ -d "$AUTH/GITHUB_CLI/gh" ] && export GH_CONFIG_DIR="$AUTH/GITHUB_CLI/gh"
+[ -d "$AUTH/RCLONE/rclone" ] && export RCLONE_CONFIG="$AUTH/RCLONE/rclone/rclone.conf"

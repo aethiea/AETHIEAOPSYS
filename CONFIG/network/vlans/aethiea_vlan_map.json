@@ -1,0 +1,51 @@
+{
+  "status": "registered_not_yet_proven",
+  "rule": "VLANs are membranes. They separate lanes without creating separate bodies.",
+  "vlan_map": {
+    "10": {
+      "name": "MGMT",
+      "role": "management plane",
+      "contains": ["proxmox_admin", "router", "switches"]
+    },
+    "20": {
+      "name": "AETHIEA_CORE",
+      "role": "core service lane",
+      "contains": ["redis", "postgres", "api", "internal_services"]
+    },
+    "30": {
+      "name": "AI_MODEL_LAB",
+      "role": "local AI and model runtime",
+      "contains": ["ollama", "llama.cpp", "fabric", "model_tests"]
+    },
+    "40": {
+      "name": "MEDIA_DOCS",
+      "role": "media and doctrine workflow",
+      "contains": ["obsidian", "assets", "docs"]
+    },
+    "50": {
+      "name": "DMZ_EDGE",
+      "role": "public boundary landing zone",
+      "contains": ["cloudflare_tunnel", "reverse_proxy"]
+    },
+    "60": {
+      "name": "GUEST_UNTRUSTED",
+      "role": "untrusted test devices",
+      "contains": ["guest", "temporary"]
+    },
+    "70": {
+      "name": "SECURITY_LAB",
+      "role": "isolated research lane",
+      "contains": ["dark_ae", "recon_lab", "sandbox"]
+    },
+    "80": {
+      "name": "STORAGE",
+      "role": "storage and backup plane",
+      "contains": ["juicefs", "nas", "backup"]
+    },
+    "90": {
+      "name": "MONITORING",
+      "role": "observability plane",
+      "contains": ["betterstack_agent", "prometheus", "grafana"]
+    }
+  }
+}

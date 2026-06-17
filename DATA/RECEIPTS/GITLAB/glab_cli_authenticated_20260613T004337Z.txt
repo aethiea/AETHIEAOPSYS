@@ -1,0 +1,18 @@
+AETHIEA GLAB CLI RECEIPT
+UTC=20260613T004337Z
+HOST=RUBIII
+ROOT=/mnt/h/AETHIEAOPSYS
+COMMAND=/snap/bin/glab
+VERSION=glab 1.102.0 (b5a548b)
+
+AUTH_STATUS:
+gitlab.com
+  ✓ Logged in to gitlab.com as aethiea (/home/d_ny5u5/snap/glab/6032/.config/glab-cli/config.yml)
+  ✓ Git operations for gitlab.com configured to use ssh protocol.
+  ✓ API calls for gitlab.com are made over https protocol.
+  ✓ REST API Endpoint: https://gitlab.com/api/v4/
+  ✓ GraphQL Endpoint: https://gitlab.com/api/graphql/
+  ✓ Token found: **************************
+
+CONFIG_FILES:
+/home/d_ny5u5/snap/glab/6032/.config/glab-cli/config.yml

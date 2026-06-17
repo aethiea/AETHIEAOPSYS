@@ -1,0 +1,69 @@
+=== GAP FILL PROOF: PROMETHEUS GRAFANA RUNPODCTL ===
+2026-06-10T01:23:45Z
+RUBIII
+d_ny5u5
+
+=== PROMETHEUS ===
+/usr/bin/prometheus
+prometheus, version 2.53.5+ds1 (branch: debian/sid, revision: 2.53.5+ds1-3)
+  build user:       team+pkg-go@tracker.debian.org
+  build date:       20251231-19:01:34
+  go version:       go1.25.0
+  platform:         linux/amd64
+  tags:             unknown
+-rwxr--r-- 1 d_ny5u5 d_ny5u5 136 Jun  9 21:17 SERVICES/prometheus/config/prometheus.yml
+20c5375336d67e73878937094743431e3e66d9f0d175a67ef493cee8416f922d  SERVICES/prometheus/config/prometheus.yml
+
+=== GRAFANA ===
+not-found
+inactive
+
+=== RUNPODCTL ===
+/home/d_ny5u5/.local/bin/runpodctl
+/home/d_ny5u5/.local/bin/runpodctl
+/mnt/h/AETHIEAOPSYS/TOOLIO/bin/runpodctl
+runpodctl 2.3.0-be4ced4
+lrwxrwxrwx 1 d_ny5u5 d_ny5u5       40 Jun  9 21:23 /home/d_ny5u5/.local/bin/runpodctl -> /mnt/h/AETHIEAOPSYS/TOOLIO/bin/runpodctl
+-rwxr--r-- 1 d_ny5u5 d_ny5u5 13676706 Jun  9 21:23 /mnt/h/AETHIEAOPSYS/TOOLIO/bin/runpodctl
+fdac0b7a0ac4d4b5b9ef1203f9229c99313e212ac8689701a29e4ba05fae32b8  /home/d_ny5u5/.local/bin/runpodctl
+fdac0b7a0ac4d4b5b9ef1203f9229c99313e212ac8689701a29e4ba05fae32b8  /mnt/h/AETHIEAOPSYS/TOOLIO/bin/runpodctl
+
+=== AESOFT AUDIT ===
+=== AESOFT AUDIT ===
+software       command         state    path                                        version_probe
+Git            git             FOUND    /usr/bin/git                                git version 2.53.0
+Hetzner CLI    hcloud          FOUND    /usr/bin/hcloud                             hcloud 1.39.0
+Node.js        node            FOUND    /usr/bin/node                               v22.22.1
+npm            npm             FOUND    /usr/bin/npm                                9.2.0
+Python         python3         FOUND    /usr/bin/python3                            Python 3.14.4
+pip            pip3            FOUND    /usr/bin/pip3                               pip 25.1.1 from /usr/lib/python3/dist-packages/pip (python 3.14)
+OpenSSH        ssh             FOUND    /usr/bin/ssh                                OpenSSH_10.2p1 Ubuntu-2ubuntu3.2, OpenSSL 3.5.5 27 Jan 2026
+rsync          rsync           FOUND    /usr/bin/rsync                              rsync  version 3.4.1  protocol version 32
+curl           curl            FOUND    /usr/bin/curl                               curl 8.18.0 (x86_64-pc-linux-gnu) libcurl/8.18.0 OpenSSL/3.5.5 zlib/1.3.1 brotli/1.2.0 zstd/1.5.7 libidn2/2.3.8 libpsl/0.21.2 libssh2/1.11.1 nghttp2/1.68.0 librtmp/2.3 mit-krb5/1.22.1 OpenLDAP/2.6.10
+wget           wget            FOUND    /usr/bin/wget                               GNU Wget 1.25.0 built on linux-gnu.
+systemctl      systemctl       FOUND    /usr/bin/systemctl                          systemd 259 (259.5-0ubuntu3)
+FUSE           fusermount3     FOUND    /usr/bin/fusermount3                        fusermount3 version: 3.18.2
+Docker         docker          FOUND    /usr/bin/docker                             Docker version 29.1.3, build 29.1.3-0ubuntu4.1
+Cloudflared    cloudflared     FOUND    /mnt/h/AETHIEAOPSYS/TOOLIO/bin/cloudflared  cloudflared version 2026.5.0 (built 2026-05-13-11:24 UTC)
+Prometheus     prometheus      FOUND    /usr/bin/prometheus                         prometheus, version 2.53.5+ds1 (branch: debian/sid, revision: 2.53.5+ds1-3)
+Grafana        grafana-server  MISSING                                              
+Rust Cargo     cargo           FOUND    /usr/bin/cargo                              cargo 1.93.1 (083ac5135 2025-12-15) (built from a source tarball)
+Rust Compiler  rustc           FOUND    /usr/bin/rustc                              rustc 1.93.1 (01f6ddf75 2026-02-11) (built from a source tarball)
+rclone         rclone          FOUND    /usr/bin/rclone                             rclone v1.60.1-DEV
+Redis          redis-server    FOUND    /usr/bin/redis-server                       Redis server v=8.0.5 sha=00000000:0 malloc=jemalloc-5.3.0 bits=64 build=9729964261b8fc0f
+Postgres       psql            FOUND    /usr/bin/psql                               psql (PostgreSQL) 18.4 (Ubuntu 18.4-0ubuntu0.26.04.1)
+JuiceFS        juicefs         FOUND    /home/d_ny5u5/.local/bin/juicefs            juicefs version 1.3.1+2025-12-02.e0032b2
+Fabric         fabric          FOUND    /home/d_ny5u5/.local/bin/fabric             v1.4.455
+jq             jq              FOUND    /usr/bin/jq                                 jq-1.8.1
+yq             yq              FOUND    /usr/bin/yq                                 yq 3.4.3
+
+=== STATUS ===
+# AESOFT AUDIT STATUS
+
+Timestamp UTC: 2026-06-10T01:23:53Z
+Host: RUBIII
+Receipt: aesoft_audit_RUBIII_20260610T012346Z.tsv
+SHA256: 426b711b060da610d93a879b36602fe2b6d6d7ecca1e7aca416b2f1e839ab22e
+
+Rule:
+Software is audited as callable capacity, not just package presence.

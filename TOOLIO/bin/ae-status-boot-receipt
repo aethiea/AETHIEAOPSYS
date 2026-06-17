@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -u
+
+STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
+OUT="/tmp/ae_status_BOOT_RUBIII_$STAMP.txt"
+
+if ! command -v ae-status >/dev/null 2>&1; then
+  echo "ae-status not found" | tee "$OUT"
+  exit 1
+fi
+
+ae-status | tee "$OUT"
+
+for root in /mnt/h/AETHIEAOPSYS /mnt/i/AETHIEAOPSYS /home/d_ny5u5/AETHIEAOPSYS; do
+  [ -d "$root" ] || continue
+  mkdir -p "$root/DATA/STATUS/receipts" "$root/TOOLIO/bin"
+  cp /mnt/h/AETHIEAOPSYS/TOOLIO/bin/ae-status "$root/TOOLIO/bin/ae-status" 2>/dev/null || true
+  cp "$OUT" "$root/DATA/STATUS/receipts/"
+done
+
+sha256sum "$OUT" | tee -a /mnt/h/AETHIEAOPSYS/LOGS/BOOT/aevps_startup.log

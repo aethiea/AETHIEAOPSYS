@@ -1,0 +1,9 @@
+# BEGIN AEVPS-001
+Host aevps-001
+  HostName 5.161.63.237
+  User root
+  IdentityFile ~/.ssh/id_ed25519
+  IdentitiesOnly yes
+  ServerAliveInterval 30
+  ServerAliveCountMax 3
+# END AEVPS-001

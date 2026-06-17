@@ -1,0 +1,8 @@
+surface	path	windows_drive	size	used	available	use_percent	role	status
+AETHIEAOPSYS_BODY	/mnt/h	H:	117G	11G	106G	10%	current root body / authority filesystem	ONLINE
+AEXHD_CANDIDATE	/mnt/i	I:	299G	332M	298G	1%	AE320GB / AEXHD heavy habitat candidate	ONLINE
+OUTTABODYDRIVE_LACIE	/mnt/d	D:	466G	49G	418G	11%	LaCie / OuttaBodyDrive / backup + mass surface	ONLINE
+LOCAL_SYSTEM	/mnt/c	C:	238G	217G	22G	92%	host OS / avoid heavy writes	ONLINE_LOW_SPACE
+EXTERNAL_E	/mnt/e	E:	290G	80G	211G	28%	unclassified external/storage surface	ONLINE_UNCLASSIFIED
+EXTERNAL_F	/mnt/f	F:	176G	767M	176G	1%	unclassified external/storage surface	ONLINE_UNCLASSIFIED
+WSL_ROOT	/	/dev/sdd	1007G	18G	939G	2%	Linux runtime + docker root	ONLINE

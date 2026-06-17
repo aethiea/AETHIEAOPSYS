@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# AETHIEA AEUSB SSH Authority Loader
+# Private custody lives on AEUSB. Host only executes.
+
+ROOT="/mnt/h/AETHIEAOPSYS"
+AUTH="$ROOT/VAULT/AUTH/SSH"
+ENVFILE="$HOME/.ssh/aethieaos_ssh_agent.env"
+
+[ -d "$AUTH" ] || exit 0
+
+mkdir -p "$HOME/.ssh"
+chmod 700 "$HOME/.ssh" 2>/dev/null || true
+
+[ -f "$ENVFILE" ] && . "$ENVFILE" >/dev/null 2>&1 || true
+
+if ! ssh-add -l >/dev/null 2>&1; then
+  eval "$(ssh-agent -s)" >/dev/null
+  {
+    echo "export SSH_AUTH_SOCK='$SSH_AUTH_SOCK'"
+    echo "export SSH_AGENT_PID='$SSH_AGENT_PID'"
+  } > "$ENVFILE"
+  chmod 600 "$ENVFILE" 2>/dev/null || true
+fi
+
+find "$AUTH" -mindepth 2 -maxdepth 2 -type f \
+  \( -name '*_ed25519' -o -name 'id_ed25519' -o -name '*_rsa' -o -name '*_ecdsa' \) \
+  ! -name '*.pub' \
+  ! -path '*/HOST_QUARANTINE/*' \
+  | sort | while read -r KEY; do
+      PUB="$KEY.pub"
+      FP=""
+      [ -f "$PUB" ] && FP="$(ssh-keygen -lf "$PUB" 2>/dev/null | awk '{print $2}')"
+
+      if [ -n "$FP" ] && ssh-add -l 2>/dev/null | grep -q "$FP"; then
+        continue
+      fi
+
+      ssh-add "$KEY" >/dev/null 2>&1 || true
+    done

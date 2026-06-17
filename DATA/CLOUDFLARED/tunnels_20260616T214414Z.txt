@@ -1,0 +1,8 @@
+You can obtain more detailed information for each tunnel with `cloudflared tunnel info <name/uuid>`
+ID                                   NAME            CREATED              CONNECTIONS                                                            
+d7afd49e-b7ca-4cdd-81ff-66ba2dd8de1c AETHERNet       2026-01-14T16:42:47Z                                                                        
+8b52d381-a5e5-464a-a5cf-67951b475be0 AETHERNet_local 2026-05-24T04:45:19Z 1xiad03, 1xiad05, 1xiad08, 1xiad10, 1xiad12, 1xiad15, 1xiad16, 1xiad19 
+02fbfd13-4d69-4c30-ab35-1a62c22b5d31 AETHERPort      2026-05-03T08:59:38Z                                                                        
+2f1b94a2-e520-4c1c-a5b6-939d00da016c BAE_004_LABELLA 2026-01-01T22:40:17Z                                                                        
+fee59bcb-90c6-4eb2-af4f-0d5d49c8eae7 corpus-ssh      2026-02-07T23:51:18Z                                                                        
+221ef488-2e5e-4a05-b2fa-3ca5525df8b7 labella         2026-01-01T23:16:47Z                                                                        

@@ -1,0 +1,24 @@
+{
+  "provider": "proxmox",
+  "role": "local_virtualization_body_farm",
+  "status": "registered_not_yet_proven",
+  "under": "AETHIEAOPSYS",
+  "authority_root": "AEUSB",
+  "functions": [
+    "virtual machines",
+    "lxc containers",
+    "vlan segmentation",
+    "bridges",
+    "storage pools",
+    "snapshots",
+    "backups",
+    "local lab runtime"
+  ],
+  "not": [
+    "authority root",
+    "second corpus",
+    "public edge",
+    "single source of truth"
+  ],
+  "rule": "Proxmox contains local runtime bodies; AETHIEAOPSYS governs lane, custody, and continuity."
+}

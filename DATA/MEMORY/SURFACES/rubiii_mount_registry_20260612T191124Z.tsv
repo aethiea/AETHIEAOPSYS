@@ -1,0 +1,8 @@
+surfacepathwindows_drivesizeusedavailableuse_percentrolestatus
+AETHIEAOPSYS_BODY/mnt/hH:117G11G106G10%current root body / authority filesystemONLINE
+AEXHD_CANDIDATE/mnt/iI:299G332M298G1%AE320GB / AEXHD heavy habitat candidateONLINE
+OUTTABODYDRIVE/mnt/dD:466G49G418G11%backup / mass surface / Olivia image laneONLINE
+LOCAL_SYSTEM/mnt/cC:238G217G22G92%host OS / avoid heavy writesONLINE_LOW_SPACE
+EXTERNAL_E/mnt/eE:290G80G211G28%unclassified external/storage surfaceONLINE_UNCLASSIFIED
+EXTERNAL_F/mnt/fF:176G767M176G1%unclassified external/storage surfaceONLINE_UNCLASSIFIED
+WSL_ROOT//dev/sdd1007G18G939G2%Linux runtime + docker rootONLINE

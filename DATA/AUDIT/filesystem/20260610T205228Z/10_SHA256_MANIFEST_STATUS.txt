@@ -1,0 +1,7 @@
+# SHA256 MANIFEST STATUS
+
+Timestamp UTC: 2026-06-10T21:02:01Z
+Status: PARTIAL_INTERRUPTED
+Reason: Full hash manifest was manually interrupted before completion.
+Observed cause: Full body includes large objects such as APT/IMAGES/aethiea-apt-rootfs.ext4 and model/tool binaries.
+Rule: Folder/file inventory completed; deep hash manifest must be run as separate large-object-safe pass.

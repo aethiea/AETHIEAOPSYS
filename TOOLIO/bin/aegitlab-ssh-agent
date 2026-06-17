@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+exec /mnt/h/AETHIEAOPSYS/TOOLIO/bin/aeusb-ssh-authority "$@"

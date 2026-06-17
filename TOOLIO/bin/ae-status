@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+set -u
+
+ROOT="/mnt/h/AETHIEAOPSYS"
+
+echo "=== AETHIEAOPSYS STATUS ==="
+date -u +%FT%TZ
+hostname
+whoami
+
+echo
+echo "=== ROOTS ==="
+for root in /mnt/h/AETHIEAOPSYS /mnt/i/AETHIEAOPSYS /home/d_ny5u5/AETHIEAOPSYS; do
+  printf "%-38s " "$root"
+  [ -d "$root" ] && echo "PRESENT" || echo "MISSING"
+done
+
+echo
+echo "=== AEVPS ==="
+systemctl --user is-enabled aevps-startup.service 2>/dev/null | sed 's/^/aevps-startup enabled: /' || true
+systemctl --user is-enabled aevps-tunnel.service 2>/dev/null | sed 's/^/aevps-tunnel enabled:  /' || true
+systemctl --user is-active aevps-tunnel.service 2>/dev/null | sed 's/^/aevps-tunnel active:   /' || true
+[ -f "$ROOT/DATA/BOOT/AEVPS_STARTUP_STATUS.md" ] && cat "$ROOT/DATA/BOOT/AEVPS_STARTUP_STATUS.md"
+
+echo
+echo "=== CALLABLE TOOLS ==="
+for cmd in hcloud cloudflared ssh juicefs fabric prometheus grafana grafana-server redis-server psql docker jq yq; do
+  if command -v "$cmd" >/dev/null 2>&1; then
+    echo "FOUND   $cmd -> $(command -v "$cmd")"
+  else
+    echo "MISSING $cmd"
+  fi
+done
+
+echo
+echo "=== AE-CARRIED TOOL RESOLUTION ==="
+for cmd in cloudflared fabric juicefs; do
+  if command -v "$cmd" >/dev/null 2>&1; then
+    echo "$cmd => $(readlink -f "$(command -v "$cmd")")"
+  fi
+done
+
+echo
+echo "=== OBSERVABILITY ==="
+if [ -f "$ROOT/CONFIG/observability/observability_modes.json" ]; then
+  jq -r '.lane + " / " + .status' "$ROOT/CONFIG/observability/observability_modes.json" 2>/dev/null || cat "$ROOT/CONFIG/observability/observability_modes.json"
+  sha256sum "$ROOT/CONFIG/observability/observability_modes.json"
+fi
+
+echo
+echo "=== AESOFT AUDIT ==="
+aesoft-audit 2>/dev/null || echo "aesoft-audit not callable"

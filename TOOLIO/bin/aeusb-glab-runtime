@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# AETHIEA glab runtime bridge
+# AEUSB carries custody. Host gets ephemeral permission-correct runtime copy.
+
+set -euo pipefail
+
+SRC="/mnt/h/AETHIEAOPSYS/VAULT/AUTH/CALLABLE/GITLAB_CLI_SNAP_CURRENT/glab-cli"
+
+# snap glab current revision path
+DST="$HOME/snap/glab/current/.config/glab-cli"
+
+[ -d "$SRC" ] || exit 0
+
+mkdir -p "$(dirname "$DST")"
+rm -rf "$DST"
+mkdir -p "$DST"
+
+# Copy files without printing secrets.
+cp -a "$SRC"/. "$DST"/ 2>/dev/null || cp -r "$SRC"/. "$DST"/
+
+find "$DST" -type d -exec chmod 700 {} \; 2>/dev/null || true
+find "$DST" -type f -exec chmod 600 {} \; 2>/dev/null || true

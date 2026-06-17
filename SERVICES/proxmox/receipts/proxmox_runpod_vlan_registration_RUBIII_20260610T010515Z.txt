@@ -1,0 +1,19 @@
+=== PROXMOX RUNPOD VLAN REGISTRATION ===
+2026-06-10T01:05:16Z
+RUBIII
+d_ny5u5
+
+=== FILES ===
+-rwxr--r-- 1 d_ny5u5 d_ny5u5 565 Jun  9 21:04 CONFIG/provider/proxmox/provider.json
+-rwxr--r-- 1 d_ny5u5 d_ny5u5 621 Jun  9 21:04 CONFIG/provider/runpod/provider.json
+-rwxr--r-- 1 d_ny5u5 d_ny5u5 1444 Jun  9 21:05 CONFIG/network/vlans/aethiea_vlan_map.json
+
+=== HASH ===
+5b97a4202be012627069b487c022a3b0467faa8cf84938c7515c89ab0c22f6ca  CONFIG/provider/proxmox/provider.json
+e72045d7aaa4c9696434e1cebd89b2d812b99faa4bf22206f1ad10098fb19be3  CONFIG/provider/runpod/provider.json
+829295f201d2aeb561d24d2aa9dcf0555697ca350d8aff313ea4f8730a6aab76  CONFIG/network/vlans/aethiea_vlan_map.json
+
+=== STATUS ===
+Proxmox registered, not yet proven.
+RunPod registered, not yet proven.
+VLAN map registered, not yet proven.

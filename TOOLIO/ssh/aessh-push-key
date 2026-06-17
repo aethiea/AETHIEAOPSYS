@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+set -u
+
+ROOT="${AETHIEA:-/mnt/h/AETHIEAOPSYS}"
+PUB="$ROOT/CONFIG/ssh/aethiea_operator.pub"
+INV="$ROOT/CONFIG/ssh/inventory/ssh_targets.tsv"
+
+mkdir -p "$ROOT/SERVICES/ssh/receipts"
+
+STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
+OUT="/tmp/aessh_push_key_${HOSTNAME}_${STAMP}.txt"
+
+{
+  echo "=== AESSH PUBLIC KEY PUSH ==="
+  date -u +%FT%TZ
+  hostname
+  whoami
+
+  echo
+  echo "=== PUBLIC KEY ==="
+  ls -l "$PUB"
+  sha256sum "$PUB"
+  cat "$PUB"
+
+  echo
+  echo "=== INVENTORY ==="
+  cat -te "$INV"
+
+  echo
+  echo "=== PUSH RESULTS ==="
+
+  while IFS=$'\t' read -r label user host port; do
+    [[ -z "${label:-}" ]] && continue
+    [[ "$label" =~ ^# ]] && continue
+    [[ -z "${user:-}" || -z "${host:-}" ]] && continue
+
+    port="${port:-22}"
+
+    echo
+    echo "--- $label :: $user@$host:$port"
+
+    ssh-copy-id \
+      -i "$PUB" \
+      -p "$port" \
+      -o StrictHostKeyChecking=accept-new \
+      "$user@$host" \
+      && echo "OK $label" \
+      || echo "FAIL $label"
+  done < "$INV"
+
+} | tee "$OUT"
+
+for root in /mnt/h/AETHIEAOPSYS /mnt/i/AETHIEAOPSYS /home/d_ny5u5/AETHIEAOPSYS; do
+  [ -d "$root" ] || continue
+  mkdir -p "$root/SERVICES/ssh/receipts"
+  cp "$OUT" "$root/SERVICES/ssh/receipts/"
+done
+
+sha256sum "$OUT"

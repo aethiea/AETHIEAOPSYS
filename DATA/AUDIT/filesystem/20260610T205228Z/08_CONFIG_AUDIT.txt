@@ -1,0 +1,13 @@
+/mnt/h/AETHIEAOPSYS/CONFIG/network/vlans/aethiea_vlan_map.json
+/mnt/h/AETHIEAOPSYS/CONFIG/network/vlans/receipts/proxmox_runpod_vlan_registration_RUBIII_20260610T010515Z.txt
+/mnt/h/AETHIEAOPSYS/CONFIG/observability/observability_modes.json
+/mnt/h/AETHIEAOPSYS/CONFIG/provider/proxmox/provider.json
+/mnt/h/AETHIEAOPSYS/CONFIG/provider/runpod/provider.json
+/mnt/h/AETHIEAOPSYS/CONFIG/ssh/aethiea_operator.pub
+/mnt/h/AETHIEAOPSYS/CONFIG/ssh/inventory/ssh_targets.tsv
+
+JSON validation:
+JSON_OK  /mnt/h/AETHIEAOPSYS/CONFIG/network/vlans/aethiea_vlan_map.json
+JSON_OK  /mnt/h/AETHIEAOPSYS/CONFIG/observability/observability_modes.json
+JSON_OK  /mnt/h/AETHIEAOPSYS/CONFIG/provider/proxmox/provider.json
+JSON_OK  /mnt/h/AETHIEAOPSYS/CONFIG/provider/runpod/provider.json

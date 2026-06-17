@@ -1,0 +1,112 @@
+=== HERMES PROOF ===
+2026-06-10T15:03:52Z
+RUBIII
+d_ny5u5
+
+=== COMMAND ===
+/home/d_ny5u5/.local/bin/hermes
+/mnt/h/AETHIEAOPSYS/TOOLIO/hermes/hermes.sh
+-rwxr--r-- 1 d_ny5u5 d_ny5u5 314 May 24 03:28 /mnt/h/AETHIEAOPSYS/TOOLIO/bin/hermes
+-rwxr--r-- 1 d_ny5u5 d_ny5u5 420 Jun  8 12:45 /mnt/h/AETHIEAOPSYS/TOOLIO/hermes/hermes.sh
+
+=== RECEIPTS ===
+{
+  "surface": "RUBIII",
+  "operator": "d_ny5u5",
+  "mode": "USB_CONTINUITY",
+  "root_body": "/mnt/h/AETHIEAOPSYS",
+  "artifact": "TOOLIO/bin/hermes",
+  "body": "TOOLIO/hermes/hermes.sh",
+  "status": "HERMES_ONLINE",
+  "role": "courier / interface membrane",
+  "verified_command_path": "/mnt/h/AETHIEAOPSYS/TOOLIO/bin/hermes",
+  "boot_log": "LOGS/HERMES/hermes_boot.log",
+  "doctrine": [
+    "AEUSB carries Hermes",
+    "Host executes Hermes",
+    "Host does not own Hermes",
+    "Hermes relays signal without becoming authority",
+    "#butnotlimitedTEWW"
+  ],
+  "timestamp_utc": "2026-05-22T12:24:21Z"
+}
+
+{
+  "surface": "RUBIII",
+  "operator": "d_ny5u5",
+  "root": "/mnt/h/AETHIEAOPSYS",
+  "mode": "AEUSB_CARRIED",
+  "artifact": "ENV/SHELL/aethiea_env.sh",
+  "hermes_path": "/mnt/h/AETHIEAOPSYS/TOOLIO/bin/hermes",
+  "status": "AEUSB_ROOT_ENV_LOCKED",
+  "doctrine": [
+    "Live root is /mnt/h/AETHIEAOPSYS until /opt bind is active",
+    "Hermes is native to AEUSB-carried AETHIEAOPSYS",
+    "Host executes; AEUSB carries; host does not own"
+  ],
+  "timestamp_utc": "2026-05-22T13:31:34Z"
+}
+
+=== LOGS ===
+2026-05-22T14:11:05Z AETHIEA HERMES ROUTE → /home/d_ny5u5/.local/bin/hermes --help
+2026-05-22T14:11:37Z AETHIEA HERMES ROUTE → /home/d_ny5u5/.local/bin/hermes --help
+2026-05-22T14:17:57Z AETHIEA HERMES ROUTE → /home/d_ny5u5/.local/bin/hermes --tui
+2026-06-08T16:41:33Z RUBIII HERMES BRIDGE VERIFIED → /mnt/h/AETHIEAOPSYS/TOOLIO/hermes/hermes.sh
+2026-06-08T16:46:29Z RUBIII HERMES WRAPPER RECOVERED + SYNTAX CLEAN
+
+Timestamp UTC: 2026-05-22T12:24:21Z
+Timestamp UTC: 2026-05-22T12:33:41Z
+Timestamp UTC: 2026-05-22T12:34:13Z
+Timestamp UTC: 2026-05-22T13:28:08Z
+Timestamp UTC: 2026-05-22T13:31:22Z
+Timestamp UTC: 2026-05-22T13:32:23Z
+Timestamp UTC: 2026-05-22T13:42:07Z
+Timestamp UTC: 2026-05-22T14:04:24Z
+Timestamp UTC: 2026-05-24T07:29:27Z
+Timestamp UTC: 2026-06-03T22:19:12Z
+Timestamp UTC: 2026-06-08T16:39:54Z
+Timestamp UTC: 2026-06-08T16:39:57Z
+Timestamp UTC: 2026-06-08T16:45:15Z
+Timestamp UTC: 2026-06-08T16:46:20Z
+Timestamp UTC: 2026-06-09T01:27:58Z
+
+=== AUDIT ===
+=== AESOFT AUDIT ===
+software       command         state  path                                        version_probe
+Git            git             FOUND  /usr/bin/git                                git version 2.53.0
+Hetzner CLI    hcloud          FOUND  /usr/bin/hcloud                             hcloud 1.39.0
+Node.js        node            FOUND  /usr/bin/node                               v22.22.1
+npm            npm             FOUND  /usr/bin/npm                                9.2.0
+Python         python3         FOUND  /usr/bin/python3                            Python 3.14.4
+pip            pip3            FOUND  /usr/bin/pip3                               pip 25.1.1 from /usr/lib/python3/dist-packages/pip (python 3.14)
+OpenSSH        ssh             FOUND  /usr/bin/ssh                                OpenSSH_10.2p1 Ubuntu-2ubuntu3.2, OpenSSL 3.5.5 27 Jan 2026
+rsync          rsync           FOUND  /usr/bin/rsync                              rsync  version 3.4.1  protocol version 32
+curl           curl            FOUND  /usr/bin/curl                               curl 8.18.0 (x86_64-pc-linux-gnu) libcurl/8.18.0 OpenSSL/3.5.5 zlib/1.3.1 brotli/1.2.0 zstd/1.5.7 libidn2/2.3.8 libpsl/0.21.2 libssh2/1.11.1 nghttp2/1.68.0 librtmp/2.3 mit-krb5/1.22.1 OpenLDAP/2.6.10
+wget           wget            FOUND  /usr/bin/wget                               GNU Wget 1.25.0 built on linux-gnu.
+systemctl      systemctl       FOUND  /usr/bin/systemctl                          systemd 259 (259.5-0ubuntu3)
+FUSE           fusermount3     FOUND  /usr/bin/fusermount3                        fusermount3 version: 3.18.2
+Docker         docker          FOUND  /usr/bin/docker                             Docker version 29.1.3, build 29.1.3-0ubuntu4.1
+Cloudflared    cloudflared     FOUND  /mnt/h/AETHIEAOPSYS/TOOLIO/bin/cloudflared  cloudflared version 2026.5.0 (built 2026-05-13-11:24 UTC)
+Hermes         hermes          FOUND  /home/d_ny5u5/.local/bin/hermes             HERMES ONLINE
+Prometheus     prometheus      FOUND  /usr/bin/prometheus                         prometheus, version 2.53.5+ds1 (branch: debian/sid, revision: 2.53.5+ds1-3)
+Grafana        grafana-server  FOUND  /usr/sbin/grafana-server                    Deprecation warning: 'grafana-server' is deprecated and will be removed in a future release. Use the 'grafana server' subcommand instead.
+Rust Cargo     cargo           FOUND  /usr/bin/cargo                              cargo 1.93.1 (083ac5135 2025-12-15) (built from a source tarball)
+Rust Compiler  rustc           FOUND  /usr/bin/rustc                              rustc 1.93.1 (01f6ddf75 2026-02-11) (built from a source tarball)
+rclone         rclone          FOUND  /usr/bin/rclone                             rclone v1.60.1-DEV
+Redis          redis-server    FOUND  /usr/bin/redis-server                       Redis server v=8.0.5 sha=00000000:0 malloc=jemalloc-5.3.0 bits=64 build=9729964261b8fc0f
+Postgres       psql            FOUND  /usr/bin/psql                               psql (PostgreSQL) 18.4 (Ubuntu 18.4-0ubuntu0.26.04.1)
+JuiceFS        juicefs         FOUND  /home/d_ny5u5/.local/bin/juicefs            juicefs version 1.3.1+2025-12-02.e0032b2
+Fabric         fabric          FOUND  /home/d_ny5u5/.local/bin/fabric             v1.4.455
+jq             jq              FOUND  /usr/bin/jq                                 jq-1.8.1
+yq             yq              FOUND  /usr/bin/yq                                 yq 3.4.3
+
+=== STATUS ===
+# AESOFT AUDIT STATUS
+
+Timestamp UTC: 2026-06-10T15:03:56Z
+Host: RUBIII
+Receipt: aesoft_audit_RUBIII_20260610T150352Z.tsv
+SHA256: 15b9122d180d66f9db25d1d1787444d13610443db2ae5356109d2072811d49d4
+
+Rule:
+Software is audited as callable capacity, not just package presence.

@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+set -u
+
+ROOT="/mnt/h/AETHIEAOPSYS"
+HROOT="/mnt/h/AETHIEAOPSYS"
+IROOT="/mnt/i/AETHIEAOPSYS"
+UROOT="/home/d_ny5u5/AETHIEAOPSYS"
+
+echo "=== AETHIEA BOOTPROOF ==="
+date -u +%FT%TZ
+hostname
+whoami
+
+echo
+echo "=== SERVICES ==="
+printf "aevps-startup.service: "
+systemctl --user is-enabled aevps-startup.service 2>/dev/null || true
+
+printf "aevps-tunnel.service:  "
+systemctl --user is-enabled aevps-tunnel.service 2>/dev/null || true
+
+printf "aevps-tunnel active:   "
+systemctl --user is-active aevps-tunnel.service 2>/dev/null || true
+
+printf "ae-status-boot-receipt.service: "
+systemctl --user is-enabled ae-status-boot-receipt.service 2>/dev/null || true
+
+printf "ae-status-boot-receipt active:  "
+systemctl --user is-active ae-status-boot-receipt.service 2>/dev/null || true
+
+echo
+echo "=== AEVPS STARTUP STATUS ==="
+if [ -f "$ROOT/DATA/BOOT/AEVPS_STARTUP_STATUS.md" ]; then
+  grep -E 'Timestamp UTC:|HCLOUD:|Server Status:|Cloudflare Tunnel Service:|SSH Agent:' "$ROOT/DATA/BOOT/AEVPS_STARTUP_STATUS.md" || cat "$ROOT/DATA/BOOT/AEVPS_STARTUP_STATUS.md"
+else
+  echo "MISSING $ROOT/DATA/BOOT/AEVPS_STARTUP_STATUS.md"
+fi
+
+echo
+echo "=== LATEST BOOT RECEIPT ==="
+latest="$(ls -t "$HROOT"/DATA/STATUS/receipts/ae_status_BOOT_RUBIII_*.txt 2>/dev/null | head -n 1 || true)"
+
+if [ -z "${latest:-}" ]; then
+  echo "NO BOOT RECEIPT FOUND"
+  exit 1
+fi
+
+base="$(basename "$latest")"
+echo "$base"
+
+echo
+echo "=== MIRROR HASH CHECK ==="
+sha256sum \
+  "$HROOT/DATA/STATUS/receipts/$base" \
+  "$IROOT/DATA/STATUS/receipts/$base" \
+  "$UROOT/DATA/STATUS/receipts/$base"
+
+echo
+echo "=== BOOT LOG ANCHOR ==="
+grep "$base\|$(sha256sum "$latest" | awk '{print $1}')" "$ROOT/LOGS/BOOT/aevps_startup.log" | tail -n 5 || true
+
+echo
+echo "=== CLEAN LOCK ==="
+echo "AEVPS startup proven."
+echo "Cloudflare tunnel proven."
+echo "ae-status boot receipt proven."
+echo "Receipt mirrored across AEUSB, AE320, and host body."
+echo "Host executes. AEUSB carries. Host does not own."

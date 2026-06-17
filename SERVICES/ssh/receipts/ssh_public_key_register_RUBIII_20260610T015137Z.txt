@@ -1,0 +1,19 @@
+=== SSH PUBLIC KEY REGISTER ===
+2026-06-10T01:51:37Z
+RUBIII
+d_ny5u5
+
+=== DISCOVERED PUBLIC KEYS ===
+/home/d_ny5u5/.ssh/aethieaos_hf_ed25519.pub
+/home/d_ny5u5/.ssh/aethieaos_gitlab_ed25519.pub
+/home/d_ny5u5/.ssh/id_ed25519.pub
+/home/d_ny5u5/.ssh/aethieaos_github_ed25519.pub
+
+=== REGISTERED OPERATOR KEY ===
+-rwxr--r-- 1 d_ny5u5 d_ny5u5 82 Jun  9 21:50 CONFIG/ssh/aethiea_operator.pub
+577861a3030d7a66768164c8fed49bdb033156cad73154884fe46b2c3033a221  CONFIG/ssh/aethiea_operator.pub
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAID4Uyyr4zROdPkX8o9nO1+Y8Obg0IlqyQmgpwBB1ECE+ 
+
+=== OPENSSH AUDIT ===
+/usr/bin/ssh
+OpenSSH_10.2p1 Ubuntu-2ubuntu3.2, OpenSSL 3.5.5 27 Jan 2026

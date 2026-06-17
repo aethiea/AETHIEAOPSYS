@@ -1,0 +1,28 @@
+{
+  "provider": "runpod",
+  "role": "remote_gpu_body",
+  "status": "registered_not_yet_proven",
+  "under": "AETHIEAOPSYS",
+  "authority_root": "AEUSB",
+  "functions": [
+    "gpu pods",
+    "serverless endpoints",
+    "network volumes",
+    "model inference",
+    "training",
+    "fine tuning",
+    "vllm",
+    "comfyui",
+    "remote gpu scripts"
+  ],
+  "secret_env": [
+    "RUNPOD_API_KEY"
+  ],
+  "not": [
+    "authority root",
+    "permanent corpus body",
+    "identity source",
+    "single runtime dependency"
+  ],
+  "rule": "RunPod supplies remote GPU muscle; AETHIEAOPSYS retains continuity, routing, and custody."
+}

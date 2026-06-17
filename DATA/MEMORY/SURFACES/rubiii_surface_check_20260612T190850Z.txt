@@ -1,0 +1,93 @@
+AETHIEAOPSYS RUBIII SURFACE CHECK
+UTC=20260612T190850Z
+
+PWD:
+/mnt/h/AETHIEAOPSYS
+
+ROOT LIST:
+total 1.0M
+-rwxr--r-- 1 d_ny5u5 d_ny5u5   51 Jun  8 12:50 2026-06-08T16:50:09Z RUBIII APT INVENTORY CAPTURED
+-rwxr--r-- 1 d_ny5u5 d_ny5u5 531K Jun  9 16:51 32
+-rwxr--r-- 1 d_ny5u5 d_ny5u5    0 Jun  3 18:16 AE320GB
+drwxr-xr-x 1 d_ny5u5 d_ny5u5  512 Jun  9 17:31 AEFS
+-rwxr--r-- 1 d_ny5u5 d_ny5u5    0 Jun  3 18:16 AEUSB
+drwxr-xr-x 1 d_ny5u5 d_ny5u5  512 May 22 02:39 APT
+drwxr-xr-x 1 d_ny5u5 d_ny5u5  512 May  5 19:27 CLOUD_CLONE
+drwxr-xr-x 1 d_ny5u5 d_ny5u5  512 Jun  9 21:01 CONFIG
+drwxr-xr-x 1 d_ny5u5 d_ny5u5  512 Apr 20 05:23 CORE
+drwxr-xr-x 1 d_ny5u5 d_ny5u5  512 Apr 20 05:23 DATA
+drwxr-xr-x 1 d_ny5u5 d_ny5u5  512 Jun  9 15:40 DOCKER
+drwxr-xr-x 1 d_ny5u5 d_ny5u5  512 Apr 20 05:40 DOMAINS
+drwxr-xr-x 1 d_ny5u5 d_ny5u5  512 May  2 17:34 ENV
+drwxr-xr-x 1 d_ny5u5 d_ny5u5  512 Apr 25 08:21 EXECUTION
+drwxr-xr-x 1 d_ny5u5 d_ny5u5  512 Apr 24 23:30 GCR
+drwxr-xr-x 1 d_ny5u5 d_ny5u5  512 May 28 19:54 GITLAB
+drwxr-xr-x 1 d_ny5u5 d_ny5u5  512 Jun 10 11:03 HERMES
+drwxr-xr-x 1 d_ny5u5 d_ny5u5  512 Apr 20 05:40 LAYERS
+drwxr-xr-x 1 d_ny5u5 d_ny5u5  512 Apr 20 05:23 LOGS
+drwxr-xr-x 1 d_ny5u5 d_ny5u5  512 May  5 16:49 MODELS
+drwxr-xr-x 1 d_ny5u5 d_ny5u5  512 Apr 20 05:23 MODS
+drwxr-xr-x 1 d_ny5u5 d_ny5u5  512 May  5 20:02 PORTAL
+drwxr-xr-x 1 d_ny5u5 d_ny5u5  512 Jun  9 13:45 PROGRAMS
+drwxr-xr-x 1 d_ny5u5 d_ny5u5  512 May  2 17:51 REJECTED
+drwxr-xr-x 1 d_ny5u5 d_ny5u5  512 Jun  2 10:39 ROUTES
+drwxr-xr-x 1 d_ny5u5 d_ny5u5  512 May  3 05:09 RUN
+drwxr-xr-x 1 d_ny5u5 d_ny5u5  512 Jun  9 15:42 SERVICES
+-rwxr--r-- 1 d_ny5u5 d_ny5u5  652 Jun  8 14:14 STATUS.md
+drwxr-xr-x 1 d_ny5u5 d_ny5u5  512 Apr 20 05:23 TEMP
+drwxr-xr-x 1 d_ny5u5 d_ny5u5  512 Apr 20 05:23 TOOLIO
+drwxr-xr-x 1 d_ny5u5 d_ny5u5  512 Jun  2 10:39 USB_NATIVE_ROUTED
+drwxr-xr-x 1 d_ny5u5 d_ny5u5  512 Jun  8 16:36 VAULT
+-rwxr--r-- 1 d_ny5u5 d_ny5u5 2.7K Jun  9 17:20 wget-log
+-rwxr--r-- 1 d_ny5u5 d_ny5u5    0 May 24 10:53 wsl
+
+BLOCK DEVICES:
+NAME   SIZE FSTYPE LABEL MOUNTPOINTS
+sda  356.9M ext4         
+sdb  159.5M ext4         
+sdc      2G swap         [SWAP]
+sdd      1T ext4         /var/lib/docker
+                         /snap
+                         /mnt/wslg/distro
+                         /
+
+FILESYSTEMS:
+Filesystem     Type           Size  Used Avail Use% Mounted on
+none           overlay        3.9G     0  3.9G   0% /usr/lib/modules/6.18.33.1-microsoft-standard-WSL2
+none           tmpfs          3.9G  4.0K  3.9G   1% /mnt/wsl
+drivers        9p             238G  217G   22G  92% /usr/lib/wsl/drivers
+/dev/sdd       ext4          1007G   18G  939G   2% /
+none           tmpfs          3.9G   36K  3.9G   1% /mnt/wslg
+none           overlay        3.9G     0  3.9G   0% /usr/lib/wsl/lib
+rootfs         rootfs         3.9G  2.8M  3.9G   1% /init
+none           tmpfs          3.9G  884K  3.9G   1% /run
+none           tmpfs          3.9G     0  3.9G   0% /run/lock
+none           tmpfs          3.9G     0  3.9G   0% /run/shm
+none           overlay        3.9G   80K  3.9G   1% /mnt/wslg/versions.txt
+none           overlay        3.9G   80K  3.9G   1% /mnt/wslg/doc
+H:             9p             117G   11G  106G  10% /mnt/h
+I:             9p             299G  332M  298G   1% /mnt/i
+C:\            9p             238G  217G   22G  92% /mnt/c
+D:\            9p             466G   49G  418G  11% /mnt/d
+E:\            9p             290G   80G  211G  28% /mnt/e
+F:\            9p             176G  767M  176G   1% /mnt/f
+none           tmpfs          1.0M     0  1.0M   0% /run/credentials/systemd-journald.service
+tmpfs          tmpfs          3.9G   20K  3.9G   1% /tmp
+none           tmpfs          1.0M     0  1.0M   0% /run/credentials/systemd-resolved.service
+snapfuse       fuse.snapfuse   50M   50M     0 100% /snap/snapd/26865
+snapfuse       fuse.snapfuse   65M   65M     0 100% /snap/codex/34
+snapfuse       fuse.snapfuse   67M   67M     0 100% /snap/core24/1643
+none           tmpfs          1.0M     0  1.0M   0% /run/credentials/getty@tty1.service
+tmpfs          tmpfs          792M   12K  792M   1% /run/user/1000
+
+MOUNTS:
+H: on /mnt/h type 9p (rw,relatime,aname=drvfs;path=H:;metadata;uid=1000;gid=1000;umask=022;fmask=011;symlinkroot=/mnt/,cache=0x5,access=client,msize=65536,trans=fd,rfd=3,wfd=3)
+I: on /mnt/i type 9p (rw,relatime,aname=drvfs;path=I:;metadata;uid=1000;gid=1000;umask=022;fmask=011;symlinkroot=/mnt/,cache=0x5,access=client,msize=65536,trans=fd,rfd=3,wfd=3)
+C:\ on /mnt/c type 9p (rw,noatime,aname=drvfs;path=C:\;uid=1000;gid=1000;symlinkroot=/mnt/,cache=0x5,access=client,msize=65536,trans=fd,rfd=6,wfd=6)
+D:\ on /mnt/d type 9p (rw,noatime,aname=drvfs;path=D:\;uid=1000;gid=1000;symlinkroot=/mnt/,cache=0x5,access=client,msize=65536,trans=fd,rfd=6,wfd=6)
+E:\ on /mnt/e type 9p (rw,noatime,aname=drvfs;path=E:\;uid=1000;gid=1000;symlinkroot=/mnt/,cache=0x5,access=client,msize=65536,trans=fd,rfd=6,wfd=6)
+F:\ on /mnt/f type 9p (rw,noatime,aname=drvfs;path=F:\;uid=1000;gid=1000;symlinkroot=/mnt/,cache=0x5,access=client,msize=65536,trans=fd,rfd=6,wfd=6)
+fusectl on /sys/fs/fuse/connections type fusectl (rw,nosuid,nodev,noexec,relatime)
+snapfuse on /snap/snapd/26865 type fuse.snapfuse (ro,nodev,relatime,user_id=0,group_id=0,allow_other)
+snapfuse on /snap/codex/34 type fuse.snapfuse (ro,nodev,relatime,user_id=0,group_id=0,allow_other)
+snapfuse on /snap/core24/1643 type fuse.snapfuse (ro,nodev,relatime,user_id=0,group_id=0,allow_other)
