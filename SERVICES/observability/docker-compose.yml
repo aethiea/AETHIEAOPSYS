@@ -4,16 +4,20 @@ services:
     container_name: ae-prometheus
     restart: unless-stopped
     ports:
-      - "127.0.0.1:9090:9090"
+      - "127.0.0.1:9900:9090"
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - ./data/prometheus:/prometheus
+      - ae_prometheus_data:/prometheus
 
   grafana:
     image: grafana/grafana-oss:latest
     container_name: ae-grafana
     restart: unless-stopped
     ports:
-      - "127.0.0.1:3000:3000"
+      - "127.0.0.1:3900:3000"
     volumes:
-      - ./data/grafana:/var/lib/grafana
+      - ae_grafana_data:/var/lib/grafana
+
+volumes:
+  ae_prometheus_data:
+  ae_grafana_data:
