@@ -1,8 +1,43 @@
 #!/usr/bin/env bash
-AETH_ROOT="${AETH_ROOT:-${AETHIEA:-/mnt/h/AETHIEAOPSYS}}"
+set -e
 
-cmd="$1"
-shift || true
+resolve_root() {
+  local r d
+
+  if command -v aeth_root >/dev/null 2>&1; then
+    r="$(aeth_root 2>/dev/null || true)"
+    [ -n "$r" ] && [ -d "$r" ] && [ -f "$r/.aeth_root" ] && { printf '%s\n' "$r"; return 0; }
+  fi
+
+  for r in "${AETH_ROOT:-}" "${AETHIEA:-}" "${AETHIEAOPSYS:-}" "${AEUSB:-}"; do
+    [ -n "$r" ] && [ -d "$r" ] && [ -f "$r/.aeth_root" ] && { printf '%s\n' "$r"; return 0; }
+  done
+
+  d="$PWD"
+  while [ "$d" != "/" ]; do
+    [ -f "$d/.aeth_root" ] && { printf '%s\n' "$d"; return 0; }
+    d="$(dirname "$d")"
+  done
+
+  for r in /mnt/[a-z]/AETHIEAOPSYS /media/*/AETHIEAOPSYS /run/media/*/AETHIEAOPSYS /Volumes/*/AETHIEAOPSYS "$HOME/AETHIEAOPSYS" /opt/AETHIEAOPSYS; do
+    [ -d "$r" ] || continue
+    [ -f "$r/.aeth_root" ] || continue
+    [ -f "$r/STATUS.md" ] || continue
+    [ ! -f "$r/AE320GB_HEAVY_BODY" ] || continue
+    [ ! -f "$r/.aeth_heavy_body" ] || continue
+    printf '%s\n' "$r"
+    return 0
+  done
+
+  return 1
+}
+
+AETH_ROOT="$(resolve_root)"
+export AETH_ROOT
+export AETHIEA="$AETH_ROOT"
+
+cmd="${1:-status-surface}"
+[ $# -gt 0 ] && shift || true
 
 case "$cmd" in
   up|start)

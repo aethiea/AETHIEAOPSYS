@@ -5,8 +5,8 @@
   "relationship": "renders_and_interacts_with_AETHIEAOPSYS",
   "host_role": "execution_and_interface",
   "runtime": "AETHIEAOPSYS",
-  "runtime_root": "/mnt/h/AETHIEAOPSYS",
-  "mode": "USB_CONTINUITY",
+  "runtime_root": "/mnt/j/AETHIEAOPSYS",
+  "mode": "USB_NATIVE_ROUTED",
   "operator_node": "DNY-5U5",
   "status": "ACTIVE",
   "rules": [
@@ -19,7 +19,6 @@
     "Host state is temporary unless explicitly registered",
     "#butnotlimitedTEWW",
     "Visible example does not close topology",
-    "This surface confirms a pattern but does not limit the system",
     "System-wide non-closure clause applies unless explicitly sealed"
   ]
 }

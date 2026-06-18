@@ -1,28 +1,43 @@
 #!/usr/bin/env bash
 # AETHIEA AEUSB Callable Auth Env Loader
 # Host executes. AEUSB carries auth. Host does not own.
+# Dynamic root. No fixed drive letter.
 
-ROOT="/mnt/h/AETHIEAOPSYS"
+aeusb_auth_valid_root() {
+  local r="$1"
+  [ -n "$r" ] || return 1
+  [ -d "$r" ] || return 1
+  [ -f "$r/.aeth_root" ] || return 1
+  [ -f "$r/STATUS.md" ] || return 1
+  [ ! -f "$r/AE320GB_HEAVY_BODY" ] || return 1
+  [ ! -f "$r/.aeth_heavy_body" ] || return 1
+}
+
+ROOT="${AETH_ROOT:-${AETHIEA:-}}"
+
+if ! aeusb_auth_valid_root "$ROOT"; then
+  if declare -F aeth_root >/dev/null 2>&1; then
+    ROOT="$(aeth_root 2>/dev/null || true)"
+  fi
+fi
+
+if ! aeusb_auth_valid_root "$ROOT"; then
+  return 0 2>/dev/null || exit 0
+fi
+
 AUTH="$ROOT/VAULT/AUTH/CALLABLE"
 ENV_DIR="$AUTH/ENV"
 ENV_FILE="$ENV_DIR/aeusb.env"
 
 [ -d "$AUTH" ] || return 0 2>/dev/null || exit 0
 
-# Optional operator-managed env file.
-# Format:
-#   export NAME='value'
-# Keep this file private and ignored.
 if [ -f "$ENV_FILE" ]; then
   . "$ENV_FILE"
 fi
 
-# glab/snap enforces 0600 on config.yml. AEUSB mounts may report 0777.
-# Build a runtime copy from AEUSB custody on wake.
-if [ -x /mnt/h/AETHIEAOPSYS/TOOLIO/bin/aeusb-glab-runtime ]; then
-  /mnt/h/AETHIEAOPSYS/TOOLIO/bin/aeusb-glab-runtime || true
+if [ -x "$ROOT/TOOLIO/bin/aeusb-glab-runtime" ]; then
+  "$ROOT/TOOLIO/bin/aeusb-glab-runtime" || true
 fi
 
-# Common CLI hints. These do not expose secrets.
 [ -d "$AUTH/GITHUB_CLI/gh" ] && export GH_CONFIG_DIR="$AUTH/GITHUB_CLI/gh"
 [ -d "$AUTH/RCLONE/rclone" ] && export RCLONE_CONFIG="$AUTH/RCLONE/rclone/rclone.conf"

@@ -1,14 +1,33 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [ -f /mnt/h/AETHIEAOPSYS/ENV/SHELL/aethiea_env.sh ]; then
-  # shellcheck source=/mnt/h/AETHIEAOPSYS/ENV/SHELL/aethiea_env.sh
-  . /mnt/h/AETHIEAOPSYS/ENV/SHELL/aethiea_env.sh
-else
-  export AETHIEAOPSYS="/mnt/h/AETHIEAOPSYS"
-  export AETH_ROOT="$AETHIEAOPSYS"
-  export AEUSB="$AETHIEAOPSYS"
-fi
+resolve_root() {
+  local r
+  if command -v aeth_root >/dev/null 2>&1; then
+    r="$(aeth_root 2>/dev/null || true)"
+    [ -n "$r" ] && [ -d "$r" ] && [ -f "$r/.aeth_root" ] && { printf '%s\n' "$r"; return 0; }
+  fi
+
+  for r in "${AETH_ROOT:-}" "${AETHIEA:-}" /mnt/[a-z]/AETHIEAOPSYS /media/*/AETHIEAOPSYS /run/media/*/AETHIEAOPSYS /Volumes/*/AETHIEAOPSYS "$HOME/AETHIEAOPSYS" /opt/AETHIEAOPSYS; do
+    [ -d "$r" ] || continue
+    [ -f "$r/.aeth_root" ] || continue
+    [ -f "$r/STATUS.md" ] || continue
+    [ ! -f "$r/AE320GB_HEAVY_BODY" ] || continue
+    [ ! -f "$r/.aeth_heavy_body" ] || continue
+    printf '%s\n' "$r"
+    return 0
+  done
+
+  return 1
+}
+
+ROOT="$(resolve_root)"
+export AETH_ROOT="$ROOT"
+export AETHIEA="$ROOT"
+export AETHIEAOPSYS="$ROOT"
+export AEUSB="$ROOT"
+
+[ -f "$ROOT/ENV/SHELL/aethiea_env.sh" ] && . "$ROOT/ENV/SHELL/aethiea_env.sh" || true
 
 cd "$AETH_ROOT"
 

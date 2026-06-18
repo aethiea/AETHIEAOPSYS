@@ -1,16 +1,42 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT="${AETHIEA:-${AETH_ROOT:-}}"
+valid_root() {
+  local r="$1"
+  [ -n "$r" ] || return 1
+  [ -d "$r" ] || return 1
+  [ -f "$r/.aeth_root" ] || return 1
+  [ -f "$r/STATUS.md" ] || return 1
+  [ ! -f "$r/AE320GB_HEAVY_BODY" ] || return 1
+  [ ! -f "$r/.aeth_heavy_body" ] || return 1
+}
 
-if [ -z "$ROOT" ] || [ ! -d "$ROOT" ]; then
-  for candidate in /opt/AETHIEAOPSYS /mnt/h/AETHIEAOPSYS /mnt/e/AETHIEAOPSYS /mnt/d/AETHIEAOPSYS "$HOME/AETHIEAOPSYS"; do
-    if [ -f "$candidate/.aeth_root" ] || [ -d "$candidate/CORE" ]; then
-      ROOT="$candidate"
-      break
-    fi
+resolve_root() {
+  local r d
+
+  if declare -F aeth_root >/dev/null 2>&1; then
+    r="$(aeth_root 2>/dev/null || true)"
+    valid_root "$r" && { printf '%s\n' "$r"; return 0; }
+  fi
+
+  for r in "${AETHIEA:-}" "${AETH_ROOT:-}" "${AETHIEAOPSYS:-}" "${AEUSB:-}"; do
+    valid_root "$r" && { printf '%s\n' "$r"; return 0; }
   done
-fi
+
+  d="$PWD"
+  while [ "$d" != "/" ]; do
+    valid_root "$d" && { printf '%s\n' "$d"; return 0; }
+    d="$(dirname "$d")"
+  done
+
+  for r in /mnt/[a-z]/AETHIEAOPSYS /media/*/AETHIEAOPSYS /run/media/*/AETHIEAOPSYS /Volumes/*/AETHIEAOPSYS "$HOME/AETHIEAOPSYS" /opt/AETHIEAOPSYS; do
+    valid_root "$r" && { printf '%s\n' "$r"; return 0; }
+  done
+
+  return 1
+}
+
+ROOT="$(resolve_root || true)"
 
 if [ -z "$ROOT" ] || [ ! -d "$ROOT" ]; then
   echo "SURFACE REGISTER ERROR → AETHIEA root not found" >&2
@@ -46,7 +72,6 @@ cat > "$SURFACE_FILE" <<JSON
     "Host state is temporary unless explicitly registered",
     "#butnotlimitedTEWW",
     "Visible example does not close topology",
-    "This surface confirms a pattern but does not limit the system",
     "System-wide non-closure clause applies unless explicitly sealed"
   ]
 }

@@ -1,15 +1,45 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-cd /mnt/h/AETHIEAOPSYS
+resolve_root() {
+  local r
+  if command -v aeth_root >/dev/null 2>&1; then
+    r="$(aeth_root 2>/dev/null || true)"
+    [ -n "$r" ] && [ -d "$r" ] && [ -f "$r/.aeth_root" ] && { printf '%s\n' "$r"; return 0; }
+  fi
+
+  for r in "${AETH_ROOT:-}" "${AETHIEA:-}" /mnt/[a-z]/AETHIEAOPSYS /media/*/AETHIEAOPSYS /run/media/*/AETHIEAOPSYS /Volumes/*/AETHIEAOPSYS "$HOME/AETHIEAOPSYS" /opt/AETHIEAOPSYS; do
+    [ -d "$r" ] || continue
+    [ -f "$r/.aeth_root" ] || continue
+    [ -f "$r/STATUS.md" ] || continue
+    [ ! -f "$r/AE320GB_HEAVY_BODY" ] || continue
+    [ ! -f "$r/.aeth_heavy_body" ] || continue
+    printf '%s\n' "$r"
+    return 0
+  done
+
+  return 1
+}
+
+ROOT="$(resolve_root)"
+export AETH_ROOT="$ROOT"
+export AETHIEA="$ROOT"
+
+[ -f "$ROOT/ENV/SHELL/aethiea_env.sh" ] && . "$ROOT/ENV/SHELL/aethiea_env.sh" || true
+
+cd "$ROOT"
 
 echo "=== AETHIEA WAKE ==="
-aeth-ssh-agent
+echo "ROOT: $AETH_ROOT"
+echo "HOST: $(hostname)"
+echo "USER: $(whoami)"
 echo
-aeth-bodies
-echo
-aeth-components
-echo
-aeth-hid
-echo
-git --git-dir="$HOME/.aethiea_git/AETHIEAOPSYS.git" --work-tree="/mnt/h/AETHIEAOPSYS" status --short
+
+for cmd in aeth-ssh-agent aeth-bodies aeth-components aeth-hid; do
+  if command -v "$cmd" >/dev/null 2>&1; then
+    "$cmd" || true
+    echo
+  fi
+done
+
+git --git-dir="$HOME/.aethiea_git/AETHIEAOPSYS.git" --work-tree="$ROOT" status --short

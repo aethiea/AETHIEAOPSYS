@@ -1,55 +1,54 @@
 #!/usr/bin/env bash
-
 # AETHIEAOPSYS Surface Bootstrap
+# Canonical visible startup owner.
 # Portable Wake Protocol: hostless, stateless, headless.
 # USB carries continuity. Host provides temporary runtime only.
-# #butnotlimitedTEWW: any visible example is non-exhaustive unless explicitly sealed.
+# #butnotlimitedTEWW: visible example does not close topology.
 
-MARKER=".aeth_root"
+_aeth_boot_return_ok() {
+  return 0 2>/dev/null || exit 0
+}
+
+_aeth_boot_valid_root() {
+  local r="$1"
+  [ -n "$r" ] || return 1
+  [ -d "$r" ] || return 1
+  [ -f "$r/.aeth_root" ] || return 1
+  [ -f "$r/STATUS.md" ] || return 1
+  [ ! -f "$r/AE320GB_HEAVY_BODY" ] || return 1
+  [ ! -f "$r/.aeth_heavy_body" ] || return 1
+}
 
 resolve_root() {
-  if [ -n "${AETH_ROOT:-}" ] && [ -d "$AETH_ROOT" ]; then
-    echo "$AETH_ROOT"
-    return 0
-  fi
+  local r d
 
-  if [ -n "${AETHIEA:-}" ] && [ -d "$AETHIEA" ]; then
-    echo "$AETHIEA"
-    return 0
-  fi
-
-  DIR="$PWD"
-  while [ "$DIR" != "/" ]; do
-    if [ -f "$DIR/$MARKER" ]; then
-      echo "$DIR"
+  if declare -F aeth_root >/dev/null 2>&1; then
+    r="$(aeth_root 2>/dev/null || true)"
+    if _aeth_boot_valid_root "$r"; then
+      printf '%s\n' "$r"
       return 0
     fi
-    DIR="$(dirname "$DIR")"
-  done
+  fi
 
-  for root in \
-    /opt/AETHIEAOPSYS \
-    /mnt/h/AETHIEAOPSYS \
-    /mnt/e/AETHIEAOPSYS \
-    /mnt/d/AETHIEAOPSYS \
-    "$HOME/AETHIEAOPSYS"
-  do
-    if [ -f "$root/$MARKER" ] || [ -d "$root/CORE" ]; then
-      echo "$root"
+  for r in "${AETH_ROOT:-}" "${AETHIEA:-}" "${AETHIEAOPSYS:-}" "${AEUSB:-}"; do
+    if _aeth_boot_valid_root "$r"; then
+      printf '%s\n' "$r"
       return 0
     fi
   done
 
-  for base in /mnt/* /media/* /run/media/* /Volumes/*; do
-    [ -d "$base" ] || continue
-
-    if [ -f "$base/AETHIEAOPSYS/$MARKER" ]; then
-      echo "$base/AETHIEAOPSYS"
+  d="$PWD"
+  while [ "$d" != "/" ]; do
+    if _aeth_boot_valid_root "$d"; then
+      printf '%s\n' "$d"
       return 0
     fi
+    d="$(dirname "$d")"
+  done
 
-    if [ -f "$base/$MARKER" ]; then
-      echo "$base"
+  for r in /mnt/[a-z]/AETHIEAOPSYS /media/*/AETHIEAOPSYS /run/media/*/AETHIEAOPSYS /Volumes/*/AETHIEAOPSYS "$HOME/AETHIEAOPSYS" /opt/AETHIEAOPSYS; do
+    if _aeth_boot_valid_root "$r"; then
+      printf '%s\n' "$r"
       return 0
     fi
   done
@@ -57,12 +56,7 @@ resolve_root() {
   return 1
 }
 
-
 aeth_apply_visual_schema() {
-  # AETHIEA native visual schema
-  # Corpus-carried. Hostless. Formless. Stateless.
-  # Dark R.E.D.D. field. Bright R.E.D.D. text. Gold routes.
-
   export AETH_BG="#1A0000"
   export AETH_FG="#FF1A1A"
   export AETH_GOLD="#FFD700"
@@ -70,11 +64,9 @@ aeth_apply_visual_schema() {
   export AETH_SHADOW="#3A0000"
 
   if [ -t 1 ]; then
-    # OSC terminal palette where supported
-    printf '\033]10;%s\007' "$AETH_FG"       # foreground
-    printf '\033]11;%s\007' "$AETH_BG"       # background
-    printf '\033]12;%s\007' "$AETH_GOLD"     # cursor / route point
-
+    printf '\033]10;%s\007' "$AETH_FG"
+    printf '\033]11;%s\007' "$AETH_BG"
+    printf '\033]12;%s\007' "$AETH_GOLD"
     printf '\033]4;0;#000000\007'
     printf '\033]4;1;%s\007' "$AETH_FG"
     printf '\033]4;3;%s\007' "$AETH_GOLD"
@@ -92,18 +84,33 @@ aeth_apply_visual_schema() {
   SILVER=$'\033[38;5;250m'
   RESET=$'\033[0m'
 
+  P_BG_REDD='\[\033[48;5;52m\]'
+  P_REDD='\[\033[38;5;196m\]'
+  P_GOLD='\[\033[38;5;220m\]'
+  P_BONE='\[\033[38;5;230m\]'
+  P_RESET='\[\033[0m\]'
+
   export BG_REDD REDD GOLD BONE SILVER RESET
+  export P_BG_REDD P_REDD P_GOLD P_BONE P_RESET
 }
 
 FOUND="$(resolve_root || true)"
 
 if [ -z "$FOUND" ]; then
-  echo "ERROR: Could not locate AETHIEAOPSYS root." >&2
+  echo "ERROR: Could not locate AETHIEAOPSYS authority root." >&2
   return 1 2>/dev/null || exit 1
 fi
 
 export AETH_ROOT="$FOUND"
 export AETHIEA="$FOUND"
+export AETHIEA_ROOT="$FOUND"
+export AETHIEAOPSYS="$FOUND"
+export AEUSB="$FOUND"
+
+if [ -f "$AETH_ROOT/ENV/SHELL/aethiea_env.sh" ]; then
+  . "$AETH_ROOT/ENV/SHELL/aethiea_env.sh" || true
+fi
+
 export AETH_CORE="$AETH_ROOT/CORE"
 export AETH_DATA="$AETH_ROOT/DATA"
 export AETH_LAYERS="$AETH_ROOT/LAYERS"
@@ -117,6 +124,18 @@ if [[ ":$PATH:" != *":$AETH_TOOLIO:"* ]]; then
   export PATH="$AETH_TOOLIO:$PATH"
 fi
 
+if [ -d "$AETH_ROOT/TOOLIO/bin" ] && [[ ":$PATH:" != *":$AETH_ROOT/TOOLIO/bin:"* ]]; then
+  export PATH="$AETH_ROOT/TOOLIO/bin:$PATH"
+fi
+
+aeth_apply_visual_schema
+
+if [ "${AETH_SURFACE_BOOTSTRAP_LOADED_FOR:-}" = "$AETH_ROOT" ] && [ -z "${AETH_FORCE_BOOTSTRAP:-}" ]; then
+  _aeth_boot_return_ok
+fi
+
+export AETH_SURFACE_BOOTSTRAP_LOADED_FOR="$AETH_ROOT"
+
 mkdir -p "$AETH_ROOT/LOGS/BOOT" "$AETH_ROOT/DATA/MEMORY/SURFACES"
 
 BOOT_LOG="$AETH_ROOT/LOGS/BOOT/portable_wake_$(date -u +%Y%m%d).log"
@@ -124,8 +143,6 @@ BOOT_LOG="$AETH_ROOT/LOGS/BOOT/portable_wake_$(date -u +%Y%m%d).log"
 {
   echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) | PORTABLE_WAKE | HOST=$AETHIEA_HOST | OPERATOR=$AETHIEA_OPERATOR | ROOT=$AETH_ROOT | MODE=$AETHIEA_MODE | TOPOLOGY=#butnotlimitedTEWW"
 } >> "$BOOT_LOG"
-
-aeth_apply_visual_schema
 
 printf "%b" "${BG_REDD}${REDD}"
 printf "╔══════════════════════════════════════════════════════════════╗\n"
@@ -148,11 +165,12 @@ printf "║  RULE      → ${GOLD}DON'T MINGLE${REDD}\n"
 printf "║  TOPOLOGY  → ${GOLD}#butnotlimitedTEWW${REDD}\n"
 printf "║  STATUS    → ${GOLD}ONLINE${REDD}\n"
 printf "╚══════════════════════════════════════════════════════════════╝\n"
+printf "%b" "${RESET}"
 
 cd "$AETH_ROOT" 2>/dev/null || true
 
 if [ -n "${BASH_VERSION:-}" ]; then
-  export PS1="${BG_REDD}${GOLD}\u@\h${REDD}:${GOLD}\w${REDD}\$ ${RESET}${BG_REDD}${REDD}"
+  export PS1="${P_BG_REDD}${P_GOLD}\u@\h ${P_REDD}${AETHIEA_MODE} ${P_GOLD}DNY-5U5 ${P_BONE}\w ${P_REDD}\$ ${P_RESET}"
   case "${PROMPT_COMMAND:-}" in
     *aeth_apply_visual_schema*) ;;
     "") PROMPT_COMMAND="aeth_apply_visual_schema" ;;
@@ -160,13 +178,6 @@ if [ -n "${BASH_VERSION:-}" ]; then
   esac
 fi
 
-printf "%b" "${BG_REDD}${REDD}"
-
 if [ -x "$AETH_ROOT/ENV/SURFACES/register_surface.sh" ]; then
   "$AETH_ROOT/ENV/SURFACES/register_surface.sh" >/dev/null 2>&1 || true
-fi
-
-# AETHIEA TOOLIO BIN
-if [ -d "$AETH_ROOT/TOOLIO/bin" ] && [[ ":$PATH:" != *":$AETH_ROOT/TOOLIO/bin:"* ]]; then
-  export PATH="$AETH_ROOT/TOOLIO/bin:$PATH"
 fi
