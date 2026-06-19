@@ -1,4 +1,23 @@
 #!/usr/bin/env bash
+# BEGIN AEUSB_DYNAMIC_ROOT_COMPAT
+_AEUSB_ROOT="$(aeusb-root 2>/dev/null || true)"
+if [ -n "${_AEUSB_ROOT:-}" ]; then
+  export AETH_ROOT="${AETH_ROOT:-$_AEUSB_ROOT}"
+  export AETHIEA="${AETHIEA:-$AETH_ROOT}"
+  export AETHIEAOPSYS="${AETHIEAOPSYS:-$AETH_ROOT}"
+  export AEUSB="${AEUSB:-$AETH_ROOT}"
+fi
+
+_AEHEAVY_ROOT="$(aeheavy-root 2>/dev/null || true)"
+if [ -n "${_AEHEAVY_ROOT:-}" ]; then
+  export AEHEAVY_ROOT="${AEHEAVY_ROOT:-$_AEHEAVY_ROOT}"
+  export AE320="${AE320:-$_AEHEAVY_ROOT}"
+fi
+
+if [ -n "${AETH_ROOT:-}" ] && [ -f "$AETH_ROOT/ENV/SHELL/aethiea_env.sh" ]; then
+  . "$AETH_ROOT/ENV/SHELL/aethiea_env.sh" || true
+fi
+# END AEUSB_DYNAMIC_ROOT_COMPAT
 set -euo pipefail
 
 # AETHIEA Runtime Resolver
@@ -29,7 +48,7 @@ resolve_aeth_root() {
 
   for root in \
     /opt/AETHIEAOPSYS \
-    /mnt/h/AETHIEAOPSYS \
+    ${AETH_ROOT} \
     /mnt/e/AETHIEAOPSYS \
     /mnt/d/AETHIEAOPSYS \
     "$HOME/AETHIEAOPSYS"

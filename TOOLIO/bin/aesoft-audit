@@ -1,14 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-AUTH="/mnt/h/AETHIEAOPSYS"
+AUTH="$(aeusb-root)"
 STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
 HOST="$(hostname 2>/dev/null || echo UNKNOWN)"
 
 OUT="/tmp/aesoft_audit_${HOST}_${STAMP}.tsv"
-STATUS="$AUTH/DATA/RUNTIME/AESOFT_AUDIT_STATUS.md"
+VERIFY_DIR="$AUTH/PROGRAMS/VERIFY"
+RUNTIME_DIR="$AUTH/DATA/RUNTIME"
+STATUS="$RUNTIME_DIR/AESOFT_AUDIT_STATUS.md"
 
-mkdir -p "$AUTH/DATA/RUNTIME" "$AUTH/PROGRAMS/VERIFY"
+mkdir -p "$RUNTIME_DIR" "$VERIFY_DIR"
 
 {
   printf "software\tcommand\tstate\tpath\tversion_probe\n"
@@ -57,31 +59,28 @@ mkdir -p "$AUTH/DATA/RUNTIME" "$AUTH/PROGRAMS/VERIFY"
 
 SHA="$(sha256sum "$OUT" | awk '{print $1}')"
 
-for root in /mnt/h/AETHIEAOPSYS /mnt/i/AETHIEAOPSYS /home/d_ny5u5/AETHIEAOPSYS; do
-  [ -d "$root" ] || continue
-  mkdir -p "$root/PROGRAMS/VERIFY" "$root/DATA/RUNTIME"
-  cp "$OUT" "$root/PROGRAMS/VERIFY/"
-done
+cp "$OUT" "$VERIFY_DIR/"
 
-cat > "$STATUS" <<EOF
+cat > "$STATUS" <<STATUS_EOF
 # AESOFT AUDIT STATUS
 
 Timestamp UTC: $(date -u +%FT%TZ)
 Host: $HOST
+Authority Root: $AUTH
 Receipt: $(basename "$OUT")
 SHA256: $SHA
 
 Rule:
 Software is audited as callable capacity, not just package presence.
-EOF
-
-for root in /mnt/i/AETHIEAOPSYS /home/d_ny5u5/AETHIEAOPSYS; do
-  [ -d "$root" ] || continue
-  cp "$STATUS" "$root/DATA/RUNTIME/AESOFT_AUDIT_STATUS.md"
-done
+Host executes. AEUSB carries. Host does not own.
+STATUS_EOF
 
 echo "=== AESOFT AUDIT ==="
-column -t -s $'\t' "$OUT"
+if command -v column >/dev/null 2>&1; then
+  column -t -s $'\t' "$OUT"
+else
+  cat "$OUT"
+fi
 
 echo
 echo "=== STATUS ==="

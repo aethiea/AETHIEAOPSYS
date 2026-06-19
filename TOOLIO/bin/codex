@@ -1,17 +1,36 @@
 #!/usr/bin/env bash
-set -euo pipefail
-
-if [ -f /mnt/h/AETHIEAOPSYS/ENV/SHELL/aethiea_env.sh ]; then
-  # shellcheck source=/mnt/h/AETHIEAOPSYS/ENV/SHELL/aethiea_env.sh
-  . /mnt/h/AETHIEAOPSYS/ENV/SHELL/aethiea_env.sh
+# BEGIN AEUSB_DYNAMIC_ROOT_COMPAT
+_AEUSB_ROOT="$(aeusb-root 2>/dev/null || true)"
+if [ -n "${_AEUSB_ROOT:-}" ]; then
+  export AETH_ROOT="${AETH_ROOT:-$_AEUSB_ROOT}"
+  export AETHIEA="${AETHIEA:-$AETH_ROOT}"
+  export AETHIEAOPSYS="${AETHIEAOPSYS:-$AETH_ROOT}"
+  export AEUSB="${AEUSB:-$AETH_ROOT}"
 fi
 
-CODEX_JS="${AETH_ROOT:-/mnt/h/AETHIEAOPSYS}/ENV/RUNTIME/npm-global/node_modules/@openai/codex/bin/codex.js"
+_AEHEAVY_ROOT="$(aeheavy-root 2>/dev/null || true)"
+if [ -n "${_AEHEAVY_ROOT:-}" ]; then
+  export AEHEAVY_ROOT="${AEHEAVY_ROOT:-$_AEHEAVY_ROOT}"
+  export AE320="${AE320:-$_AEHEAVY_ROOT}"
+fi
+
+if [ -n "${AETH_ROOT:-}" ] && [ -f "$AETH_ROOT/ENV/SHELL/aethiea_env.sh" ]; then
+  . "$AETH_ROOT/ENV/SHELL/aethiea_env.sh" || true
+fi
+# END AEUSB_DYNAMIC_ROOT_COMPAT
+set -euo pipefail
+
+if [ -f ${AETH_ROOT}/ENV/SHELL/aethiea_env.sh ]; then
+  # shellcheck source=${AETH_ROOT}/ENV/SHELL/aethiea_env.sh
+  . ${AETH_ROOT}/ENV/SHELL/aethiea_env.sh
+fi
+
+CODEX_JS="${AETH_ROOT:-${AETH_ROOT}}/ENV/RUNTIME/npm-global/node_modules/@openai/codex/bin/codex.js"
 
 if [ ! -f "$CODEX_JS" ]; then
   echo "USB CODEX PACKAGE MISSING: $CODEX_JS"
   echo "Install it with:"
-  echo "npm --cache /tmp/aeusb-npm-cache --prefix /mnt/h/AETHIEAOPSYS/ENV/RUNTIME/npm-global install --no-bin-links @openai/codex"
+  echo "npm --cache /tmp/aeusb-npm-cache --prefix ${AETH_ROOT}/ENV/RUNTIME/npm-global install --no-bin-links @openai/codex"
   exit 127
 fi
 

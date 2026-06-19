@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+valid_heavy_root() {
+  local r="${1:-}"
+  [ -n "$r" ] || return 1
+  [ -d "$r" ] || return 1
+  { [ -f "$r/AE320GB_HEAVY_BODY" ] || [ -f "$r/.aeth_heavy_body" ]; } || return 1
+}
+
+for r in "${AEHEAVY_ROOT:-}" "${AE320:-}"; do
+  if valid_heavy_root "$r"; then
+    printf '%s\n' "$r"
+    exit 0
+  fi
+done
+
+for r in /mnt/[a-z]/AETHIEAOPSYS /media/*/AETHIEAOPSYS /run/media/*/AETHIEAOPSYS /Volumes/*/AETHIEAOPSYS "$HOME/AETHIEAOPSYS" /opt/AETHIEAOPSYS; do
+  if valid_heavy_root "$r"; then
+    printf '%s\n' "$r"
+    exit 0
+  fi
+done
+
+exit 1

@@ -1916,12 +1916,12 @@ from pathlib import Path as _AETH_Path
 import os as _AETH_os
 
 if "ROOT" not in globals():
-    ROOT = _AETH_Path(_AETH_os.environ.get("AETH_ROOT") or _AETH_os.environ.get("AETHIEA") or "/mnt/h/AETHIEAOPSYS")
+    ROOT = _AETH_Path(_AETH_os.environ.get("AETH_ROOT") or _AETH_os.environ.get("AETHIEA") or _AETH_os.popen("aeusb-root 2>/dev/null").read().strip() or str(_AETH_Path.cwd()))
 from pathlib import Path as _AETH_Path
 import os as _AETH_os
 
 if "ROOT" not in globals():
-    ROOT = _AETH_Path(_AETH_os.environ.get("AETH_ROOT") or _AETH_os.environ.get("AETHIEA") or "/mnt/h/AETHIEAOPSYS")
+    ROOT = _AETH_Path(_AETH_os.environ.get("AETH_ROOT") or _AETH_os.environ.get("AETHIEA") or _AETH_os.popen("aeusb-root 2>/dev/null").read().strip() or str(_AETH_Path.cwd()))
 
 AENET = ROOT / "LAYERS" / "AENET"
 if "routes" not in globals():

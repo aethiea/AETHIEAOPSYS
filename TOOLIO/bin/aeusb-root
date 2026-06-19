@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+valid_aeth_root() {
+  local r="${1:-}"
+  [ -n "$r" ] || return 1
+  [ -d "$r" ] || return 1
+  [ -f "$r/.aeth_root" ] || return 1
+  [ -f "$r/STATUS.md" ] || return 1
+  [ ! -f "$r/AE320GB_HEAVY_BODY" ] || return 1
+  [ ! -f "$r/.aeth_heavy_body" ] || return 1
+}
+
+for r in "${AETH_ROOT:-}" "${AETHIEA:-}" "${AETHIEAOPSYS:-}" "${AEUSB:-}"; do
+  if valid_aeth_root "$r"; then
+    printf '%s\n' "$r"
+    exit 0
+  fi
+done
+
+self_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd -P || true)"
+if [ -n "$self_dir" ]; then
+  candidate="$(cd "$self_dir/../.." 2>/dev/null && pwd -P || true)"
+  if valid_aeth_root "$candidate"; then
+    printf '%s\n' "$candidate"
+    exit 0
+  fi
+fi
+
+d="$PWD"
+while [ "$d" != "/" ]; do
+  if valid_aeth_root "$d"; then
+    printf '%s\n' "$d"
+    exit 0
+  fi
+  d="$(dirname "$d")"
+done
+
+for r in /mnt/[a-z]/AETHIEAOPSYS /media/*/AETHIEAOPSYS /run/media/*/AETHIEAOPSYS /Volumes/*/AETHIEAOPSYS "$HOME/AETHIEAOPSYS" /opt/AETHIEAOPSYS; do
+  if valid_aeth_root "$r"; then
+    printf '%s\n' "$r"
+    exit 0
+  fi
+done
+
+exit 1
