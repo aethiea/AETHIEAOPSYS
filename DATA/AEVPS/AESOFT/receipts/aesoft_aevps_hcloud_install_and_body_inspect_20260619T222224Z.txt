@@ -1,0 +1,60 @@
+AEVPS HCLOUD INSTALL + BODY TOOLIO INSPECT
+HOST=aevps-001
+TIME_UTC=2026-06-19T22:22:24Z
+
+=== INSTALL HCLOUD CLI ===
+Hit:1 https://mirror.hetzner.com/ubuntu/packages noble InRelease
+Hit:2 https://mirror.hetzner.com/ubuntu/packages noble-updates InRelease
+Hit:3 https://mirror.hetzner.com/ubuntu/packages noble-backports InRelease
+Hit:4 https://mirror.hetzner.com/ubuntu/security noble-security InRelease
+Reading package lists...
+Reading package lists...
+Building dependency tree...
+Reading state information...
+The following NEW packages will be installed:
+  hcloud-cli
+0 upgraded, 1 newly installed, 0 to remove and 11 not upgraded.
+Need to get 3,796 kB of archives.
+After this operation, 12.4 MB of additional disk space will be used.
+Get:1 https://mirror.hetzner.com/ubuntu/packages noble-updates/universe amd64 hcloud-cli amd64 1.39.0-2ubuntu0.24.04.3 [3,796 kB]
+Fetched 3,796 kB in 0s (27.0 MB/s)
+Selecting previously unselected package hcloud-cli.
+(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 93707 files and directories currently installed.)
+Preparing to unpack .../hcloud-cli_1.39.0-2ubuntu0.24.04.3_amd64.deb ...
+Unpacking hcloud-cli (1.39.0-2ubuntu0.24.04.3) ...
+Setting up hcloud-cli (1.39.0-2ubuntu0.24.04.3) ...
+
+=== HCLOUD CHECK ===
+/usr/bin/hcloud
+hcloud unknown
+
+=== BODY ROOT STATE ===
+drwxr-xr-x 5 root root 4096 Jun 15 07:20 /opt/AETHIEAOPSYS
+/opt/AETHIEAOPSYS
+/opt/AETHIEAOPSYS/DATA
+/opt/AETHIEAOPSYS/DATA/AEVPS
+/opt/AETHIEAOPSYS/DATA/RECEIPTS
+/opt/AETHIEAOPSYS/DATA/STATUS
+/opt/AETHIEAOPSYS/LOGS
+/opt/AETHIEAOPSYS/LOGS/CLOUDFLARED
+/opt/AETHIEAOPSYS/LOGS/SYSTEMD
+/opt/AETHIEAOPSYS/RUN
+
+=== GIT STATE IF PRESENT ===
+NO_GIT_REPO_AT_/opt/AETHIEAOPSYS
+
+=== TOOLIO STATE ===
+NO_TOOLIO_DIR
+NO_TOOLIO_BIN_DIR
+
+=== REMAINING SPECIAL COMMANDS ===
+hcloud          /usr/bin/hcloud
+grafana-server  MISSING
+grafana         MISSING
+hermes          MISSING
+fabric          MISSING
+juicefs         MISSING
+cloudflared     /usr/local/bin/cloudflared
+
+RECEIPT=/opt/AETHIEAOPSYS/DATA/AEVPS/AESOFT/aesoft_aevps_hcloud_install_and_body_inspect_20260619T222224Z.txt
+AEVPS_HCLOUD_INSTALL_BODY_INSPECT_COMPLETE

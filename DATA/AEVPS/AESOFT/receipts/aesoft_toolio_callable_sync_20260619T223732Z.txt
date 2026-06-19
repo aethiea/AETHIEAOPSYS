@@ -1,0 +1,15 @@
+AEVPS TOOLIO CALLABLE SYNC
+HOST=aevps-001
+TIME_UTC=2026-06-19T22:37:32Z
+
+=== COMMAND CHECK ===
+hcloud          /usr/bin/hcloud
+grafana-server  MISSING
+grafana         MISSING
+hermes          /usr/local/bin/hermes
+fabric          /usr/local/bin/fabric
+juicefs         /usr/local/bin/juicefs
+cloudflared     /usr/local/bin/cloudflared
+
+RECEIPT=/opt/AETHIEAOPSYS/DATA/AEVPS/AESOFT/aesoft_toolio_callable_sync_20260619T223732Z.txt
+AEVPS_TOOLIO_CALLABLE_SYNC_COMPLETE

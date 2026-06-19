@@ -1,0 +1,58 @@
+AEVPS AESOFT SPECIAL LANE INSPECT
+HOST=aevps-001
+TIME_UTC=2026-06-19T22:19:50Z
+
+=== BODY ROOT CHECK ===
+drwxr-xr-x 5 root root 4096 Jun 15 07:20 /opt/AETHIEAOPSYS
+
+=== TOOLIO BIN CHECK ===
+
+=== COMMAND PATH CHECK ===
+hcloud          MISSING
+grafana-server  MISSING
+grafana         MISSING
+hermes          MISSING
+fabric          MISSING
+juicefs         MISSING
+cloudflared     /usr/local/bin/cloudflared
+
+=== APT POLICY SPECIAL ===
+--- hcloud-cli ---
+hcloud-cli:
+  Installed: (none)
+  Candidate: 1.39.0-2ubuntu0.24.04.3
+  Version table:
+     1.39.0-2ubuntu0.24.04.3 500
+        500 https://mirror.hetzner.com/ubuntu/packages noble-updates/universe amd64 Packages
+        500 https://mirror.hetzner.com/ubuntu/security noble-security/universe amd64 Packages
+     1.39.0-2 500
+        500 https://mirror.hetzner.com/ubuntu/packages noble/universe amd64 Packages
+--- grafana ---
+--- grafana-enterprise ---
+--- grafana-server ---
+--- juicefs ---
+--- fabric ---
+fabric:
+  Installed: (none)
+  Candidate: 2.6.0-1
+  Version table:
+     2.6.0-1 500
+        500 https://mirror.hetzner.com/ubuntu/packages noble/universe amd64 Packages
+
+=== SERVICES CHECK ===
+aethiea-cloudflared.service                  enabled         enabled
+aethiea-perpetual.service                    static          -
+docker.service                               enabled         enabled
+prometheus.service                           enabled         enabled
+redis-server.service                         enabled         enabled
+redis-server@.service                        disabled        enabled
+redis.service                                alias           -
+docker.socket                                enabled         enabled
+aethiea-perpetual.timer                      enabled         enabled
+  aethiea-cloudflared.service loaded active running AETHIEAOPSYS Cloudflare Door - AETHERNet_local
+  docker.service              loaded active running Docker Application Container Engine
+  prometheus.service          loaded active running Monitoring system and time series database
+  redis-server.service        loaded active running Advanced key-value store
+
+REPORT=/opt/AETHIEAOPSYS/DATA/AEVPS/AESOFT/aesoft_special_lane_inspect_20260619T221950Z.txt
+AEVPS_AESOFT_SPECIAL_LANE_INSPECT_COMPLETE
