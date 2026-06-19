@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+echo "AETHIEA AUTOSYNC DISABLED: deletion-blast route quarantined. Use explicit operator-reviewed aegit commands."
+exit 125

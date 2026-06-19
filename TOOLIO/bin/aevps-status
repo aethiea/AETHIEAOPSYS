@@ -1,45 +1,56 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -u
 
-ROOT="/mnt/h/AETHIEAOPSYS"
-AEVPS_NAME="${AEVPS_NAME:-aevps-001}"
-STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
+ROOT=""
+for r in /mnt/[a-z]/AETHIEAOPSYS; do
+  if [ -d "$r" ] \
+    && [ -f "$r/.aeth_root" ] \
+    && [ -f "$r/STATUS.md" ] \
+    && [ ! -f "$r/AE320GB_HEAVY_BODY" ] \
+    && [ ! -f "$r/.aeth_heavy_body" ]; then
+    ROOT="$r"
+    break
+  fi
+done
 
-mkdir -p "$ROOT/DATA/HCLOUD" "$ROOT/DATA/CLOUDFLARED" "$ROOT/LOGS/HCLOUD" "$ROOT/LOGS/CLOUDFLARED"
-
-echo "=== AEVPS STATUS ==="
-echo "Time: $(date -u +%FT%TZ)"
-echo "Root: $ROOT"
-echo "Server: $AEVPS_NAME"
-echo
-
-echo "[HCLOUD]"
-if hcloud-ae location list > "$ROOT/DATA/HCLOUD/locations_${STAMP}.txt"; then
-  echo "hcloud auth: OK"
-else
-  echo "hcloud auth: FAILED"
+if [ -z "$ROOT" ]; then
+  echo "AEVPS STATUS: authority body not found"
+  exit 1
 fi
+
+REG="$ROOT/DATA/MEMORY/REGISTRY/aevps_current.md"
+BOOT="$ROOT/DATA/BOOT/AEVPS_STARTUP_STATUS.md"
+
+echo "AEVPS STATUS"
+echo "==========="
+echo "ROOT=$ROOT"
 echo
 
-echo "[SERVER DESCRIBE]"
-hcloud-ae server describe "$AEVPS_NAME" | tee "$ROOT/DATA/HCLOUD/server_describe_${AEVPS_NAME}_${STAMP}.txt" || true
-echo
+if [ -f "$REG" ]; then
+  echo "--- REGISTRY ---"
+  sed -n '1,120p' "$REG"
+  echo
+else
+  echo "REGISTRY: missing $REG"
+  echo
+fi
 
-echo "[SERVER LIST]"
-hcloud-ae server list | tee "$ROOT/DATA/HCLOUD/servers_${STAMP}.txt" || true
-echo
+if [ -f "$BOOT" ]; then
+  echo "--- STARTUP ---"
+  sed -n '1,120p' "$BOOT"
+  echo
+else
+  echo "STARTUP: missing $BOOT"
+  echo
+fi
 
-echo "[FIREWALL LIST]"
-hcloud-ae firewall list | tee "$ROOT/DATA/HCLOUD/firewalls_${STAMP}.txt" || true
-echo
+if command -v hcloud >/dev/null 2>&1; then
+  echo "--- HCLOUD SERVERS ---"
+  hcloud server list 2>/dev/null || true
+  echo
+fi
 
-echo "[CLOUDFLARED TUNNELS]"
-cloudflared-ae tunnel list | tee "$ROOT/DATA/CLOUDFLARED/tunnels_${STAMP}.txt" || true
-echo
-
-echo "[TUNNEL SERVICE]"
-systemctl --user status aevps-tunnel.service --no-pager || true
-echo
-
-echo "[SSH TEST]"
-ssh -o BatchMode=yes -o ConnectTimeout=5 "$AEVPS_NAME" 'echo AEVPS_SSH_OK && hostname && uname -a' || true
+if command -v cloudflared >/dev/null 2>&1; then
+  echo "--- CLOUDFLARED TUNNELS ---"
+  cloudflared tunnel list 2>/dev/null || true
+fi
