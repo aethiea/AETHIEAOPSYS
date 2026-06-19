@@ -1,0 +1,6 @@
+coreutils-from-uutils
+gnu-coreutils
+hcloud-cli
+rust-coreutils
+ubuntu-minimal
+ubuntu-wsl
