@@ -1,0 +1,22 @@
+script_path	lane	initial_status	executable	shebang	has_main_guard	has_cli_parser	touches_memory_or_files	touches_logs_or_receipts	path_refs	imports_head	sha256
+CORE/aeth.py	CORE	NEEDS_PATH_REVIEW	YES	-	YES	NO	YES	YES	/mnt/h	datetime,json,os,pathlib,py_compile,router,subprocess,sys	4e4c7fcf11883e7a0bbc10aa8eeda73ff31aa373ddf7b00666df7bfa744df57c
+CORE/router.py	CORE	UNKNOWN	YES	-	NO	NO	YES	NO	-	__future__,json,os,pathlib,state	764b2aacbdec51dc68c1c6c9dc8214e7fcbfcda4a112f532bf3bcf310fca61d7
+TOOLIO/HID/AEDUCK/templates/circuitpython/code.py	TOOLIO	UNKNOWN	YES	-	NO	NO	NO	NO	-	adafruit_hid.keyboard,adafruit_hid.keycode,time,usb_hid	9a18adc824767b77c6b6b89ff8a882855c387c6761e7103691cd97d2c652e7f8
+TOOLIO/aeth_authority_switch.py	TOOLIO	UNKNOWN	YES	#!/usr/bin/env python3	YES	YES	YES	YES	AETHIEAOPSYS	__future__,argparse,datetime,pathlib,typing	1cd11676ca9089e8a516bb9b48864d6ee772c0ee1648fb54f468755275f09927
+TOOLIO/aeth_buildout_next10.py	TOOLIO	UNKNOWN	YES	#!/usr/bin/env python3	YES	NO	YES	NO	AETHIEAOPSYS	datetime,json,os,pathlib,subprocess	41f52a0f25b080ecff8c10331db05ff982129da50e2078e4be4c376cf9b665b0
+TOOLIO/aeth_cloud_clone.py	TOOLIO	UNKNOWN	YES	#!/usr/bin/env python3	YES	NO	YES	YES	-	datetime,json,os,pathlib,shutil	0f30c8d5fec3abfc394c94eb8cfedf923e940069b042f5f30dc31bdebd1bc940
+TOOLIO/aeth_diff.py	TOOLIO	UNKNOWN	YES	#!/usr/bin/env python3	NO	NO	NO	NO	-	json,pathlib,sys	6e34e2bfd51845b3afeb59fd488e2bb8b9333e3311005cd7dc24f6fc7230c9cf
+TOOLIO/aeth_guard.py	TOOLIO	UNKNOWN	YES	#!/usr/bin/env python3	YES	NO	YES	NO	-	datetime,hashlib,json,os,pathlib,shlex,subprocess,sys	25a32504a4bda0551b9bca05bb72a48ba9a5d2c0ceaa91ff30a6ae3a9b2502ca
+TOOLIO/aeth_rebind.py	TOOLIO	UNKNOWN	YES	#!/usr/bin/env python3	NO	NO	YES	NO	AETHIEAOPSYS	datetime,json,pathlib	d3827bb5ee8250d9f71d0421cc37c9432bde3e09922bb260b7c33b76266c1f7c
+TOOLIO/aeth_repair_services.py	TOOLIO	UNKNOWN	YES	#!/usr/bin/env python3	NO	NO	NO	NO	-	subprocess	c3a0586b46dc705b2bc79428cc34867f5d6c939ee1f2a66c2ee1cfb1b5371def
+TOOLIO/aeth_run_pipeline.py	TOOLIO	UNKNOWN	YES	#!/usr/bin/env python3	NO	NO	NO	NO	-	json,pathlib	b6676a8903107a0af384bd31879e0e7ff6ebb093b033237e6dc5fc7549b07103
+TOOLIO/aeth_verify_stack.py	TOOLIO	UNKNOWN	YES	#!/usr/bin/env python3	NO	NO	YES	NO	-	datetime,pathlib,subprocess	57095bed476f3f8769b0782ef3bda239fed5e8d42161bcf72faf3ebab3ee7ade
+TOOLIO/patch_ae_aenet_first.py	TOOLIO	UNKNOWN	YES	#!/usr/bin/env python3	NO	NO	YES	NO	-	pathlib	b516f8a3605cd8683d1c693a0be1052ed9e92aff38deb72b74c7024d4555be46
+TOOLIO/patch_cloudflare_aenet.py	TOOLIO	UNKNOWN	YES	#!/usr/bin/env python3	NO	NO	YES	NO	-	os,pathlib,shutil	bfa1a5d4d4d71c5dd31aa248a17eb07babd8a8a5eeec6f37efdbe9d2b71db9ca
+TOOLIO/patch_router_clean.py	TOOLIO	UNKNOWN	YES	#!/usr/bin/env python3	NO	NO	YES	NO	-	os,pathlib,re	8e2246f720bb1b8a52758f4e4ea522714f9cf18fb82ebdf0621b92eaf51e9095
+TOOLIO/patch_router_root_fix.py	TOOLIO	UNKNOWN	YES	#!/usr/bin/env python3	NO	NO	YES	NO	-	os,pathlib	5ed87e927c4596bbfdf41a264ced08ae8c22fc84ff8a5981910318922256e672
+TOOLIO/register_capability_node.py	TOOLIO	UNKNOWN	YES	#!/usr/bin/env python3	YES	YES	YES	YES	AETHIEAOPSYS	__future__,argparse,datetime,hashlib,json,os,pathlib,typing	60be7d22c2b14a871871d58f99c0c8281fa5119c5a93e8d4ef2241bed8467c67
+TOOLIO/src/fabric/go/pkg/mod/github.com/danielmiessler/fabric@v1.4.454/internal/plugins/template/Examples/word-generator.py	TOOLIO	UNKNOWN	YES	#!/usr/bin/env python3	YES	NO	YES	NO	-	json,random,sys	9668026b8d0bea55092bc2881f4bf321dec10896caa31e252d99f5ad8320f2af
+TOOLIO/src/fabric/go/pkg/mod/github.com/danielmiessler/fabric@v1.4.454/scripts/pattern_descriptions/extract_patterns.py	TOOLIO	UNKNOWN	YES	#!/usr/bin/env python3	YES	NO	YES	NO	-	json,os	0e83211a56da8ad230bf588179e5ad8ec2e2e324cd613d9c9a95537304d9efaf
+TOOLIO/src/fabric/go/pkg/mod/github.com/danielmiessler/fabric@v1.4.454/scripts/python_ui/streamlit.py	TOOLIO	UNKNOWN	YES	-	YES	YES	YES	YES	-	datetime,dotenv,json,logging,matplotlib.pyplot,numpy,os,pandas,pyperclip,re,seaborn,shutil	ac428cadcd7f482237f411a9ed221a7eab42fead0ad48845caae954d64dc4790
+TOOLIO/src/fabric/go/pkg/mod/github.com/danielmiessler/fabric@v1.4.454/scripts/readme_updates/update_readme_features.py	TOOLIO	UNKNOWN	YES	#!/usr/bin/env python3	YES	YES	NO	NO	-	argparse,datetime,pathlib,re,sqlite3,sys,typing	01fac6253758fc4540a206f0816719809f22ec759ecf8b48fa338ad5ab71985f
