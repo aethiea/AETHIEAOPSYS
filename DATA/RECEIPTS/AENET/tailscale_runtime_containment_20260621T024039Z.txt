@@ -1,0 +1,27 @@
+AENET TAILSCALE RUNTIME CONTAINMENT CHECK
+Timestamp UTC: 20260621T024039Z
+Host: RUBIII
+AEUSB Root: /mnt/h/AETHIEAOPSYS
+
+Wrapper:
+1.98.4
+  tailscale commit: 9e69045b291a7cb1edc714442d68e83b95d05e6b
+  long version: 1.98.4-t9e69045b2-ged3a62f14
+  other commit: ed3a62f143dd73c8aae368d9c639ea49de878f9b
+  go version: go1.26.3 (tailscale/go e877d97384)
+
+RUN lane files:
+/mnt/h/AETHIEAOPSYS/RUN/TAILSCALE/.gitignore
+
+Git secret/state check:
+NO_SECRET_OR_RUNTIME_STATE_IN_GIT_STATUS
+
+Current host/system Tailscale daemons:
+  28918 Ssl     01:35:19 /usr/sbin/tailscaled --state=/var/lib/tailscale/tailscaled.state --socket=/run/tailscale/tailscaled.sock --port=41641
+  37108 S+         00:06 tee /mnt/h/AETHIEAOPSYS/DATA/RECEIPTS/AENET/tailscale_runtime_containment_20260621T024039Z.txt
+
+Doctrine:
+AEUSB carries callable binaries and wrappers.
+RUN/TAILSCALE contains AEUSB runtime state and remains ignored.
+Host/system daemon state is not AEUSB authority.
+No tailscale up has been run for the AEUSB lane.

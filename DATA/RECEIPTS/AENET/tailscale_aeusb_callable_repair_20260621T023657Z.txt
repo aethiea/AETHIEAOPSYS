@@ -1,0 +1,42 @@
+AENET TAILSCALE AEUSB CALLABLE REPAIR
+Timestamp UTC: 20260621T023657Z
+Host: RUBIII
+AEUSB Root: /mnt/h/AETHIEAOPSYS
+
+Doctrine:
+Host installs. Host executes. AEUSB carries. Host does not own.
+Callable binaries must live in AEUSB TOOLIO/bin.
+Runtime state must live in RUN/TAILSCALE and remain ignored.
+
+Host package binaries:
+/usr/bin/tailscale 31830315 bytes
+/usr/sbin/tailscaled 41121401 bytes
+957d73713f10fc18239378d126608a1a7535d6f5ffd69dcd12a3d903c674408b  /usr/bin/tailscale
+aaef867dc2ed94aae433abd68902f06984332f4f4eb7c9f1ea149b3ffbdae3e2  /usr/sbin/tailscaled
+
+AEUSB carried binaries:
+/mnt/h/AETHIEAOPSYS/TOOLIO/bin/tailscale 31830315 bytes
+/mnt/h/AETHIEAOPSYS/TOOLIO/bin/tailscaled 41121401 bytes
+957d73713f10fc18239378d126608a1a7535d6f5ffd69dcd12a3d903c674408b  /mnt/h/AETHIEAOPSYS/TOOLIO/bin/tailscale
+aaef867dc2ed94aae433abd68902f06984332f4f4eb7c9f1ea149b3ffbdae3e2  /mnt/h/AETHIEAOPSYS/TOOLIO/bin/tailscaled
+
+Byte compare:
+TAILSCALE_CLIENT_MATCH
+TAILSCALED_DAEMON_MATCH
+
+AEUSB version checks:
+1.98.4
+  tailscale commit: 9e69045b291a7cb1edc714442d68e83b95d05e6b
+  long version: 1.98.4-t9e69045b2-ged3a62f14
+  other commit: ed3a62f143dd73c8aae368d9c639ea49de878f9b
+  go version: go1.26.3 (tailscale/go e877d97384)
+1.98.4
+  tailscale commit: 9e69045b291a7cb1edc714442d68e83b95d05e6b
+  long version: 1.98.4-t9e69045b2-ged3a62f14
+  other commit: ed3a62f143dd73c8aae368d9c639ea49de878f9b
+  go version: go1.26.3 (tailscale/go e877d97384)
+1.98.4
+  tailscale commit: 9e69045b291a7cb1edc714442d68e83b95d05e6b
+  long version: 1.98.4-t9e69045b2-ged3a62f14
+  other commit: ed3a62f143dd73c8aae368d9c639ea49de878f9b
+  go version: go1.26.3 (tailscale/go e877d97384)

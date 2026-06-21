@@ -1,0 +1,10 @@
+AENET TAILSCALE LINUX NATIVE USB SEAL
+Timestamp UTC: 20260620T221143Z
+Host: RUBIII
+Root: /mnt/j/AETHIEAOPSYS
+
+
+Rules:
+- TOOLIO/bin carries binaries and wrapper.
+- RUN/TAILSCALE carries live state and is ignored.
+- No auth keys, machine keys, sockets, or state DB in Git.

@@ -1,0 +1,49 @@
+AENET TAILSCALE USERSPACE DAEMON V3
+Timestamp UTC: 20260621T071042Z
+Host: RUBIII
+AEUSB Root: /mnt/h/AETHIEAOPSYS
+
+Wrapper version:
+1.98.4
+  tailscale commit: 9e69045b291a7cb1edc714442d68e83b95d05e6b
+  long version: 1.98.4-t9e69045b2-ged3a62f14
+  other commit: ed3a62f143dd73c8aae368d9c639ea49de878f9b
+  go version: go1.26.3 (tailscale/go e877d97384)
+
+Daemon PID:
+53154
+
+Daemon process:
+    PID STAT     ELAPSED CMD
+  53154 Sl         02:36 /mnt/h/AETHIEAOPSYS/TOOLIO/bin/tailscaled --tun=userspace-networking --socket=/run/user/1000/aethiea-tailscale/tailscaled.sock --state=/run/user/1000/aethiea-tailscale/tailscaled.state --socks5-server=localhost:1055 --outbound-http-proxy-listen=localhost:1055
+
+AEUSB pointer files:
+/mnt/h/AETHIEAOPSYS/RUN/TAILSCALE/.gitignore
+/mnt/h/AETHIEAOPSYS/RUN/TAILSCALE/tailscaled.sock.path
+/mnt/h/AETHIEAOPSYS/RUN/TAILSCALE/tailscaled-userspace.pid
+/mnt/h/AETHIEAOPSYS/RUN/TAILSCALE/tailscaled.state.path
+
+Socket pointer:
+/run/user/1000/aethiea-tailscale/tailscaled.sock
+
+State pointer:
+/run/user/1000/aethiea-tailscale/tailscaled.state
+
+Runtime directory listing, names only:
+total 4
+drwxr-xr-x 2 d_ny5u5 d_ny5u5  80 Jun 21 03:08 .
+drwx------ 6 d_ny5u5 d_ny5u5 240 Jun 20 23:02 ..
+srw-rw-rw- 1 d_ny5u5 d_ny5u5   0 Jun 21 03:08 tailscaled.sock
+-rw------- 1 d_ny5u5 d_ny5u5   2 Jun 21 03:08 tailscaled.state
+
+No-auth status:
+Logged out.
+
+Git secret/state check:
+NO_SECRET_OR_RUNTIME_STATE_IN_GIT_STATUS
+
+Doctrine:
+AEUSB carries binaries, wrapper, pointer files, logs, receipts, and policy.
+Linux runtime carries live socket inode and live mutable state DB.
+Live state contents are not copied into Git receipts.
+No tailscale up has been run for the AEUSB lane.

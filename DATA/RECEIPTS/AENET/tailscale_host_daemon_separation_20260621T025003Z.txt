@@ -1,0 +1,24 @@
+AENET TAILSCALE HOST DAEMON SEPARATION
+Timestamp UTC: 20260621T025003Z
+Host: RUBIII
+AEUSB Root: /mnt/h/AETHIEAOPSYS
+
+Host package remains installed as source lane.
+Host/system daemon is stopped and disabled.
+AEUSB TOOLIO carries callable binaries.
+AEUSB RUN/TAILSCALE is the intended AEUSB runtime lane.
+
+Systemctl:
+inactive
+disabled
+
+Processes:
+  38765 S+         00:00 tee /mnt/h/AETHIEAOPSYS/DATA/RECEIPTS/AENET/tailscale_host_daemon_separation_20260621T025003Z.txt
+
+AEUSB RUN lane:
+/mnt/h/AETHIEAOPSYS/RUN/TAILSCALE/.gitignore
+
+Doctrine:
+Host installs. Host executes. AEUSB carries. Host does not own.
+Host daemon state is not AEUSB authority.
+No tailscale up has been run for the AEUSB lane.

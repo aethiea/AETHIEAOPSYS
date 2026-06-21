@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="${AETHIEA:-${AETH_ROOT:-$(pwd)}}"
+if [ ! -f "$ROOT/.aeth_root" ]; then
+  probe="$(pwd)"
+  while [ "$probe" != "/" ]; do
+    if [ -f "$probe/.aeth_root" ]; then
+      ROOT="$probe"
+      break
+    fi
+    probe="$(dirname "$probe")"
+  done
+fi
+
+BIN="$ROOT/TOOLIO/bin"
+RUN="$ROOT/RUN/TAILSCALE"
+LOG="$ROOT/LOGS/AENET/TAILSCALE"
+
+RUNTIME_BASE="${XDG_RUNTIME_DIR:-/tmp}/aethiea-tailscale"
+SOCK="$RUNTIME_BASE/tailscaled.sock"
+STATE="$RUNTIME_BASE/tailscaled.state"
+
+mkdir -p "$RUN" "$LOG" "$RUNTIME_BASE"
+
+case "${1:-version}" in
+  version)
+    "$BIN/tailscale" version
+    ;;
+
+  daemon-userspace)
+    echo "$SOCK" > "$RUN/tailscaled.sock.path"
+    echo "$STATE" > "$RUN/tailscaled.state.path"
+    exec "$BIN/tailscaled" \
+      --tun=userspace-networking \
+      --socket="$SOCK" \
+      --state="$STATE" \
+      --socks5-server=localhost:1055 \
+      --outbound-http-proxy-listen=localhost:1055
+    ;;
+
+  up-userspace)
+    shift || true
+    exec "$BIN/tailscale" --socket="$SOCK" up "$@"
+    ;;
+
+  status)
+    exec "$BIN/tailscale" --socket="$SOCK" status
+    ;;
+
+  socket-path)
+    echo "$SOCK"
+    ;;
+
+  state-path)
+    echo "$STATE"
+    ;;
+
+  *)
+    exec "$BIN/tailscale" --socket="$SOCK" "$@"
+    ;;
+esac
