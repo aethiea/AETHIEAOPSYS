@@ -1,17 +1,33 @@
 #!/usr/bin/env bash
+# BEGIN AETHIEA_MARKER_RESOLVE
+_aeth_resolve_root() {
+  local p="${AETHIEA_ROOT:-${AETH_ROOT:-${AETHIEA:-${AETHIEAOPSYS:-$(pwd -P)}}}}"
+  if [ -n "$p" ] && [ -f "$p/.aeth_root" ]; then (cd "$p" && pwd -P); return; fi
+  p="$(pwd -P)"
+  while [ "$p" != "/" ] && [ ! -f "$p/.aeth_root" ]; do p="$(dirname "$p")"; done
+  if [ -f "$p/.aeth_root" ]; then (cd "$p" && pwd -P); return; fi
+  for p in /mnt/*/AETHIEAOPSYS "$HOME/AETHIEAOPSYS" /opt/AETHIEAOPSYS; do
+    [ -f "$p/.aeth_root" ] && { (cd "$p" && pwd -P); return; }
+  done
+  return 1
+}
+AETHIEA_ROOT="$(_aeth_resolve_root)" || { echo "NO_AETH_ROOT_FOUND"; exit 1; }
+export AETHIEA_ROOT AETH_ROOT="$AETHIEA_ROOT" AETHIEA="$AETHIEA_ROOT" AETHIEAOPSYS="$AETHIEA_ROOT"
+# END AETHIEA_MARKER_RESOLVE
+
 set -euo pipefail
 
-if [ -f /mnt/h/AETHIEAOPSYS/ENV/SHELL/aethiea_env.sh ]; then
-  # shellcheck source=/mnt/h/AETHIEAOPSYS/ENV/SHELL/aethiea_env.sh
-  . /mnt/h/AETHIEAOPSYS/ENV/SHELL/aethiea_env.sh
+if [ -f ${AETHIEA_ROOT}/ENV/SHELL/aethiea_env.sh ]; then
+  # shellcheck source=/dev/null
+  . ${AETHIEA_ROOT}/ENV/SHELL/aethiea_env.sh
 fi
 
-CODEX_JS="${AETH_ROOT:-/mnt/h/AETHIEAOPSYS}/ENV/RUNTIME/npm-global/node_modules/@openai/codex/bin/codex.js"
+CODEX_JS="${AETH_ROOT:-$AETHIEA_ROOT}/ENV/RUNTIME/npm-global/node_modules/@openai/codex/bin/codex.js"
 
 if [ ! -f "$CODEX_JS" ]; then
   echo "USB CODEX PACKAGE MISSING: $CODEX_JS"
   echo "Install it with:"
-  echo "npm --cache /tmp/aeusb-npm-cache --prefix /mnt/h/AETHIEAOPSYS/ENV/RUNTIME/npm-global install --no-bin-links @openai/codex"
+  echo "npm --cache /tmp/aeusb-npm-cache --prefix ${AETHIEA_ROOT}/ENV/RUNTIME/npm-global install --no-bin-links @openai/codex"
   exit 127
 fi
 

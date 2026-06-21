@@ -4,7 +4,20 @@ from pathlib import Path
 from datetime import datetime, timezone
 from openai import OpenAI
 
-AETH_ROOT = Path(os.environ.get("AETH_ROOT", "/mnt/e/AETHIEAOPSYS"))
+def _resolve_aeth_root():
+    for val in (os.environ.get("AETH_ROOT"), os.environ.get("AETHIEA_ROOT"), os.environ.get("AETHIEA"), os.environ.get("AETHIEAOPSYS")):
+        if val and (Path(val) / ".aeth_root").exists():
+            return Path(val).resolve()
+    p = Path.cwd().resolve()
+    for q in (p, *p.parents):
+        if (q / ".aeth_root").exists():
+            return q
+    for q in list(Path("/mnt").glob("*/AETHIEAOPSYS")) + [Path.home() / "AETHIEAOPSYS", Path("/opt/AETHIEAOPSYS")]:
+        if (q / ".aeth_root").exists():
+            return q.resolve()
+    raise SystemExit("NO_AETH_ROOT_FOUND")
+
+AETH_ROOT = _resolve_aeth_root()
 LOG_DIR = AETH_ROOT / "LOGS" / "CHAT"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 

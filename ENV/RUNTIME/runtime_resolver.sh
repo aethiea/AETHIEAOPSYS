@@ -49,8 +49,8 @@ resolve_aeth_root() {
   for root in \
     /opt/AETHIEAOPSYS \
     ${AETH_ROOT} \
-    /mnt/e/AETHIEAOPSYS \
-    /mnt/d/AETHIEAOPSYS \
+    /mnt/*/AETHIEAOPSYS \
+    /mnt/*/AETHIEAOPSYS \
     "$HOME/AETHIEAOPSYS"
   do
     if [ -f "$root/$MARKER" ] || [ -d "$root/CORE" ]; then

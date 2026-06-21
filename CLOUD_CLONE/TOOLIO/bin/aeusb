@@ -1,11 +1,27 @@
 #!/usr/bin/env bash
+# BEGIN AETHIEA_MARKER_RESOLVE
+_aeth_resolve_root() {
+  local p="${AETHIEA_ROOT:-${AETH_ROOT:-${AETHIEA:-${AETHIEAOPSYS:-$(pwd -P)}}}}"
+  if [ -n "$p" ] && [ -f "$p/.aeth_root" ]; then (cd "$p" && pwd -P); return; fi
+  p="$(pwd -P)"
+  while [ "$p" != "/" ] && [ ! -f "$p/.aeth_root" ]; do p="$(dirname "$p")"; done
+  if [ -f "$p/.aeth_root" ]; then (cd "$p" && pwd -P); return; fi
+  for p in /mnt/*/AETHIEAOPSYS "$HOME/AETHIEAOPSYS" /opt/AETHIEAOPSYS; do
+    [ -f "$p/.aeth_root" ] && { (cd "$p" && pwd -P); return; }
+  done
+  return 1
+}
+AETHIEA_ROOT="$(_aeth_resolve_root)" || { echo "NO_AETH_ROOT_FOUND"; exit 1; }
+export AETHIEA_ROOT AETH_ROOT="$AETHIEA_ROOT" AETHIEA="$AETHIEA_ROOT" AETHIEAOPSYS="$AETHIEA_ROOT"
+# END AETHIEA_MARKER_RESOLVE
+
 set -euo pipefail
 
-if [ -f /mnt/h/AETHIEAOPSYS/ENV/SHELL/aethiea_env.sh ]; then
-  # shellcheck source=/mnt/h/AETHIEAOPSYS/ENV/SHELL/aethiea_env.sh
-  . /mnt/h/AETHIEAOPSYS/ENV/SHELL/aethiea_env.sh
+if [ -f ${AETHIEA_ROOT}/ENV/SHELL/aethiea_env.sh ]; then
+  # shellcheck source=/dev/null
+  . ${AETHIEA_ROOT}/ENV/SHELL/aethiea_env.sh
 else
-  export AETHIEAOPSYS="/mnt/h/AETHIEAOPSYS"
+  export AETHIEAOPSYS="$AETHIEA_ROOT"
   export AETH_ROOT="$AETHIEAOPSYS"
   export AEUSB="$AETHIEAOPSYS"
 fi

@@ -1,10 +1,26 @@
 #!/usr/bin/env bash
+# BEGIN AETHIEA_MARKER_RESOLVE
+_aeth_resolve_root() {
+  local p="${AETHIEA_ROOT:-${AETH_ROOT:-${AETHIEA:-${AETHIEAOPSYS:-$(pwd -P)}}}}"
+  if [ -n "$p" ] && [ -f "$p/.aeth_root" ]; then (cd "$p" && pwd -P); return; fi
+  p="$(pwd -P)"
+  while [ "$p" != "/" ] && [ ! -f "$p/.aeth_root" ]; do p="$(dirname "$p")"; done
+  if [ -f "$p/.aeth_root" ]; then (cd "$p" && pwd -P); return; fi
+  for p in /mnt/*/AETHIEAOPSYS "$HOME/AETHIEAOPSYS" /opt/AETHIEAOPSYS; do
+    [ -f "$p/.aeth_root" ] && { (cd "$p" && pwd -P); return; }
+  done
+  return 1
+}
+AETHIEA_ROOT="$(_aeth_resolve_root)" || { echo "NO_AETH_ROOT_FOUND"; exit 1; }
+export AETHIEA_ROOT AETH_ROOT="$AETHIEA_ROOT" AETHIEA="$AETHIEA_ROOT" AETHIEAOPSYS="$AETHIEA_ROOT"
+# END AETHIEA_MARKER_RESOLVE
+
 set -u
 
-ROOT="/mnt/h/AETHIEAOPSYS"
-HROOT="/mnt/h/AETHIEAOPSYS"
-IROOT="/mnt/i/AETHIEAOPSYS"
-UROOT="/home/d_ny5u5/AETHIEAOPSYS"
+ROOT="$AETHIEA_ROOT"
+HROOT="$AETHIEA_ROOT"
+IROOT="${AETH_SECONDARY_ROOT:-}"
+UROOT="${AETH_USER_ROOT:-$HOME/AETHIEAOPSYS}"
 
 echo "=== AETHIEA BOOTPROOF ==="
 date -u +%FT%TZ

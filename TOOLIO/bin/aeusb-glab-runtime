@@ -1,10 +1,26 @@
 #!/usr/bin/env bash
+# BEGIN AETHIEA_MARKER_RESOLVE
+_aeth_resolve_root() {
+  local p="${AETHIEA_ROOT:-${AETH_ROOT:-${AETHIEA:-${AETHIEAOPSYS:-$(pwd -P)}}}}"
+  if [ -n "$p" ] && [ -f "$p/.aeth_root" ]; then (cd "$p" && pwd -P); return; fi
+  p="$(pwd -P)"
+  while [ "$p" != "/" ] && [ ! -f "$p/.aeth_root" ]; do p="$(dirname "$p")"; done
+  if [ -f "$p/.aeth_root" ]; then (cd "$p" && pwd -P); return; fi
+  for p in /mnt/*/AETHIEAOPSYS "$HOME/AETHIEAOPSYS" /opt/AETHIEAOPSYS; do
+    [ -f "$p/.aeth_root" ] && { (cd "$p" && pwd -P); return; }
+  done
+  return 1
+}
+AETHIEA_ROOT="$(_aeth_resolve_root)" || { echo "NO_AETH_ROOT_FOUND"; exit 1; }
+export AETHIEA_ROOT AETH_ROOT="$AETHIEA_ROOT" AETHIEA="$AETHIEA_ROOT" AETHIEAOPSYS="$AETHIEA_ROOT"
+# END AETHIEA_MARKER_RESOLVE
+
 # AETHIEA glab runtime bridge
 # AEUSB carries custody. Host gets ephemeral permission-correct runtime copy.
 
 set -euo pipefail
 
-SRC="/mnt/h/AETHIEAOPSYS/VAULT/AUTH/CALLABLE/GITLAB_CLI_SNAP_CURRENT/glab-cli"
+SRC="${AETHIEA_ROOT}/VAULT/AUTH/CALLABLE/GITLAB_CLI_SNAP_CURRENT/glab-cli"
 
 # snap glab current revision path
 DST="$HOME/snap/glab/current/.config/glab-cli"
