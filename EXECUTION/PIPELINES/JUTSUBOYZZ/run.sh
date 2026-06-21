@@ -1,7 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT="${AETHIEA:-/mnt/h/AETHIEAOPSYS}"
+ROOT="${AETHIEA:-${AETH_ROOT:-}}"
+if [ -z "$ROOT" ] || [ ! -f "$ROOT/.aeth_root" ]; then
+  ROOT="$(pwd -P)"
+  while [ "$ROOT" != "/" ] && [ ! -f "$ROOT/.aeth_root" ]; do
+    ROOT="$(dirname "$ROOT")"
+  done
+fi
+[ -f "$ROOT/.aeth_root" ] || { echo "NO_AETH_ROOT_FOUND"; exit 1; }
 PIPE="$ROOT/EXECUTION/PIPELINES/JUTSUBOYZZ"
 CONFIG="$PIPE/CONFIG/pipeline.json"
 SECURITY_LOG="$ROOT/EXECUTION/REPORTS/security.log"

@@ -11,11 +11,11 @@ fi
 
 ae-status | tee "$OUT"
 
-for root in /mnt/h/AETHIEAOPSYS /mnt/i/AETHIEAOPSYS /home/d_ny5u5/AETHIEAOPSYS; do
+for root in "${AETHIEA:-${AETH_ROOT:-$(pwd -P)}}"; do
   [ -d "$root" ] || continue
   mkdir -p "$root/DATA/STATUS/receipts" "$root/TOOLIO/bin"
-  cp /mnt/h/AETHIEAOPSYS/TOOLIO/bin/ae-status "$root/TOOLIO/bin/ae-status" 2>/dev/null || true
+  cp "${AETHIEA:-${AETH_ROOT:-$(pwd -P)}}/TOOLIO/bin/ae-status" "$root/TOOLIO/bin/ae-status" 2>/dev/null || true
   cp "$OUT" "$root/DATA/STATUS/receipts/"
 done
 
-sha256sum "$OUT" | tee -a /mnt/h/AETHIEAOPSYS/LOGS/BOOT/aevps_startup.log
+sha256sum "$OUT" | tee -a "${AETHIEA:-${AETH_ROOT:-$(pwd -P)}}/LOGS/BOOT/aevps_startup.log"
