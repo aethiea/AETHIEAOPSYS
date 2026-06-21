@@ -5,7 +5,7 @@
   "relationship": "renders_and_interacts_with_AETHIEAOPSYS",
   "host_role": "execution_and_interface",
   "runtime": "AETHIEAOPSYS",
-  "runtime_root": "/mnt/j/AETHIEAOPSYS",
+  "runtime_root": "/mnt/h/AETHIEAOPSYS",
   "mode": "USB_CONTINUITY",
   "operator_node": "DNY-5U5",
   "status": "ACTIVE",
