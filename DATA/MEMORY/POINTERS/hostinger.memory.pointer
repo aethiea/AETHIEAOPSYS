@@ -1,0 +1,3 @@
+HOSTINGER_MEMORY_MARKERS=AE320GB_HEAVY_BODY,.aexhb_root,.aeth_heavy_root
+HOSTINGER_MEMORY_REL=DATA/MEMORY/HOSTINGER
+RULE=Resolve marker at runtime. Do not hardcode USB port, drive letter, or /mnt path.

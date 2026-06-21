@@ -1,0 +1,6 @@
+HOSTINGER LANE RECEIPT
+Timestamp UTC: 20260621T222918Z
+AEUSB marker: .aeth_root
+AEXHB markers: AE320GB_HEAVY_BODY / .aexhb_root / .aeth_heavy_root / .aeth_heavy_body
+Memory relative path: DATA/MEMORY/HOSTINGER
+Rule: AEUSB carries authority. AEXHB carries memory. No secrets in Git.

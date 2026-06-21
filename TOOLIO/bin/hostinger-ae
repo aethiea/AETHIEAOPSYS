@@ -1,0 +1,99 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+climb_to_marker() {
+  local root="${1:-}"
+  [ -n "$root" ] || return 1
+  root="${root%/}"
+
+  while [ "$root" != "/" ]; do
+    if [ -f "$root/.aeth_root" ]; then
+      printf '%s\n' "$root"
+      return 0
+    fi
+    root="$(dirname "$root")"
+  done
+
+  return 1
+}
+
+resolve_aeusb() {
+  local root=""
+
+  for candidate in "${AETHIEA:-}" "${AETH_ROOT:-}" "$(pwd -P)" /mnt/*/AETHIEAOPSYS; do
+    [ -n "${candidate:-}" ] || continue
+    [ -e "$candidate" ] || continue
+
+    root="$(climb_to_marker "$candidate" 2>/dev/null || true)"
+    if [ -n "$root" ] && [ -f "$root/.aeth_root" ]; then
+      printf '%s\n' "$root"
+      return 0
+    fi
+  done
+
+  return 1
+}
+
+resolve_aexhb() {
+  local root=""
+
+  for candidate in "${AEXHB_ROOT:-}" "${AEXHB:-}" "${AE320_ROOT:-}" "${AEXHD_ROOT:-}" /mnt/*/AETHIEAOPSYS; do
+    [ -n "${candidate:-}" ] || continue
+    [ -d "$candidate" ] || continue
+
+    root="${candidate%/}"
+    if [ -f "$root/AE320GB_HEAVY_BODY" ] || \
+       [ -f "$root/.aexhb_root" ] || \
+       [ -f "$root/.aeth_heavy_root" ] || \
+       [ -f "$root/.aeth_heavy_body" ]; then
+      printf '%s\n' "$root"
+      return 0
+    fi
+  done
+
+  return 1
+}
+
+AEUSB_ROOT="$(resolve_aeusb || true)"
+AEXHB_ROOT="$(resolve_aexhb || true)"
+
+[ -n "${AEUSB_ROOT:-}" ] && [ -f "$AEUSB_ROOT/.aeth_root" ] || { echo "NO_AEUSB_ROOT"; exit 1; }
+[ -n "${AEXHB_ROOT:-}" ] && [ -d "$AEXHB_ROOT" ] || { echo "NO_AEXHB_ROOT"; exit 1; }
+
+HOSTINGER_MEMORY="$AEXHB_ROOT/DATA/MEMORY/HOSTINGER"
+
+case "${1:-status}" in
+  status)
+    echo "HOSTINGER LANE STATUS"
+    echo "AEUSB_ROOT=$AEUSB_ROOT"
+    echo "AEXHB_ROOT=$AEXHB_ROOT"
+    echo "AUTHORITY=$AEUSB_ROOT/LAYERS/AENET/HOSTINGER"
+    echo "MEMORY=$HOSTINGER_MEMORY"
+    [ -d "$HOSTINGER_MEMORY" ] && echo "MEMORY_OK" || echo "MEMORY_MISSING"
+    ;;
+  memory-path)
+    echo "$HOSTINGER_MEMORY"
+    ;;
+  init-memory)
+    mkdir -p "$HOSTINGER_MEMORY"/{accounts,domains,sites,backups,exports,logs,secrets}
+    [ -f "$HOSTINGER_MEMORY/secrets/.gitignore" ] || printf '*\n!.gitignore\n' > "$HOSTINGER_MEMORY/secrets/.gitignore"
+    echo "HOSTINGER_MEMORY_READY=$HOSTINGER_MEMORY"
+    ;;
+  receipt)
+    ts="$(date -u +%Y%m%dT%H%M%SZ)"
+    receipt="$AEUSB_ROOT/DATA/RECEIPTS/HOSTINGER/hostinger_lane_${ts}.txt"
+    {
+      echo "HOSTINGER LANE RECEIPT"
+      echo "Timestamp UTC: $ts"
+      echo "AEUSB marker: .aeth_root"
+      echo "AEXHB markers: AE320GB_HEAVY_BODY / .aexhb_root / .aeth_heavy_root / .aeth_heavy_body"
+      echo "Memory relative path: DATA/MEMORY/HOSTINGER"
+      echo "Rule: AEUSB carries authority. AEXHB carries memory. No secrets in Git."
+    } | tee "$receipt"
+    (cd "$(dirname "$receipt")" && sha256sum "$(basename "$receipt")") > "$receipt.sha256"
+    ;;
+  *)
+    echo "usage: hostinger-ae [status|memory-path|init-memory|receipt]"
+    exit 2
+    ;;
+esac
