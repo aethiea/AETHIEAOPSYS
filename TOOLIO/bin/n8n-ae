@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+resolve_aeusb() {
+  local root="${AETHIEA:-${AETH_ROOT:-$(pwd -P)}}"
+  while [ "$root" != "/" ] && [ ! -f "$root/.aeth_root" ]; do
+    root="$(dirname "$root")"
+  done
+  [ -f "$root/.aeth_root" ] && printf '%s\n' "$root"
+}
+
+resolve_aexhb() {
+  for candidate in "${AEXHB_ROOT:-}" "${AEXHB:-}" "${AE320_ROOT:-}" "${AEXHD_ROOT:-}" /mnt/*/AETHIEAOPSYS; do
+    [ -n "${candidate:-}" ] || continue
+    [ -d "$candidate" ] || continue
+    if [ -f "$candidate/AE320GB_HEAVY_BODY" ] || \
+       [ -f "$candidate/.aexhb_root" ] || \
+       [ -f "$candidate/.aeth_heavy_root" ] || \
+       [ -f "$candidate/.aeth_heavy_body" ]; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+  done
+  return 1
+}
+
+AEUSB_ROOT="$(resolve_aeusb || true)"
+AEXHB_ROOT="$(resolve_aexhb || true)"
+
+[ -n "${AEUSB_ROOT:-}" ] && [ -f "$AEUSB_ROOT/.aeth_root" ] || { echo "NO_AEUSB_ROOT"; exit 1; }
+[ -n "${AEXHB_ROOT:-}" ] && [ -d "$AEXHB_ROOT" ] || { echo "NO_AEXHB_ROOT"; exit 1; }
+
+NPM_PREFIX="${NPM_PREFIX:-$HOME/.local/aethiea/npm-global}"
+N8N_BIN="$NPM_PREFIX/bin/n8n"
+N8N_MEMORY="$AEXHB_ROOT/DATA/MEMORY/N8N"
+
+export N8N_USER_FOLDER="$N8N_MEMORY/user_folder"
+export N8N_HOST="${N8N_HOST:-127.0.0.1}"
+export N8N_PORT="${N8N_PORT:-5678}"
+export N8N_PROTOCOL="${N8N_PROTOCOL:-http}"
+
+[ -x "$N8N_BIN" ] || { echo "NO_N8N_BIN=$N8N_BIN"; exit 1; }
+
+mkdir -p \
+  "$N8N_MEMORY/user_folder" \
+  "$N8N_MEMORY/workflows" \
+  "$N8N_MEMORY/credentials_exports" \
+  "$N8N_MEMORY/backups" \
+  "$N8N_MEMORY/logs" \
+  "$N8N_MEMORY/tmp"
+
+case "${1:-status}" in
+  status)
+    echo "N8N LANE STATUS"
+    echo "AEUSB_ROOT=$AEUSB_ROOT"
+    echo "AEXHB_ROOT=$AEXHB_ROOT"
+    echo "N8N_BIN=$N8N_BIN"
+    echo "N8N_MEMORY=$N8N_MEMORY"
+    echo "N8N_USER_FOLDER=$N8N_USER_FOLDER"
+    echo "N8N_HOST=$N8N_HOST"
+    echo "N8N_PORT=$N8N_PORT"
+    "$N8N_BIN" --version
+    ;;
+  memory-path)
+    echo "$N8N_MEMORY"
+    ;;
+  user-folder)
+    echo "$N8N_USER_FOLDER"
+    ;;
+  version)
+    "$N8N_BIN" --version
+    ;;
+  start)
+    shift || true
+    exec "$N8N_BIN" "$@"
+    ;;
+  *)
+    exec "$N8N_BIN" "$@"
+    ;;
+esac

@@ -1,0 +1,12 @@
+N8N LANE RECEIPT
+Timestamp UTC: 20260622T021206Z
+Software installed: yes
+n8n version: 2.26.8
+Host install relative: HOME/.local/aethiea/npm-global/bin/n8n
+AEUSB marker: .aeth_root
+AEXHB marker: AE320GB_HEAVY_BODY / heavy-body markers
+Memory provider: AEXHB / AE320
+Memory relative path: DATA/MEMORY/N8N
+User folder relative path: DATA/MEMORY/N8N/user_folder
+Rule: AEUSB carries authority. AEXHB carries n8n memory. Host executes. Host does not own.
+Secrets: none committed
