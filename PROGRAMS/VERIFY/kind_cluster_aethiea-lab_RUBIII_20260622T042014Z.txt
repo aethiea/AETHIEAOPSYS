@@ -1,0 +1,31 @@
+AETHIEA KIND CLUSTER RECEIPT
+Timestamp UTC: 20260622T042014Z
+Host: RUBIII
+Cluster: aethiea-lab
+AEUSB_ROOT=/mnt/h/AETHIEAOPSYS
+AEXHD_ROOT=/mnt/i/AETHIEAOPSYS
+KUBECONFIG=/mnt/i/AETHIEAOPSYS/DATA/MEMORY/KUBERNETES/kube/config
+Config: LAYERS/AENET/KUBERNETES/kind-aethiea-lab.yaml
+
+=== TOOLCHAIN ===
+Client Version: v1.36.2
+Kustomize Version: v5.8.1
+version.BuildInfo{Version:"v4.0.2", GitCommit:"94659f25033af6eb43fc186c24e6c07b1091800b", GitTreeState:"clean", GoVersion:"go1.25.4", KubeClientVersion:"v1.34"}
+kind v0.32.0 go1.26.3 linux/amd64
+
+=== CLUSTER ===
+kind-aethiea-lab
+NAME                        STATUS     ROLES           AGE   VERSION   INTERNAL-IP   EXTERNAL-IP   OS-IMAGE                       KERNEL-VERSION                              CONTAINER-RUNTIME
+aethiea-lab-control-plane   NotReady   control-plane   11s   v1.36.1   172.17.0.2    <none>        Debian GNU/Linux 13 (trixie)   6.18.33.1-microsoft-standard-WSL2 (amd64)   containerd://2.3.1
+NAMESPACE            NAME                                                READY   STATUS    RESTARTS   AGE
+kube-system          coredns-589f44dc88-htl2r                            0/1     Pending   0          4s
+kube-system          coredns-589f44dc88-s7nzp                            0/1     Pending   0          4s
+kube-system          etcd-aethiea-lab-control-plane                      0/1     Running   0          10s
+kube-system          kindnet-xvt2d                                       1/1     Running   0          4s
+kube-system          kube-apiserver-aethiea-lab-control-plane            0/1     Running   0          10s
+kube-system          kube-controller-manager-aethiea-lab-control-plane   0/1     Running   0          10s
+kube-system          kube-proxy-k8d7k                                    1/1     Running   0          4s
+kube-system          kube-scheduler-aethiea-lab-control-plane            0/1     Running   0          10s
+local-path-storage   local-path-provisioner-855c7b7774-gj6qq             0/1     Pending   0          4s
+
+Rule: Docker executes. AEUSB carries config/proof. AEXHD carries kube state. Host does not own.
