@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+export KUBECONFIG="/mnt/i/AETHIEAOPSYS/DATA/MEMORY/KUBERNETES/kube/config"
+export KIND_EXPERIMENTAL_DOCKER_NETWORK="bridge"
+exec /mnt/i/AETHIEAOPSYS/TOOLIO/KUBERNETES/bin/kind "$@"

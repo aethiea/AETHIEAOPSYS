@@ -1,0 +1,49 @@
+AETHIEA KUBERNETES AEUSB + AEXHD INSTALL RECEIPT
+Timestamp UTC: 20260622T040739Z
+Host: RUBIII
+AEUSB_ROOT=/mnt/h/AETHIEAOPSYS
+AEXHD_ROOT=/mnt/i/AETHIEAOPSYS
+K8S_PAYLOAD=/mnt/i/AETHIEAOPSYS/TOOLIO/KUBERNETES/bin
+KUBECTL_VERSION=v1.36.2
+HELM_VERSION=v4.0.2
+KIND_VERSION=v0.32.0
+
+=== AEUSB WRAPPERS ===
+-rwxrwxrwx 1 root root  314 Jun 22 00:07 /mnt/h/AETHIEAOPSYS/TOOLIO/bin/helm
+-rwxrwxrwx 1 root root 1691 Jun 22 00:07 /mnt/h/AETHIEAOPSYS/TOOLIO/bin/k8s-ae
+-rwxrwxrwx 1 root root  201 Jun 22 00:07 /mnt/h/AETHIEAOPSYS/TOOLIO/bin/kind
+-rwxrwxrwx 1 root root   80 Jun 22 00:07 /mnt/h/AETHIEAOPSYS/TOOLIO/bin/kubectl
+
+=== AEXHD PAYLOAD ===
+-rwxrwxrwx 1 d_ny5u5 d_ny5u5 63M Jun 22 00:07 /mnt/i/AETHIEAOPSYS/TOOLIO/KUBERNETES/bin/helm
+-rwxrwxrwx 1 d_ny5u5 d_ny5u5 11M Jun 22 00:07 /mnt/i/AETHIEAOPSYS/TOOLIO/KUBERNETES/bin/kind
+-rwxrwxrwx 1 d_ny5u5 d_ny5u5 57M Jun 22 00:06 /mnt/i/AETHIEAOPSYS/TOOLIO/KUBERNETES/bin/kubectl
+1e9045ec32bea85da43de85f0065358529ea7c7a152eca78154fba5b58c27d82  /mnt/i/AETHIEAOPSYS/TOOLIO/KUBERNETES/bin/kubectl
+2e9cc6829da8c3dc4e9a8461a328159570e927496388ad419addc5142157983e  /mnt/i/AETHIEAOPSYS/TOOLIO/KUBERNETES/bin/helm
+50030de23cf40a18505f20426f6a8506bedf13c6e509244bd1fa9463721b0f54  /mnt/i/AETHIEAOPSYS/TOOLIO/KUBERNETES/bin/kind
+
+=== MEMORY LANES ===
+drwxrwxrwx 1 d_ny5u5 d_ny5u5 512 Jun 21 23:40 /mnt/i/AETHIEAOPSYS/DATA/MEMORY/KUBERNETES
+drwxrwxrwx 1 d_ny5u5 d_ny5u5 512 Jun 21 23:40 /mnt/i/AETHIEAOPSYS/DATA/MEMORY/KUBERNETES/helm/cache
+drwxrwxrwx 1 d_ny5u5 d_ny5u5 512 Jun 21 23:40 /mnt/i/AETHIEAOPSYS/DATA/MEMORY/KUBERNETES/helm/config
+drwxrwxrwx 1 d_ny5u5 d_ny5u5 512 Jun 21 23:40 /mnt/i/AETHIEAOPSYS/DATA/MEMORY/KUBERNETES/helm/data
+drwxrwxrwx 1 d_ny5u5 d_ny5u5 512 Jun 21 23:40 /mnt/i/AETHIEAOPSYS/DATA/MEMORY/KUBERNETES/kind
+drwxrwxrwx 1 d_ny5u5 d_ny5u5 512 Jun 21 23:40 /mnt/i/AETHIEAOPSYS/DATA/MEMORY/KUBERNETES/kube
+drwxrwxrwx 1 d_ny5u5 d_ny5u5 512 Jun 21 23:40 /mnt/i/AETHIEAOPSYS/DATA/MEMORY/KUBERNETES/receipts
+
+=== STATUS ===
+KUBERNETES AE LANE STATUS
+AEUSB_ROOT=/mnt/h/AETHIEAOPSYS
+AEXHD_ROOT=/mnt/i/AETHIEAOPSYS
+K8S_PAYLOAD=/mnt/i/AETHIEAOPSYS/TOOLIO/KUBERNETES/bin
+KUBECONFIG=/mnt/i/AETHIEAOPSYS/DATA/MEMORY/KUBERNETES/kube/config
+/mnt/h/AETHIEAOPSYS/TOOLIO/bin/kubectl
+Client Version: v1.36.2
+Kustomize Version: v5.8.1
+/mnt/h/AETHIEAOPSYS/TOOLIO/bin/helm
+version.BuildInfo{Version:"v4.0.2", GitCommit:"94659f25033af6eb43fc186c24e6c07b1091800b", GitTreeState:"clean", GoVersion:"go1.25.4", KubeClientVersion:"v1.34"}
+/mnt/h/AETHIEAOPSYS/TOOLIO/bin/kind
+kind v0.32.0 go1.26.3 linux/amd64
+NO_KUBECTL_CONTEXT
+
+Rule: Host executes. AEUSB carries wrappers/proof. AEXHD carries payload/state. Host does not own.

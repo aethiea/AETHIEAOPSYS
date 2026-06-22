@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+exec /mnt/i/AETHIEAOPSYS/TOOLIO/KUBERNETES/bin/kubectl "$@"

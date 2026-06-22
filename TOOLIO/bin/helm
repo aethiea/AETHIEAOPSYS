@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+export HELM_CACHE_HOME="/mnt/i/AETHIEAOPSYS/DATA/MEMORY/KUBERNETES/helm/cache"
+export HELM_CONFIG_HOME="/mnt/i/AETHIEAOPSYS/DATA/MEMORY/KUBERNETES/helm/config"
+export HELM_DATA_HOME="/mnt/i/AETHIEAOPSYS/DATA/MEMORY/KUBERNETES/helm/data"
+exec /mnt/i/AETHIEAOPSYS/TOOLIO/KUBERNETES/bin/helm "$@"

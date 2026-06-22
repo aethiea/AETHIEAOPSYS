@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(pwd -P)"
+while [ "$ROOT" != "/" ] && [ ! -f "$ROOT/.aeth_root" ]; do
+  ROOT="$(dirname "$ROOT")"
+done
+[ -f "$ROOT/.aeth_root" ] || { echo "NO_AETH_ROOT_FOUND"; exit 1; }
+
+AEXHD_ROOT="/mnt/i/AETHIEAOPSYS"
+K8S_MEM="$AEXHD_ROOT/DATA/MEMORY/KUBERNETES"
+K8S_PAYLOAD="$AEXHD_ROOT/TOOLIO/KUBERNETES/bin"
+
+export PATH="$ROOT/TOOLIO/bin:$K8S_PAYLOAD:$PATH"
+export KUBECONFIG="$K8S_MEM/kube/config"
+export HELM_CACHE_HOME="$K8S_MEM/helm/cache"
+export HELM_CONFIG_HOME="$K8S_MEM/helm/config"
+export HELM_DATA_HOME="$K8S_MEM/helm/data"
+export KIND_EXPERIMENTAL_DOCKER_NETWORK="bridge"
+
+cmd="${1:-status}"
+
+case "$cmd" in
+  env)
+    echo "AEUSB_ROOT=$ROOT"
+    echo "AEXHD_ROOT=$AEXHD_ROOT"
+    echo "K8S_PAYLOAD=$K8S_PAYLOAD"
+    echo "KUBECONFIG=$KUBECONFIG"
+    echo "HELM_CACHE_HOME=$HELM_CACHE_HOME"
+    echo "HELM_CONFIG_HOME=$HELM_CONFIG_HOME"
+    echo "HELM_DATA_HOME=$HELM_DATA_HOME"
+    ;;
+  status)
+    echo "KUBERNETES AE LANE STATUS"
+    echo "AEUSB_ROOT=$ROOT"
+    echo "AEXHD_ROOT=$AEXHD_ROOT"
+    echo "K8S_PAYLOAD=$K8S_PAYLOAD"
+    echo "KUBECONFIG=$KUBECONFIG"
+    command -v kubectl || true
+    kubectl version --client 2>/dev/null || echo "KUBECTL_NOT_CALLABLE"
+    command -v helm || true
+    helm version 2>/dev/null || echo "HELM_NOT_CALLABLE"
+    command -v kind || true
+    kind version 2>/dev/null || echo "KIND_NOT_CALLABLE"
+    kubectl config current-context 2>/dev/null || echo "NO_KUBECTL_CONTEXT"
+    ;;
+  kubectl)
+    shift
+    exec kubectl "$@"
+    ;;
+  helm)
+    shift
+    exec helm "$@"
+    ;;
+  kind)
+    shift
+    exec kind "$@"
+    ;;
+  *)
+    echo "usage: k8s-ae {status|env|kubectl|helm|kind}"
+    exit 2
+    ;;
+esac

@@ -1,0 +1,92 @@
+AETHIEA CONTAINER / KUBERNETES LANE CLASSIFICATION
+Timestamp UTC: 20260622T033105Z
+Host: RUBIII
+Authority Root: /mnt/h/AETHIEAOPSYS
+Rule: Host executes. AEUSB carries. Host does not own.
+
+=== DOCKER CALLABLE ===
+/usr/bin/docker
+Docker version 29.1.3, build 29.1.3-0ubuntu4.1
+Docker Compose version 2.40.3+ds1-0ubuntu1
+NAME        DESCRIPTION                               DOCKER ENDPOINT               ERROR
+default *   Current DOCKER_HOST based configuration   unix:///var/run/docker.sock   
+Client:
+ Version:    29.1.3
+ Context:    default
+ Debug Mode: false
+ Plugins:
+  compose: Docker Compose (Docker Inc.)
+    Version:  2.40.3+ds1-0ubuntu1
+    Path:     /usr/libexec/docker/cli-plugins/docker-compose
+  trust: Manage trust on Docker images (Docker Inc.)
+    Version:  29.1.3
+    Path:     /usr/libexec/docker/cli-plugins/docker-trust
+
+Server:
+ Containers: 2
+  Running: 2
+  Paused: 0
+  Stopped: 0
+ Images: 3
+ Server Version: 29.1.3
+ Storage Driver: overlayfs
+  driver-type: io.containerd.snapshotter.v1
+ Logging Driver: json-file
+ Cgroup Driver: systemd
+ Cgroup Version: 2
+ Plugins:
+  Volume: local
+  Network: bridge host ipvlan macvlan null overlay
+  Log: awslogs fluentd gcplogs gelf journald json-file local splunk syslog
+ CDI spec directories:
+  /etc/cdi
+  /var/run/cdi
+ Swarm: inactive
+ Runtimes: io.containerd.runc.v2 runc
+ Default Runtime: runc
+ Init Binary: docker-init
+ containerd version: 
+ runc version: 
+ init version: 
+ Security Options:
+  seccomp
+   Profile: builtin
+  cgroupns
+ Kernel Version: 6.18.33.1-microsoft-standard-WSL2
+ Operating System: Ubuntu 26.04 LTS
+ OSType: linux
+ Architecture: x86_64
+ CPUs: 8
+ Total Memory: 7.73GiB
+ Name: RUBIII
+ ID: f18323ab-af3b-4309-8f75-dabc7d002235
+ Docker Root Dir: /var/lib/docker
+ Debug Mode: false
+ Experimental: false
+ Insecure Registries:
+  127.0.0.0/8
+  ::1/128
+ Live Restore Enabled: false
+ Firewall Backend: iptables
+
+CONTAINER ID   IMAGE                        COMMAND                  CREATED      STATUS       PORTS                      NAMES
+aaf8f2698110   prom/prometheus:latest       "/bin/prometheus --c…"   3 days ago   Up 7 hours   127.0.0.1:9900->9090/tcp   ae-prometheus
+d192e5edce48   grafana/grafana-oss:latest   "/run.sh"                3 days ago   Up 7 hours   127.0.0.1:3900->3000/tcp   ae-grafana
+
+=== KUBERNETES CALLABLE ===
+KUBECTL_MISSING_OR_NOT_CALLABLE
+NO_KUBECTL_CONTEXT
+
+=== K8S SUPPORT TOOLS ===
+HELM_MISSING_OR_NOT_CALLABLE
+KIND_MISSING_OR_NOT_CALLABLE
+MINIKUBE_MISSING_OR_NOT_CALLABLE
+K3D_MISSING_OR_NOT_CALLABLE
+K3S_MISSING_OR_NOT_CALLABLE
+
+=== AETHIEA LANES ===
+drwxrwxrwx 1 root root 512 Apr 20 08:38 LAYERS/AENET
+
+=== GIT STATUS ===
+## main...origin/main
+?? PROGRAMS/VERIFY/container_kubernetes_RUBIII_20260622T033105Z.txt
