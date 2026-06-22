@@ -1,0 +1,45 @@
+AETHIEA AEVPS KIND BRIDGE RECEIPT
+Timestamp UTC: 20260622T045122Z
+Host: RUBIII
+AEUSB_ROOT=/mnt/h/AETHIEAOPSYS
+AEXHD_ROOT=/mnt/i/AETHIEAOPSYS
+AEVPS_IP=5.161.63.237
+Cluster=aethiea-lab
+Local API=https://127.0.0.1:40519
+AEVPS API endpoint=https://127.0.0.1:16443
+Bridge kubeconfig path on AEXHD=/mnt/i/AETHIEAOPSYS/DATA/MEMORY/KUBERNETES/AEVPS/aethiea-lab.aevps.kubeconfig
+Remote kubeconfig path=/root/.kube/aethiea-lab.config
+Remote kubectl path=/root/.local/bin/kubectl
+
+=== LOCAL STATUS ===
+kind-aethiea-lab
+NAME                        STATUS   ROLES           AGE   VERSION   INTERNAL-IP   EXTERNAL-IP   OS-IMAGE                       KERNEL-VERSION                              CONTAINER-RUNTIME
+aethiea-lab-control-plane   Ready    control-plane   31m   v1.36.1   172.17.0.2    <none>        Debian GNU/Linux 13 (trixie)   6.18.33.1-microsoft-standard-WSL2 (amd64)   containerd://2.3.1
+NAMESPACE            NAME                                                READY   STATUS    RESTARTS   AGE
+kube-system          coredns-589f44dc88-htl2r                            1/1     Running   0          31m
+kube-system          coredns-589f44dc88-s7nzp                            1/1     Running   0          31m
+kube-system          etcd-aethiea-lab-control-plane                      1/1     Running   0          31m
+kube-system          kindnet-xvt2d                                       1/1     Running   0          31m
+kube-system          kube-apiserver-aethiea-lab-control-plane            1/1     Running   0          31m
+kube-system          kube-controller-manager-aethiea-lab-control-plane   1/1     Running   0          31m
+kube-system          kube-proxy-k8d7k                                    1/1     Running   0          31m
+kube-system          kube-scheduler-aethiea-lab-control-plane            1/1     Running   0          31m
+local-path-storage   local-path-provisioner-855c7b7774-gj6qq             1/1     Running   0          31m
+
+=== AEVPS STATUS ===
+AEVPS_HOST=aevps-001
+kind-aethiea-lab
+NAME                        STATUS   ROLES           AGE   VERSION   INTERNAL-IP   EXTERNAL-IP   OS-IMAGE                       KERNEL-VERSION                              CONTAINER-RUNTIME
+aethiea-lab-control-plane   Ready    control-plane   31m   v1.36.1   172.17.0.2    <none>        Debian GNU/Linux 13 (trixie)   6.18.33.1-microsoft-standard-WSL2 (amd64)   containerd://2.3.1
+NAMESPACE            NAME                                                READY   STATUS    RESTARTS   AGE
+kube-system          coredns-589f44dc88-htl2r                            1/1     Running   0          31m
+kube-system          coredns-589f44dc88-s7nzp                            1/1     Running   0          31m
+kube-system          etcd-aethiea-lab-control-plane                      1/1     Running   0          31m
+kube-system          kindnet-xvt2d                                       1/1     Running   0          31m
+kube-system          kube-apiserver-aethiea-lab-control-plane            1/1     Running   0          31m
+kube-system          kube-controller-manager-aethiea-lab-control-plane   1/1     Running   0          31m
+kube-system          kube-proxy-k8d7k                                    1/1     Running   0          31m
+kube-system          kube-scheduler-aethiea-lab-control-plane            1/1     Running   0          31m
+local-path-storage   local-path-provisioner-855c7b7774-gj6qq             1/1     Running   0          31m
+
+Rule: RUBIII hosts kind. AEVPS reaches it through bounded SSH bridge. AEUSB carries proof. AEXHD carries kube state. Host does not own.
