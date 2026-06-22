@@ -1,0 +1,70 @@
+AESOFT EXPANDED CAPABILITY AUDIT
+Timestamp UTC: 20260622T031117Z
+Host: RUBIII
+Authority Root: /mnt/h/AETHIEAOPSYS
+
+=== CONTAINER / DEVOPS ===
+Docker version 29.1.3, build 29.1.3-0ubuntu4.1
+Docker Compose version 2.40.3+ds1-0ubuntu1
+git version 2.53.0
+
+=== CLOUD / EDGE ===
+cloudflared version 2026.5.0 (built 2026-05-13-11:24 UTC)
+4.94.0
+aws-cli/2.35.8 Python/3.14.5 Linux/6.18.33.1-microsoft-standard-WSL2 exe/x86_64.ubuntu.26
+{
+  "azure-cli": "2.87.0",
+  "azure-cli-core": "2.87.0",
+  "azure-cli-telemetry": "1.1.0",
+  "extensions": {}
+}
+hcloud 1.39.0
+
+=== RUNTIME / BACKEND ===
+v22.22.1
+9.2.0
+Python 3.14.4
+pip 25.1.1 from /usr/lib/python3/dist-packages/pip (python 3.14)
+
+=== AI / AGENT / RAG ===
+ollama version is 0.24.0
+
+=== NETWORK / VPN / PROXY ===
+OpenSSH_10.2p1 Ubuntu-2ubuntu3.2, OpenSSL 3.5.5 27 Jan 2026
+curl 8.18.0 (x86_64-pc-linux-gnu) libcurl/8.18.0 OpenSSL/3.5.5 zlib/1.3.1 brotli/1.2.0 zstd/1.5.7 libidn2/2.3.8 libpsl/0.21.2 libssh2/1.11.1 nghttp2/1.68.0 librtmp/2.3 mit-krb5/1.22.1 OpenLDAP/2.6.10
+GNU Wget 1.25.0 built on linux-gnu.
+rsync  version 3.4.1  protocol version 32
+1.98.4
+  tailscale commit: 9e69045b291a7cb1edc714442d68e83b95d05e6b
+  long version: 1.98.4-t9e69045b2-ged3a62f14
+  other commit: ed3a62f143dd73c8aae368d9c639ea49de878f9b
+  go version: go1.26.3 (tailscale/go e877d97384)
+
+=== AETHIEA / TOOLIO ===
+/home/d_ny5u5/.local/bin/hermes
+HERMES ONLINE
+Root: /mnt/h/AETHIEAOPSYS
+Mode: AEUSB_CARRIED
+Role: courier / interface membrane
+Doctrine: Host executes. AEUSB carries. Host does not own.
+Timestamp UTC: 2026-06-22T03:16:20Z
+/mnt/h/AETHIEAOPSYS/TOOLIO/bin/aeusb
+/home/d_ny5u5/.local/bin/hcloud-ae
+/home/d_ny5u5/.local/bin/aevps-status
+/mnt/h/AETHIEAOPSYS/TOOLIO/bin/hostinger-ae
+/home/d_ny5u5/.local/bin/n8n
+HOSTINGER LANE STATUS
+AEUSB_ROOT=/mnt/h/AETHIEAOPSYS
+AEXHB_ROOT=/mnt/i/AETHIEAOPSYS
+AUTHORITY=/mnt/h/AETHIEAOPSYS/LAYERS/AENET/HOSTINGER
+MEMORY=/mnt/i/AETHIEAOPSYS/DATA/MEMORY/HOSTINGER
+MEMORY_OK
+N8N LANE STATUS
+AEUSB_ROOT=/mnt/h/AETHIEAOPSYS
+AEXHB_ROOT=/mnt/i/AETHIEAOPSYS
+N8N_BIN=/home/d_ny5u5/.local/aethiea/npm-global/bin/n8n
+N8N_MEMORY=/mnt/i/AETHIEAOPSYS/DATA/MEMORY/N8N
+N8N_USER_FOLDER=/mnt/i/AETHIEAOPSYS/DATA/MEMORY/N8N/user_folder
+N8N_HOST=127.0.0.1
+N8N_PORT=5678
+2.26.8
