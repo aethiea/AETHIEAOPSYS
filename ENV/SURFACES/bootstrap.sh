@@ -149,7 +149,7 @@ printf "╔═══════════════════════
 printf "║  ÆTHIEA OPSYS // PORTABLE WAKE                              ║\n"
 printf "║  HOSTLESS · FORMLESS · STATELESS                            ║\n"
 printf "╠══════════════════════════════════════════════════════════════╣\n"
-printf "║  BODY      → ${GOLD}%s${REDD}\n" "$AETH_ROOT"
+printf "║  HOSTESS   → ${GOLD}%s${REDD}\n" "$AETH_ROOT"
 printf "║  SURFACE   → ${GOLD}%s${REDD}\n" "$AETH_SURFACE"
 printf "║  HOST      → ${GOLD}%s${REDD}\n" "$AETHIEA_HOST"
 printf "║  OPERATOR  → ${GOLD}%s${REDD}\n" "$AETHIEA_OPERATOR"
