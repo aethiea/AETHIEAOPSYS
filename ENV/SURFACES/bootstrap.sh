@@ -120,6 +120,54 @@ export AETHIEA_HOST="$(hostname)"
 export AETHIEA_OPERATOR="$(whoami)"
 export AETHIEA_MODE="${AETHIEA_MODE:-USB_CONTINUITY}"
 
+aeth_find_aexhd_root() {
+  local r base
+
+  aeth_is_aexhd_root() {
+    local x="$1"
+
+    [ -d "$x" ] || return 1
+    [ "$x" != "$AETH_ROOT" ] || return 1
+
+    # AEXHD is hostless. Marker proves body. Mount path does not.
+    [ -f "$x/.aexhd_root" ] && return 0
+    [ -f "$x/.aeth_memory_body" ] && return 0
+    [ -f "$x/.aeth_heavy_body" ] && return 0
+    [ -f "$x/AE320GB_HEAVY_BODY" ] && return 0
+
+    return 1
+  }
+
+  if [ -n "${AEXHD_ROOT:-}" ] && aeth_is_aexhd_root "$AEXHD_ROOT"; then
+    printf '%s\n' "$AEXHD_ROOT"
+    return 0
+  fi
+
+  for r in /mnt/[a-z]/AETHIEAOPSYS /media/*/AETHIEAOPSYS /run/media/*/AETHIEAOPSYS /Volumes/*/AETHIEAOPSYS "$HOME/AETHIEAOPSYS" /opt/AETHIEAOPSYS; do
+    aeth_is_aexhd_root "$r" || continue
+    printf '%s\n' "$r"
+    return 0
+  done
+
+  for base in /mnt/[a-z] /media/* /run/media/* /Volumes/*; do
+    [ -d "$base" ] || continue
+    [ -d "$base/AETHIEAOPSYS" ] || continue
+    aeth_is_aexhd_root "$base/AETHIEAOPSYS" || continue
+    printf '%s\n' "$base/AETHIEAOPSYS"
+    return 0
+  done
+
+  return 1
+}
+
+if AEXHD_FOUND="$(aeth_find_aexhd_root 2>/dev/null)"; then
+  export AEXHD_ROOT="$AEXHD_FOUND"
+  export AEXHD_STATUS="ONLINE"
+else
+  export AEXHD_ROOT="${AEXHD_ROOT:-not mounted}"
+  export AEXHD_STATUS="OFFLINE"
+fi
+
 if [[ ":$PATH:" != *":$AETH_TOOLIO:"* ]]; then
   export PATH="$AETH_TOOLIO:$PATH"
 fi
@@ -150,6 +198,7 @@ printf "║  ÆTHIEA OPSYS // PORTABLE WAKE                              ║\n"
 printf "║  HOSTLESS · FORMLESS · STATELESS                            ║\n"
 printf "╠══════════════════════════════════════════════════════════════╣\n"
 printf "║  HOSTESS   → ${GOLD}%s${REDD}\n" "$AETH_ROOT"
+printf "║  AEXHD     → ${GOLD}%s${REDD} · %s\n" "$AEXHD_ROOT" "$AEXHD_STATUS"
 printf "║  SURFACE   → ${GOLD}%s${REDD}\n" "$AETH_SURFACE"
 printf "║  HOST      → ${GOLD}%s${REDD}\n" "$AETHIEA_HOST"
 printf "║  OPERATOR  → ${GOLD}%s${REDD}\n" "$AETHIEA_OPERATOR"
