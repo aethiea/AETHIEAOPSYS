@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="${AETHIEA_ROOT:-/mnt/h/AETHIEAOPSYS}"
+CR_BIN="${CODERABBIT_BIN:-$HOME/.local/bin/coderabbit}"
+
+if [ ! -x "$CR_BIN" ]; then
+  echo "CODERABBIT_BIN_MISSING=$CR_BIN" >&2
+  exit 1
+fi
+
+cd "$ROOT"
+exec "$CR_BIN" "$@"
