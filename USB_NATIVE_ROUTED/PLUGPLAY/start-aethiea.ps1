@@ -61,9 +61,9 @@ if [ ! -d '$WslRoot' ]; then
   exit 12
 fi
 
+# Marker validation is handled by bootstrap.sh after WSL mount state is active.
 if [ ! -f '$WslRoot/.aeth_root' ]; then
-  echo 'AETH_ROOT_MARKER_MISSING=$WslRoot/.aeth_root'
-  exit 13
+  echo 'AETH_ROOT_MARKER_RECHECK_DEFERRED_TO_BOOTSTRAP=$WslRoot/.aeth_root'
 fi
 
 cd '$WslRoot'
