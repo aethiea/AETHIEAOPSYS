@@ -1,0 +1,569 @@
+#!/usr/bin/env bash
+set -u
+
+echo "=== AETHER CLOUDFLARE FULL AUDIT — READ ONLY / NO SECRET PRINT ==="
+
+LAUNCH="/home/d_ny5u5/AETHIEAOPSYS"
+ROOT="$("$LAUNCH/TOOLIO/lib/aether_hostless.py" root 2>/dev/null || true)"
+TS="$(date -u +%Y%m%dT%H%M%SZ)"
+ISO="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+GIT_DIR="$HOME/.aethiea_git/AETHIEAOPSYS.git"
+
+if [ -z "${ROOT:-}" ] || [ ! -d "$ROOT" ]; then
+  echo "STOP: HOSTLESS_ROOT_NOT_RESOLVED"
+  echo "WSL_STILL_ACTIVE=$(pwd)"
+  exit 0
+fi
+
+OUT="$ROOT/DATA/STATUS/audits/cloudflare_full_audit_${TS}"
+
+mkdir -p \
+  "$OUT" \
+  "$ROOT/CONFIG/network" \
+  "$ROOT/DATA/STATUS/receipts" \
+  "$ROOT/DATA/STATUS/storage" \
+  "$ROOT/TOOLIO/bin"
+
+CF_BIN="$LAUNCH/TOOLIO/bin/cloudflared"
+[ -x "$CF_BIN" ] || CF_BIN="$(command -v cloudflared || true)"
+
+TUNNEL_ID="9fb8bf65-80e3-417a-9c23-488d41ec5768"
+TUNNEL_NAME="AETHERPort_RUBIII"
+TUNNEL_TARGET="${TUNNEL_ID}.cfargotunnel.com"
+CF_CALL="$HOME/.aether/callable/cloudflared/.cloudflared"
+CF_CONFIG="$CF_CALL/aetherport_rubiii_configmode.yml"
+CRED_FILE="$CF_CALL/${TUNNEL_ID}.json"
+
+redact() {
+  sed -E \
+    -e 's/(eyJ[A-Za-z0-9._=-]+)/[REDACTED_JWT]/g' \
+    -e 's/(Bearer )[A-Za-z0-9._-]+/\1[REDACTED]/g' \
+    -e 's/(gh[pousr]_[A-Za-z0-9_]+|github_pat_[A-Za-z0-9_]+)/[REDACTED_GH]/g' \
+    -e 's#([A-Za-z]:\\\\[^ ]*cert\.pem|/[^ ]*cert\.pem)#[PEM_PATH_REDACTED]#g' \
+    -e 's#([A-Za-z]:\\\\[^ ]*credentials[^ ]*|/[^ ]*credentials[^ ]*)#[CREDENTIAL_PATH_REDACTED]#g' \
+    -e 's#([A-Za-z]:\\\\[^ ]*\.json|/[^ ]*\.json)#[JSON_PATH_REDACTED_IF_SENSITIVE]#g'
+}
+
+echo "root=$ROOT"
+echo "out=$OUT"
+echo "tunnel=$TUNNEL_NAME"
+echo "tunnel_id=$TUNNEL_ID"
+echo "target=$TUNNEL_TARGET"
+echo
+
+echo "=== 01 LOCAL CLOUDFLARED / PROCESS / FILE AUDIT ==="
+
+{
+  echo "timestamp_utc=$ISO"
+  echo "host=$(hostname)"
+  echo "whoami=$(whoami)"
+  echo "root=$ROOT"
+  echo
+
+  echo "=== CLOUDFLARED BINARY ==="
+  echo "CF_BIN=${CF_BIN:-MISSING}"
+  [ -n "${CF_BIN:-}" ] && "$CF_BIN" --version 2>&1 | redact || true
+  echo
+
+  echo "=== PROCESS LIST ==="
+  pgrep -af cloudflared 2>/dev/null | redact || true
+  echo
+
+  echo "=== CONFIG PATHS / FILES — PATHS ONLY ==="
+  for p in \
+    "$HOME/.cloudflared" \
+    "$HOME/.aether/callable/cloudflared/.cloudflared" \
+    "$ROOT/VAULT/AUTH/CALLABLE/CLOUDFLARED/.cloudflared" \
+    "$ROOT/SERVICES/cloudflared" \
+    "$ROOT/SERVICES/cloudflare"
+  do
+    echo "--- $p ---"
+    if [ -e "$p" ] || [ -L "$p" ]; then
+      ls -lad "$p" 2>/dev/null | redact || true
+      [ -L "$p" ] && echo "SYMLINK_TARGET=$(readlink "$p" | redact)" || true
+      find -L "$p" -maxdepth 3 -type f \
+        \( -iname '*.yml' -o -iname '*.yaml' -o -iname '*.json' -o -iname '*.pem' -o -iname '*.log' \) \
+        -printf '%M\t%s\t%TY-%Tm-%Td %TH:%TM\t%p\n' 2>/dev/null | sort | redact || true
+    else
+      echo "MISSING"
+    fi
+    echo
+  done
+
+  echo "=== ACTIVE CONFIG SAFE VIEW ==="
+  if [ -s "$CF_CONFIG" ]; then
+    sed -E \
+      -e 's#credentials-file: .*#credentials-file: [REDACTED_PATH]#' \
+      -e 's#cert: .*#cert: [REDACTED_PATH]#' \
+      "$CF_CONFIG" | redact
+  else
+    echo "CF_CONFIG_MISSING=$CF_CONFIG"
+  fi
+  echo
+
+  echo "=== TUNNEL INFO ==="
+  if [ -n "${CF_BIN:-}" ] && [ -x "$CF_BIN" ]; then
+    "$CF_BIN" tunnel info "$TUNNEL_ID" 2>&1 | redact || true
+  else
+    echo "CLOUDFLARED_BINARY_MISSING"
+  fi
+} | tee "$OUT/local_cloudflared_audit.txt"
+
+echo
+echo "=== 02 LOCAL ORIGIN AUDIT ==="
+
+{
+  echo "timestamp_utc=$ISO"
+  for item in \
+    "RUBIII_UI http://127.0.0.1:3000" \
+    "AETHERNet_3900 http://127.0.0.1:3900/status.json" \
+    "AENET_CLEAN_3910 http://127.0.0.1:3910/status.json" \
+    "SCRAPEGPT http://127.0.0.1:3925/status.json" \
+    "vRAG http://127.0.0.1:3935/status.json" \
+    "AETHvNAS http://127.0.0.1:3940/status.json"
+  do
+    name="${item%% *}"
+    url="${item#* }"
+    echo "--- $name $url ---"
+    curl -fsS --max-time 5 "$url" 2>&1 | sed -n '1,30p' || echo "LOCAL_ORIGIN_NOT_READY"
+    echo
+  done
+
+  echo "=== LISTENING PORTS ==="
+  ss -ltnp 2>/dev/null | grep -E ':(3000|3900|3910|3925|3935|3940)\b' || true
+} | tee "$OUT/local_origin_audit.txt"
+
+echo
+echo "=== 03 DNS AUDIT — BOTH ZONES AND BAD SUFFIX CHECK ==="
+
+{
+  echo "timestamp_utc=$ISO"
+  echo "expected_tunnel_target=$TUNNEL_TARGET"
+  echo
+
+  for host in \
+    thematriculation.cc \
+    aethieaopsys.thematriculation.cc \
+    aethernet.thematriculation.cc \
+    aenet.thematriculation.cc \
+    aethiea.net \
+    rubiii.aethiea.net \
+    rubiii-status.aethiea.net \
+    aethvnas.aethiea.net \
+    vrag.aethiea.net \
+    scrapegpt.aethiea.net \
+    aevps.aethiea.net \
+    aethvnas.aethiea.net.thematriculation.cc \
+    vrag.aethiea.net.thematriculation.cc \
+    scrapegpt.aethiea.net.thematriculation.cc \
+    aevps.aethiea.net.thematriculation.cc
+  do
+    echo "--- DNS $host ---"
+    getent hosts "$host" 2>/dev/null || true
+    command -v dig >/dev/null 2>&1 && {
+      echo "A:"
+      dig +short A "$host" 2>/dev/null || true
+      echo "AAAA:"
+      dig +short AAAA "$host" 2>/dev/null || true
+      echo "CNAME:"
+      dig +short CNAME "$host" 2>/dev/null || true
+    }
+    echo
+  done
+} | tee "$OUT/dns_audit.txt"
+
+echo
+echo "=== 04 PUBLIC ROUTE AUDIT ==="
+
+{
+  echo "timestamp_utc=$ISO"
+  for url in \
+    https://thematriculation.cc \
+    https://aethieaopsys.thematriculation.cc \
+    https://aethernet.thematriculation.cc/status.json \
+    https://aenet.thematriculation.cc/status.json \
+    https://aethiea.net \
+    https://rubiii.aethiea.net/status.json \
+    https://rubiii-status.aethiea.net/status.json \
+    https://aethvnas.aethiea.net/status.json \
+    https://vrag.aethiea.net/status.json \
+    https://scrapegpt.aethiea.net/status.json \
+    https://aevps.aethiea.net/status.json \
+    https://aethvnas.aethiea.net.thematriculation.cc/status.json \
+    https://vrag.aethiea.net.thematriculation.cc/status.json \
+    https://scrapegpt.aethiea.net.thematriculation.cc/status.json \
+    https://aevps.aethiea.net.thematriculation.cc/status.json
+  do
+    echo "--- PUBLIC $url ---"
+    curl -I --max-time 15 "$url" 2>&1 | sed -n '1,22p' || echo "PUBLIC_CHECK_FAILED"
+    echo
+  done
+} | tee "$OUT/public_route_audit.txt"
+
+echo
+echo "=== 05 OPTIONAL CLOUDFLARE API AUDIT — READ ONLY ==="
+
+CF_TOKEN="${CF_API_TOKEN:-${CLOUDFLARE_API_TOKEN:-}}"
+
+if [ -z "$CF_TOKEN" ]; then
+  read -r -s -p "Optional Cloudflare API token for read-only zone/tunnel audit, press Enter to skip: " CF_TOKEN
+  echo
+fi
+
+if [ -z "$CF_TOKEN" ]; then
+  echo "CLOUDFLARE_API_AUDIT_SKIPPED=NO_TOKEN"
+else
+  CF_API_TOKEN="$CF_TOKEN" python3 - "$OUT" "$TUNNEL_ID" "$TUNNEL_TARGET" <<'PY'
+import json, os, sys, urllib.parse, urllib.request
+from pathlib import Path
+
+out, tunnel_id, tunnel_target = sys.argv[1:]
+token = os.environ["CF_API_TOKEN"]
+
+base = "https://api.cloudflare.com/client/v4"
+headers = {
+    "Authorization": f"Bearer {token}",
+    "Content-Type": "application/json",
+}
+
+zones_to_check = [
+    "thematriculation.cc",
+    "aethiea.net",
+    "thechurchofpowerandpoise.cc",
+    "everydayempressworldwide.cc",
+    "thechrysalisstates.cc",
+]
+
+wanted_records = {
+    "thematriculation.cc": [
+        "thematriculation.cc",
+        "aethieaopsys.thematriculation.cc",
+        "aethernet.thematriculation.cc",
+        "aenet.thematriculation.cc",
+        "aethvnas.aethiea.net.thematriculation.cc",
+        "vrag.aethiea.net.thematriculation.cc",
+        "scrapegpt.aethiea.net.thematriculation.cc",
+        "aevps.aethiea.net.thematriculation.cc",
+    ],
+    "aethiea.net": [
+        "aethiea.net",
+        "www.aethiea.net",
+        "rubiii.aethiea.net",
+        "rubiii-status.aethiea.net",
+        "aethvnas.aethiea.net",
+        "vrag.aethiea.net",
+        "scrapegpt.aethiea.net",
+        "aevps.aethiea.net",
+    ],
+}
+
+def cf(method, path, payload=None):
+    data = None if payload is None else json.dumps(payload).encode()
+    req = urllib.request.Request(base + path, data=data, method=method, headers=headers)
+    with urllib.request.urlopen(req, timeout=45) as resp:
+        return json.loads(resp.read().decode())
+
+audit = {
+    "system": "AETHIEAOPSYS",
+    "token_printed": False,
+    "tunnel_id": tunnel_id,
+    "tunnel_target": tunnel_target,
+    "zones": {},
+    "tunnel": {},
+}
+
+try:
+    all_zones = cf("GET", "/zones?per_page=100")
+    audit["account_zones_visible_count"] = len(all_zones.get("result", []))
+    audit["visible_zone_names"] = sorted([z.get("name") for z in all_zones.get("result", []) if z.get("name")])
+
+    for zone_name in zones_to_check:
+        zr = cf("GET", "/zones?" + urllib.parse.urlencode({"name": zone_name}))
+        if not zr.get("success") or not zr.get("result"):
+            audit["zones"][zone_name] = {
+                "accessible": False,
+                "errors": zr.get("errors", [])
+            }
+            continue
+
+        z = zr["result"][0]
+        zid = z["id"]
+        zone_doc = {
+            "accessible": True,
+            "status": z.get("status"),
+            "name_servers": z.get("name_servers", []),
+            "records": [],
+        }
+
+        if zone_name in wanted_records:
+            for fqdn in wanted_records[zone_name]:
+                rr = cf("GET", f"/zones/{zid}/dns_records?" + urllib.parse.urlencode({"name": fqdn}))
+                recs = []
+                for rec in rr.get("result", []):
+                    recs.append({
+                        "name": rec.get("name"),
+                        "type": rec.get("type"),
+                        "content": rec.get("content"),
+                        "proxied": rec.get("proxied"),
+                        "ttl": rec.get("ttl"),
+                        "comment": rec.get("comment"),
+                    })
+                zone_doc["records"].append({
+                    "query": fqdn,
+                    "found": bool(recs),
+                    "records": recs,
+                })
+        else:
+            rr = cf("GET", f"/zones/{zid}/dns_records?per_page=100")
+            for rec in rr.get("result", [])[:100]:
+                zone_doc["records"].append({
+                    "name": rec.get("name"),
+                    "type": rec.get("type"),
+                    "content": rec.get("content"),
+                    "proxied": rec.get("proxied"),
+                    "ttl": rec.get("ttl"),
+                    "comment": rec.get("comment"),
+                })
+
+        audit["zones"][zone_name] = zone_doc
+
+    # Tunnel API endpoint can vary by account scope; attempt discovery safely.
+    try:
+        accounts = cf("GET", "/accounts?per_page=50")
+        audit["accounts_visible_count"] = len(accounts.get("result", []))
+        for acct in accounts.get("result", []):
+            aid = acct.get("id")
+            name = acct.get("name")
+            if not aid:
+                continue
+            try:
+                tr = cf("GET", f"/accounts/{aid}/cfd_tunnel/{tunnel_id}")
+                if tr.get("success"):
+                    audit["tunnel"] = {
+                        "account_name": name,
+                        "account_id_visible": True,
+                        "found": True,
+                        "name": tr.get("result", {}).get("name"),
+                        "id": tr.get("result", {}).get("id"),
+                        "created_at": tr.get("result", {}).get("created_at"),
+                        "deleted_at": tr.get("result", {}).get("deleted_at"),
+                    }
+                    break
+            except Exception:
+                continue
+        if not audit["tunnel"]:
+            audit["tunnel"] = {"found": False, "note": "Token may not have account/tunnel read scope."}
+    except Exception as e:
+        audit["tunnel"] = {"found": False, "error_type": type(e).__name__, "note": "Account/tunnel audit unavailable."}
+
+    audit["status"] = "CLOUDFLARE_API_AUDIT_COMPLETE"
+
+except Exception as e:
+    audit["status"] = "CLOUDFLARE_API_AUDIT_ERROR"
+    audit["error_type"] = type(e).__name__
+    audit["error"] = str(e)
+
+Path(out, "cloudflare_api_audit.json").write_text(json.dumps(audit, indent=2) + "\n")
+
+print(audit["status"])
+for zn, zd in audit.get("zones", {}).items():
+    print(f"ZONE {zn} accessible={zd.get('accessible')}")
+    if zd.get("accessible"):
+        for rec in zd.get("records", []):
+            if "query" in rec:
+                print(f"  {rec['query']} found={rec['found']}")
+PY
+fi
+
+echo
+echo "=== 06 BUILD SUMMARY JSON ==="
+
+python3 - "$ROOT" "$ISO" "$OUT" "$TUNNEL_ID" "$TUNNEL_NAME" "$TUNNEL_TARGET" <<'PY'
+import json, re, sys
+from pathlib import Path
+
+root, iso, out, tunnel_id, tunnel_name, tunnel_target = sys.argv[1:]
+outp = Path(out)
+
+def read(name):
+    p = outp / name
+    return p.read_text(errors="ignore") if p.exists() else ""
+
+dns = read("dns_audit.txt")
+public = read("public_route_audit.txt")
+local = read("local_origin_audit.txt")
+cf = read("local_cloudflared_audit.txt")
+
+def status_for(url):
+    m = re.search(rf"--- PUBLIC {re.escape(url)} ---\n(.*?)(?=\n--- PUBLIC|\Z)", public, re.S)
+    if not m:
+        return "NOT_CHECKED"
+    block = m.group(1)
+    hm = re.search(r"HTTP/\S+\s+(\d+)", block)
+    if hm:
+        return f"HTTP_{hm.group(1)}"
+    if "Could not resolve host" in block:
+        return "DNS_UNRESOLVED"
+    if "TLS connect error" in block:
+        return "TLS_ERROR"
+    return "NO_HTTP_STATUS"
+
+summary = {
+    "system": "AETHIEAOPSYS",
+    "sealed_utc": iso,
+    "map": "CLOUDFLARE_FULL_AUDIT",
+    "rule": "Cloudflare routes. AETHIEAOPSYS remains corpus body. Domains remain separate zones.",
+    "tunnel": {
+        "name": tunnel_name,
+        "id": tunnel_id,
+        "target": tunnel_target,
+        "config_mode_expected": True,
+    },
+    "domains": {
+        "thematriculation.cc": {
+            "role": "Matriculation/AENET public route zone",
+            "observed": {
+                "root": status_for("https://thematriculation.cc"),
+                "aethieaopsys": status_for("https://aethieaopsys.thematriculation.cc"),
+                "aethernet_status": status_for("https://aethernet.thematriculation.cc/status.json"),
+                "aenet_status": status_for("https://aenet.thematriculation.cc/status.json"),
+            }
+        },
+        "aethiea.net": {
+            "role": "AETHIEA system namespace zone",
+            "observed": {
+                "root": status_for("https://aethiea.net"),
+                "rubiii_status": status_for("https://rubiii.aethiea.net/status.json"),
+                "rubiii_status_alt": status_for("https://rubiii-status.aethiea.net/status.json"),
+                "aethvnas_status": status_for("https://aethvnas.aethiea.net/status.json"),
+                "vrag_status": status_for("https://vrag.aethiea.net/status.json"),
+                "scrapegpt_status": status_for("https://scrapegpt.aethiea.net/status.json"),
+                "aevps_status": status_for("https://aevps.aethiea.net/status.json"),
+            }
+        }
+    },
+    "local_origins_audited": [
+        "127.0.0.1:3000",
+        "127.0.0.1:3900",
+        "127.0.0.1:3910",
+        "127.0.0.1:3925",
+        "127.0.0.1:3935",
+        "127.0.0.1:3940"
+    ],
+    "known_unresolved_from_last_runs": [
+        "aethvnas.aethiea.net if DNS record still missing",
+        "vrag.aethiea.net if DNS record still missing",
+        "scrapegpt.aethiea.net if DNS record still missing",
+        "aevps.aethiea.net if DNS record still missing"
+    ],
+    "audit_files": {
+        "local_cloudflared_audit": str(outp / "local_cloudflared_audit.txt"),
+        "local_origin_audit": str(outp / "local_origin_audit.txt"),
+        "dns_audit": str(outp / "dns_audit.txt"),
+        "public_route_audit": str(outp / "public_route_audit.txt"),
+        "api_audit_optional": str(outp / "cloudflare_api_audit.json")
+    },
+    "forbidden": [
+        "printing Cloudflare API token",
+        "printing cloudflared token",
+        "printing cert.pem contents",
+        "printing credential JSON contents",
+        "commingling aethiea.net under thematriculation.cc"
+    ],
+    "audit": str(outp)
+}
+
+p = Path(root) / "CONFIG/network/cloudflare-full-audit.json"
+p.parent.mkdir(parents=True, exist_ok=True)
+p.write_text(json.dumps(summary, indent=2) + "\n")
+print(f"WROTE|{p}")
+print(json.dumps(summary["domains"], indent=2))
+PY
+
+cat > "$ROOT/DATA/STATUS/receipts/cloudflare_full_audit_${TS}.md" <<EOF
+# AETHIEAOPSYS — CLOUDFLARE FULL AUDIT
+
+Timestamp UTC: $ISO
+
+Root:
+
+$ROOT
+
+Audit:
+
+$OUT
+
+Tunnel:
+
+$TUNNEL_NAME
+
+Tunnel ID:
+
+$TUNNEL_ID
+
+Tunnel target:
+
+$TUNNEL_TARGET
+
+## Scope
+
+Audited local cloudflared process/config/files.
+Audited local origins.
+Audited DNS resolution for thematriculation.cc, aethiea.net, and bad suffix records.
+Audited public HTTP route status.
+Optionally audited Cloudflare API zones, records, and tunnel if token was provided locally.
+
+## Boundary
+
+thematriculation.cc and aethiea.net are separate domains and Cloudflare zones.
+
+Cloudflare routes.
+AETHIEAOPSYS remains corpus body.
+
+No token printed.
+No cert body printed.
+No credential body printed.
+EOF
+
+cp "$ROOT/DATA/STATUS/receipts/cloudflare_full_audit_${TS}.md" \
+   "$ROOT/DATA/STATUS/storage/cloudflare-full-audit-latest.md"
+
+echo
+echo "=== 07 INSTALL COMMAND + COMMIT + PUSH ==="
+
+cp /tmp/aether_cloudflare_full_audit.sh "$ROOT/TOOLIO/bin/aether-cloudflare-full-audit"
+chmod +x "$ROOT/TOOLIO/bin/aether-cloudflare-full-audit"
+cp "$ROOT/TOOLIO/bin/aether-cloudflare-full-audit" "$LAUNCH/TOOLIO/bin/aether-cloudflare-full-audit"
+chmod +x "$LAUNCH/TOOLIO/bin/aether-cloudflare-full-audit"
+
+PUSH_STATUS="NOT_ATTEMPTED"
+
+if [ -d "$GIT_DIR" ]; then
+  git --git-dir="$GIT_DIR" --work-tree="$ROOT" add \
+    CONFIG/network/cloudflare-full-audit.json \
+    DATA/STATUS/receipts/cloudflare_full_audit_${TS}.md \
+    DATA/STATUS/storage/cloudflare-full-audit-latest.md \
+    TOOLIO/bin/aether-cloudflare-full-audit
+
+  git --git-dir="$GIT_DIR" --work-tree="$ROOT" commit -m "Audit Cloudflare domains and tunnel components" || true
+
+  if ssh -n -T git@github.com 2>&1 | tee "$OUT/github_ssh_check.txt" | grep -qi "successfully authenticated"; then
+    if git --git-dir="$GIT_DIR" --work-tree="$ROOT" push origin main 2>&1 | tee "$OUT/git_push_origin_main.txt"; then
+      PUSH_STATUS="PUSH_OK"
+    else
+      PUSH_STATUS="PUSH_FAILED"
+    fi
+  else
+    PUSH_STATUS="SSH_AUTH_NOT_ACCEPTED"
+  fi
+else
+  PUSH_STATUS="BARE_GIT_DIR_MISSING"
+fi
+
+echo
+echo "AETHER_CLOUDFLARE_FULL_AUDIT_COMPLETE"
+echo "PUSH_STATUS=$PUSH_STATUS"
+echo "OUT=$OUT"
+echo "MAP=$ROOT/CONFIG/network/cloudflare-full-audit.json"
+echo "LATEST=$ROOT/DATA/STATUS/storage/cloudflare-full-audit-latest.md"
+echo "WSL_STILL_ACTIVE=$(pwd)"

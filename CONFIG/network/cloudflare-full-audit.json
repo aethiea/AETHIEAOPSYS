@@ -1,0 +1,64 @@
+{
+  "system": "AETHIEAOPSYS",
+  "sealed_utc": "2026-07-12T21:06:26Z",
+  "map": "CLOUDFLARE_FULL_AUDIT",
+  "rule": "Cloudflare routes. AETHIEAOPSYS remains corpus body. Domains remain separate zones.",
+  "tunnel": {
+    "name": "AETHERPort_RUBIII",
+    "id": "9fb8bf65-80e3-417a-9c23-488d41ec5768",
+    "target": "9fb8bf65-80e3-417a-9c23-488d41ec5768.cfargotunnel.com",
+    "config_mode_expected": true
+  },
+  "domains": {
+    "thematriculation.cc": {
+      "role": "Matriculation/AENET public route zone",
+      "observed": {
+        "root": "HTTP_200",
+        "aethieaopsys": "HTTP_302",
+        "aethernet_status": "HTTP_200",
+        "aenet_status": "HTTP_200"
+      }
+    },
+    "aethiea.net": {
+      "role": "AETHIEA system namespace zone",
+      "observed": {
+        "root": "DNS_UNRESOLVED",
+        "rubiii_status": "HTTP_404",
+        "rubiii_status_alt": "HTTP_404",
+        "aethvnas_status": "DNS_UNRESOLVED",
+        "vrag_status": "DNS_UNRESOLVED",
+        "scrapegpt_status": "DNS_UNRESOLVED",
+        "aevps_status": "DNS_UNRESOLVED"
+      }
+    }
+  },
+  "local_origins_audited": [
+    "127.0.0.1:3000",
+    "127.0.0.1:3900",
+    "127.0.0.1:3910",
+    "127.0.0.1:3925",
+    "127.0.0.1:3935",
+    "127.0.0.1:3940"
+  ],
+  "known_unresolved_from_last_runs": [
+    "aethvnas.aethiea.net if DNS record still missing",
+    "vrag.aethiea.net if DNS record still missing",
+    "scrapegpt.aethiea.net if DNS record still missing",
+    "aevps.aethiea.net if DNS record still missing"
+  ],
+  "audit_files": {
+    "local_cloudflared_audit": "/mnt/k/AETHIEAOPSYS/DATA/STATUS/audits/cloudflare_full_audit_20260712T210626Z/local_cloudflared_audit.txt",
+    "local_origin_audit": "/mnt/k/AETHIEAOPSYS/DATA/STATUS/audits/cloudflare_full_audit_20260712T210626Z/local_origin_audit.txt",
+    "dns_audit": "/mnt/k/AETHIEAOPSYS/DATA/STATUS/audits/cloudflare_full_audit_20260712T210626Z/dns_audit.txt",
+    "public_route_audit": "/mnt/k/AETHIEAOPSYS/DATA/STATUS/audits/cloudflare_full_audit_20260712T210626Z/public_route_audit.txt",
+    "api_audit_optional": "/mnt/k/AETHIEAOPSYS/DATA/STATUS/audits/cloudflare_full_audit_20260712T210626Z/cloudflare_api_audit.json"
+  },
+  "forbidden": [
+    "printing Cloudflare API token",
+    "printing cloudflared token",
+    "printing cert.pem contents",
+    "printing credential JSON contents",
+    "commingling aethiea.net under thematriculation.cc"
+  ],
+  "audit": "/mnt/k/AETHIEAOPSYS/DATA/STATUS/audits/cloudflare_full_audit_20260712T210626Z"
+}
