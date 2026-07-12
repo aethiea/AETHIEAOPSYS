@@ -1,0 +1,105 @@
+{
+  "system": "AETHIEAOPSYS",
+  "sealed_utc": "2026-07-12T20:22:07Z",
+  "manifest": "MASTER_ENDPOINT_HUB_TOPOGRAPHY",
+  "traits": [
+    "hostless",
+    "stateless",
+    "formless",
+    "headless"
+  ],
+  "doctrine": {
+    "root_rule": "Tools do not organize the OS. The OS organizes the tools.",
+    "symbiosis_rule": "Symbiosis, not assimilation.",
+    "body_rule": "AETHIEAOPSYS remains the corpus body.",
+    "surface_rule": "Every host, tool, runtime, provider, domain, tunnel, and app is a surface or membrane, not the whole system.",
+    "authority_chain": "Operator decides. AETHER resolves. AETHIEAOPSYS proves. AEUSB authorizes. AEXHD carries. AEVPS persists. Cloudflare routes. Git seals. vRAG retrieves."
+  },
+  "hubs": {
+    "AETHIEAOPSYS": {
+      "type": "corpus_body",
+      "role": "source-of-truth filesystem body",
+      "current_resolved_root": "/mnt/k/AETHIEAOPSYS",
+      "owns_authority": true
+    },
+    "vRAG": {
+      "type": "retrieval_governance_layer",
+      "role": "maps/indexes/retrieves receipts, configs, routes, endpoint audits, domain bindings, services, topology",
+      "starts_order": true,
+      "does_not_index": [
+        "VAULT",
+        ".git",
+        "RUN",
+        "LOGS",
+        "private keys",
+        "tokens",
+        "secrets",
+        "cert bodies",
+        "credential material"
+      ],
+      "does_not_own_corpus": true
+    },
+    "AETHER": {
+      "type": "resolution_layer",
+      "role": "binds continuity and resolves the active corpus root by signature"
+    },
+    "AEUSB": {
+      "type": "portable_authority_mirror",
+      "role": "ignition/runtime authority carrier",
+      "known_windows_root": "J:\\AETHIEAOPSYS when visible",
+      "rule": "AEUSB wakes. It is observed, not forced."
+    },
+    "AEXHD_AE320": {
+      "type": "heavy_readable_body",
+      "role": "expanded corpus/heavy payload/model/cache/mirror body",
+      "known_wsl_root": "/mnt/k/AETHIEAOPSYS currently resolved; historical /mnt/i when mounted",
+      "rule": "AEXHD works. It extends, not owns."
+    },
+    "WSL2_RUBIII": {
+      "type": "local_execution_surface",
+      "role": "launcher, CLI executor, callable materialization, git/cloudflared/OpenSSH control"
+    },
+    "AEVPS_AVPS": {
+      "type": "remote_apex_persistence_surface",
+      "alias": "aevps-001",
+      "ip": "5.161.63.237",
+      "status_ok_at_consolidation": true,
+      "rule": "AEVPS hosts, persists, indexes, and routes. It does not own corpus authority."
+    },
+    "Cloudflare": {
+      "type": "door_edge_membrane",
+      "role": "DNS, tunnel, Zero Trust, edge routing",
+      "rule": "Cloudflare routes. Cloudflare does not own the corpus body."
+    },
+    "AENET_AETHERNET": {
+      "type": "routing_tissue",
+      "role": "network/routing membrane connected to thematriculation.cc and AETHIEA namespaces"
+    },
+    "Git_GitHub": {
+      "type": "seal_and_replication_surface",
+      "repo": "git@github.com:aethiea/AETHIEAOPSYS.git",
+      "rule": "Git seals receipts and public-safe route material. Private keys remain excluded."
+    }
+  },
+  "surfaces": {
+    "RUBIII": "primary WSL2 execution/dev/router surface",
+    "LOLITA": "business/admin surface",
+    "OLIVIA": "legacy/executor surface",
+    "AEUSB": "portable authority/ignition",
+    "AEXHD_AE320": "heavy readable corpus mirror",
+    "AEVPS": "remote persistence/apex/status surface",
+    "Cloudflare": "edge Door",
+    "ChatGPT_Library": "external evidence reservoir/retrieval surface, not corpus body"
+  },
+  "namespace_topography": {
+    "thematriculation.cc": {
+      "role": "Matriculation public enterprise corpus/window route",
+      "connected_network": "AETHERNET / AENET",
+      "public_boundary": "governed disclosure"
+    },
+    "aethiea.net": {
+      "role": "AETHIEA system/network namespace",
+      "public_boundary": "mixed public/private by subdomain"
+    }
+  }
+}

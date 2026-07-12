@@ -1,0 +1,91 @@
+{
+  "system": "AETHIEAOPSYS",
+  "sealed_utc": "2026-07-12T20:22:07Z",
+  "registry": {
+    "local_origins": {
+      "RUBIII_public_html": {
+        "origin": "http://127.0.0.1:3000",
+        "role": "local/public HTML origin"
+      },
+      "AETHERNet_local": {
+        "origin": "http://127.0.0.1:3900/status.json",
+        "role": "AETHERNet/AENET status origin"
+      },
+      "reserved_3910": {
+        "origin": "http://127.0.0.1:3910/status.json",
+        "role": "reserved/status lane"
+      },
+      "SCRAPEGPT": {
+        "origin": "http://127.0.0.1:3925/status.json",
+        "role": "scrape/intake service status"
+      },
+      "vRAG": {
+        "origin": "http://127.0.0.1:3935/status.json",
+        "role": "retrieval/index status"
+      },
+      "AETHvNAS": {
+        "origin": "http://127.0.0.1:3940/status.json",
+        "role": "NAS/storage status-only origin"
+      }
+    },
+    "public_domains": {
+      "thematriculation.cc": {
+        "role": "Matriculation public enterprise/corpus window"
+      },
+      "aethieaopsys.thematriculation.cc": {
+        "role": "AETHIEAOPSYS public-safe window route",
+        "known_origin": "http://127.0.0.1:3000"
+      },
+      "aethernet.thematriculation.cc": {
+        "role": "AETHERNet/AENET status route",
+        "known_origin": "http://127.0.0.1:3900"
+      },
+      "aenet.thematriculation.cc": {
+        "role": "AENET route tissue status/edge"
+      },
+      "aethiea.net": {
+        "role": "AETHIEA system namespace"
+      },
+      "frend.aethiea.net": {
+        "role": "frontend / human-facing lane"
+      },
+      "bend.aethiea.net": {
+        "role": "backend / API / MCP / service lane"
+      },
+      "aethvnas.aethiea.net": {
+        "role": "backend storage / NAS status-only lane",
+        "target_origin": "http://127.0.0.1:3940"
+      },
+      "vrag.aethiea.net": {
+        "role": "vRAG public/Zero Trust status lane",
+        "target_origin": "http://127.0.0.1:3935"
+      },
+      "scrapegpt.aethiea.net": {
+        "role": "SCRAPEGPT public/Zero Trust status lane",
+        "target_origin": "http://127.0.0.1:3925"
+      },
+      "aevps.aethiea.net": {
+        "role": "AEVPS public status lane"
+      }
+    },
+    "provider_surfaces": {
+      "GitHub": "seal/replication/public-key auth",
+      "GitLab": "version-control/protocol surface",
+      "Cloudflare": "Door/tunnel/DNS/Zero Trust",
+      "Hetzner_hcloud": "AEVPS provider control plane",
+      "HuggingFace": "model/dataset/space lane",
+      "Runpod": "GPU/AI burst lane",
+      "NPM": "package/auth surface",
+      "Wrangler": "Cloudflare worker/tooling surface",
+      "OpenSSH": "callable identity transport"
+    }
+  },
+  "audit_outputs": {
+    "wsl2_surface_audit": "/mnt/k/AETHIEAOPSYS/DATA/STATUS/audits/aethiea_endpoint_hub_consolidation_20260712T202207Z/wsl2_surface_audit.txt",
+    "config_service_audit": "/mnt/k/AETHIEAOPSYS/DATA/STATUS/audits/aethiea_endpoint_hub_consolidation_20260712T202207Z/config_service_audit.txt",
+    "local_origin_endpoint_checks": "/mnt/k/AETHIEAOPSYS/DATA/STATUS/audits/aethiea_endpoint_hub_consolidation_20260712T202207Z/local_origin_endpoint_checks.txt",
+    "public_endpoint_checks": "/mnt/k/AETHIEAOPSYS/DATA/STATUS/audits/aethiea_endpoint_hub_consolidation_20260712T202207Z/public_endpoint_checks.txt",
+    "auth_git_cloudflared_redacted": "/mnt/k/AETHIEAOPSYS/DATA/STATUS/audits/aethiea_endpoint_hub_consolidation_20260712T202207Z/auth_git_cloudflared_redacted.txt",
+    "aevps_status": "/mnt/k/AETHIEAOPSYS/DATA/STATUS/audits/aethiea_endpoint_hub_consolidation_20260712T202207Z/aevps_status.txt"
+  }
+}

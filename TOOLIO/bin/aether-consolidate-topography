@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -u
+cd /home/d_ny5u5/AETHIEAOPSYS || exit 0
+if [ -x /tmp/aether_consolidate_endpoint_hub_topography.sh ]; then
+  bash /tmp/aether_consolidate_endpoint_hub_topography.sh
+else
+  echo "AETHER_CONSOLIDATION_SCRIPT_MISSING=/tmp/aether_consolidate_endpoint_hub_topography.sh"
+fi

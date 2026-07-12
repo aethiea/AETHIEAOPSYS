@@ -1,0 +1,81 @@
+{
+  "system": "AETHIEAOPSYS",
+  "sealed_utc": "2026-07-12T20:22:07Z",
+  "operation_order": [
+    {
+      "n": 0,
+      "layer": "operator_intent",
+      "actor": "DNY-5U5 / operator",
+      "action": "decide objective and boundary"
+    },
+    {
+      "n": 1,
+      "layer": "vRAG_first",
+      "action": "map ChatGPT Library, persistent memory, pasted text, receipts, configs, and endpoint audits without ingesting secrets"
+    },
+    {
+      "n": 2,
+      "layer": "AETHER_root_resolution",
+      "action": "resolve AETHIEAOPSYS by corpus signature, not by drive letter or host path"
+    },
+    {
+      "n": 3,
+      "layer": "preflight_guard",
+      "action": "enforce host-bind denial, force-mount denial, public/private boundary, and no-mingling rules"
+    },
+    {
+      "n": 4,
+      "layer": "corpus_authority",
+      "action": "read/write configs, receipts, topology, endpoint registry, route policies, and status proofs"
+    },
+    {
+      "n": 5,
+      "layer": "AEUSB_authority",
+      "action": "mirror portable authority and ignition material when visible; never force mount"
+    },
+    {
+      "n": 6,
+      "layer": "AEXHD_heavy_body",
+      "action": "carry heavy readable corpus, models, vectors, RAG bodies, caches, service material"
+    },
+    {
+      "n": 7,
+      "layer": "WSL2_callable_runtime",
+      "action": "materialize callable private auth on ext4; call OpenSSH, Git, gh, cloudflared, npm, wrangler, runpod from runtime-safe copies"
+    },
+    {
+      "n": 8,
+      "layer": "local_origins",
+      "action": "expose local status/service origins on 127.0.0.1 ports before public routing"
+    },
+    {
+      "n": 9,
+      "layer": "AEVPS_persistence",
+      "action": "persist status-only receipts, services, RAG/vector runtime bodies, remote origins"
+    },
+    {
+      "n": 10,
+      "layer": "Cloudflare_Door",
+      "action": "route public/Zero Trust edge to approved origins; Cloudflare does not own system"
+    },
+    {
+      "n": 11,
+      "layer": "Git_seal",
+      "action": "commit and push public-safe configs, receipts, endpoint maps, and public keys only"
+    },
+    {
+      "n": 12,
+      "layer": "vRAG_reindex",
+      "action": "index safe proof targets; deny VAULT, secrets, tokens, private keys, raw certs, and credential bodies"
+    }
+  ],
+  "non_negotiables": [
+    "No private key printed",
+    "No token printed",
+    "No cert body printed",
+    "No forced AEUSB mount",
+    "No surface becomes the body",
+    "No tool creates a second corpus",
+    "DON'T MINGLE"
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "system": "AETHIEAOPSYS",
+  "sealed_utc": "2026-07-12T20:22:07Z",
+  "plan": "VRAG_OPERATIONAL_INDEX_PLAN",
+  "index_targets": [
+    "DATA/STATUS/receipts",
+    "DATA/STATUS/storage",
+    "DATA/STATUS/audits",
+    "CONFIG/topology",
+    "CONFIG/network",
+    "CONFIG/endpoints",
+    "CONFIG/operations",
+    "CONFIG/vrag",
+    "CONFIG/policy",
+    "SERVICES",
+    "DOMAINS",
+    "LAYERS",
+    "MODS",
+    "TOOLIO/bin"
+  ],
+  "deny_targets": [
+    "VAULT",
+    ".git",
+    "RUN",
+    "LOGS",
+    "node_modules",
+    "__pycache__",
+    "*.key",
+    "*.pem",
+    "*.env",
+    "*token*",
+    "*secret*",
+    "*credential*",
+    "private auth material",
+    "cert bodies"
+  ],
+  "authority_rule": "vRAG retrieves and reasons over indexed corpus proof. It does not become source of truth.",
+  "source_of_truth_rule": "Receipts, configs, committed files, and operator locks remain controlling record."
+}
