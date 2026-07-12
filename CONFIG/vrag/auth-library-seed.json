@@ -1,0 +1,44 @@
+{
+  "system": "AETHIEAOPSYS",
+  "sealed_utc": "2026-07-12T20:08:22Z",
+  "route": "VRAG_HOSTLESS_AUTH_MESH_V2",
+  "traits": ["hostless", "stateless", "formless"],
+  "start_layer": "virtual_rag",
+  "rule": "vRAG maps the auth universe. Corpus mirrors preserve. Runtime callable copies execute.",
+  "library_and_runtime_findings": {
+    "stale_host_bound_symlinks": [
+      "~/.ssh/aethieaos_github_ed25519 previously pointed into stale /mnt/h",
+      "~/.config/gh currently pointed into stale /mnt/h",
+      "~/.runpod currently pointed into stale /mnt/h",
+      "K/AEXHD private-key mirrors have DrvFs permissions too open for direct OpenSSH use"
+    ],
+    "callable_auth_lanes": [
+      "OpenSSH",
+      "Git",
+      "GitHub CLI",
+      "cloudflared",
+      "GitLab CLI",
+      "HuggingFace",
+      "NPM",
+      "Runpod",
+      "Wrangler"
+    ],
+    "forbidden": [
+      "printing private keys",
+      "printing API tokens",
+      "printing cert contents",
+      "printing secrets",
+      "calling private keys directly from DrvFs mirrors",
+      "binding authority to /mnt/h, /mnt/k, J:, K:, or ~/.ssh"
+    ]
+  },
+  "flow": [
+    "vRAG",
+    "AETHIEAOPSYS corpus",
+    "AEXHD/K readable mirror",
+    "AEUSB/J portable mirror",
+    "WSL ext4 callable materialization",
+    "cloudflared/OpenSSH/Git callable lanes",
+    "AEVPS public status receipt"
+  ]
+}

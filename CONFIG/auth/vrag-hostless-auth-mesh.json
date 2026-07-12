@@ -1,0 +1,49 @@
+{
+  "system": "AETHIEAOPSYS",
+  "sealed_utc": "2026-07-12T20:11:33Z",
+  "policy": "VRAG_HOSTLESS_AUTH_MESH_FINISH",
+  "traits": [
+    "hostless",
+    "stateless",
+    "formless"
+  ],
+  "start": "virtual_rag",
+  "route_order": [
+    "vRAG seed map",
+    "AETHIEAOPSYS corpus",
+    "AEXHD/K mirror",
+    "AEUSB/J portable mirror",
+    "WSL ext4 callable materialization",
+    "cloudflared callable surface",
+    "OpenSSH callable key",
+    "Git bare-repo route",
+    "AEVPS public status"
+  ],
+  "public_fingerprint": "256 SHA256:sYKleXp5EsW0dE9Xw4hhyKALcfsopGOEsDw99kJiNzM aethieaos_RUBIII_20260712T183553Z (ED25519)",
+  "keys": {
+    "callable_private_key_ext4": "/home/d_ny5u5/.ssh/aether/keys/github/aethieaos_github_ed25519",
+    "callable_public_key_ext4": "/home/d_ny5u5/.ssh/aether/keys/github/aethieaos_github_ed25519.pub",
+    "corpus_private_mirror": "/mnt/k/AETHIEAOPSYS/VAULT/AUTH/SSH/GITHUB/aethieaos_github_ed25519",
+    "corpus_public_mirror": "/mnt/k/AETHIEAOPSYS/VAULT/AUTH/SSH/GITHUB/aethieaos_github_ed25519.pub"
+  },
+  "status": {
+    "aevps_ok": true,
+    "github_cli_ok": true,
+    "ssh_auth_ok": true
+  },
+  "forbidden": [
+    "printing private keys",
+    "printing tokens",
+    "printing cert contents",
+    "printing API secrets",
+    "calling private keys directly from DrvFs mirrors",
+    "binding authority to /mnt/h, /mnt/k, J:, K:, or ~/.ssh"
+  ],
+  "allowed_outputs": [
+    "paths",
+    "public fingerprints",
+    "public keys",
+    "file sizes",
+    "status receipts"
+  ]
+}
