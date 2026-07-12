@@ -1,0 +1,48 @@
+{
+  "system": "AETHIEAOPSYS",
+  "topology_apex": "AEVPS",
+  "vps_alias": "aevps-001",
+  "role": "REMOTE_APEX_PERSISTENCE_AND_ROUTE_SURFACE",
+  "authority_rule": "AEVPS hosts, persists, indexes, and routes. AEVPS does not own the corpus body.",
+  "corpus_authority": "AETHIEAOPSYS",
+  "root_resolution": "corpus_signature",
+  "source_body": "/mnt/k/AETHIEAOPSYS",
+  "surfaces": {
+    "RUBIII": {
+      "role": "launcher/executor/dev surface",
+      "ownership": "does_not_own"
+    },
+    "AEUSB": {
+      "role": "ignition/runtime authority body when mounted",
+      "ownership": "authority_carrier_not_host"
+    },
+    "AEXHD_AE320": {
+      "role": "heavy extended body",
+      "ownership": "corpus_extension_not_host"
+    },
+    "OLIVIA": {
+      "role": "executor surface for final Cloudflare authority lock",
+      "ownership": "does_not_own"
+    },
+    "AEVPS": {
+      "role": "topology apex remote persistence surface",
+      "ownership": "does_not_own"
+    }
+  },
+  "network_membranes": {
+    "Cloudflare": "Door / edge membrane",
+    "AENET": "route tissue",
+    "AETHER": "resolution layer",
+    "VRAG": "retrieval/indexing layer"
+  },
+  "lock": [
+    "Host executes.",
+    "AEUSB authorizes.",
+    "AEXHD carries heavy body.",
+    "AEVPS persists and indexes.",
+    "Cloudflare routes.",
+    "AETHIEAOPSYS remains corpus body.",
+    "DON'T MINGLE."
+  ],
+  "sealed_utc": "2026-07-12T17:31:50Z"
+}

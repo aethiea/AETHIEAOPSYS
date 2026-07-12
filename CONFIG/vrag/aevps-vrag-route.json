@@ -1,0 +1,40 @@
+{
+  "system": "AETHIEAOPSYS",
+  "service": "VRAG",
+  "route_name": "AEVPS_TOP_OF_TOPOLOGY_VRAG",
+  "vps_alias": "aevps-001",
+  "role": "VECTOR_RETRIEVAL_AUGMENTED_GOVERNANCE",
+  "purpose": "Index and retrieve AETHIEAOPSYS receipts, topology, routes, services, software audits, endpoint audits, and domain bindings without collapsing authority into the VPS.",
+  "corpus_root": "/mnt/k/AETHIEAOPSYS",
+  "index_targets": [
+    "DATA/STATUS/receipts",
+    "DATA/STATUS/storage",
+    "DATA/STATUS/audits",
+    "CONFIG/topology",
+    "CONFIG/network",
+    "CONFIG/vrag",
+    "SERVICES",
+    "DOMAINS",
+    "LAYERS",
+    "MODS",
+    "TOOLIO/bin"
+  ],
+  "deny_targets": [
+    "VAULT",
+    ".git",
+    "RUN",
+    "LOGS",
+    "node_modules",
+    "__pycache__",
+    "*.key",
+    "*.pem",
+    "*.json credential material",
+    "*token*",
+    "*secret*"
+  ],
+  "authority_rule": "VRAG retrieves and reasons over indexed corpus material. VRAG does not become source-of-truth.",
+  "source_of_truth_rule": "Receipts, configs, committed files, and operator locks remain controlling record.",
+  "privacy_rule": "No keys, tokens, credentials, cert bodies, or private auth material enter the index.",
+  "status": "DECLARED",
+  "sealed_utc": "2026-07-12T17:31:50Z"
+}
