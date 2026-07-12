@@ -1,0 +1,381 @@
+#!/usr/bin/env bash
+set -u
+
+echo "=== AETHER CLOUDFLARE DOOR NORMALIZE V1 — CONFIG MODE / STATUS ORIGINS ==="
+
+LAUNCH="/home/d_ny5u5/AETHIEAOPSYS"
+ROOT="$("$LAUNCH/TOOLIO/lib/aether_hostless.py" root 2>/dev/null || true)"
+TS="$(date -u +%Y%m%dT%H%M%SZ)"
+ISO="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+GIT_DIR="$HOME/.aethiea_git/AETHIEAOPSYS.git"
+
+if [ -z "${ROOT:-}" ] || [ ! -d "$ROOT" ]; then
+  echo "STOP: HOSTLESS_ROOT_NOT_RESOLVED"
+  echo "WSL_STILL_ACTIVE=$(pwd)"
+  exit 0
+fi
+
+OUT="$ROOT/DATA/STATUS/audits/cloudflare_door_normalize_${TS}"
+
+mkdir -p \
+  "$OUT" \
+  "$ROOT/CONFIG/network" \
+  "$ROOT/DATA/STATUS/receipts" \
+  "$ROOT/DATA/STATUS/storage" \
+  "$ROOT/SERVICES/vrag/www" \
+  "$ROOT/SERVICES/scrapegpt/www" \
+  "$ROOT/SERVICES/cloudflared" \
+  "$ROOT/RUN/cloudflared" \
+  "$HOME/.aether/callable/cloudflared"
+
+redact() {
+  sed -E \
+    -e 's/(eyJ[A-Za-z0-9._=-]+)/[REDACTED_JWT]/g' \
+    -e 's#([A-Za-z]:\\\\[^ ]*cert\.pem|/[^ ]*cert\.pem)#[PEM_PATH_REDACTED]#g' \
+    -e 's#([A-Za-z]:\\\\[^ ]*credentials[^ ]*|/[^ ]*credentials[^ ]*)#[CREDENTIAL_PATH_REDACTED]#g'
+}
+
+echo "root=$ROOT"
+echo "out=$OUT"
+echo
+
+echo "=== 01 START MISSING LOCAL STATUS ORIGINS ==="
+
+make_status_origin() {
+  name="$1"
+  port="$2"
+  dir="$3"
+  hostname="$4"
+
+  mkdir -p "$dir"
+
+  cat > "$dir/status.json" <<EOF
+{
+  "system": "AETHIEAOPSYS",
+  "surface": "$name",
+  "status": "ORIGIN_READY",
+  "hostname": "$hostname",
+  "local_origin": "http://127.0.0.1:$port",
+  "route_membrane": "Cloudflare",
+  "authority_rule": "Cloudflare routes. AETHIEAOPSYS remains corpus body.",
+  "sealed_utc": "$ISO"
+}
+EOF
+
+  cat > "$dir/index.html" <<EOF
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>$name</title></head>
+<body><pre>$name ORIGIN_READY
+AETHIEAOPSYS remains corpus body.
+Cloudflare routes.</pre></body>
+</html>
+EOF
+
+  if ss -ltn 2>/dev/null | grep -q ":$port "; then
+    echo "${name}_PORT_ALREADY_LISTENING=$port"
+  else
+    nohup python3 -m http.server "$port" --bind 127.0.0.1 --directory "$dir" \
+      > "$ROOT/RUN/${name}_${port}.log" 2>&1 &
+    echo $! > "$ROOT/RUN/${name}_${port}.pid"
+    sleep 1
+    echo "${name}_STARTED=$port"
+  fi
+
+  curl -fsS --max-time 4 "http://127.0.0.1:$port/status.json" 2>&1 | sed -n '1,20p' || echo "${name}_NOT_READY_AFTER_START"
+  echo
+}
+
+make_status_origin "vRAG" "3935" "$ROOT/SERVICES/vrag/www" "vrag.aethiea.net"
+make_status_origin "SCRAPEGPT" "3925" "$ROOT/SERVICES/scrapegpt/www" "scrapegpt.aethiea.net"
+
+echo "=== 02 VERIFY AETHvNAS ORIGIN ==="
+
+if ! curl -fsS --max-time 4 http://127.0.0.1:3940/status.json 2>/dev/null | sed -n '1,20p'; then
+  if [ -x "$ROOT/SERVICES/aethvNAS/bin/aethvnas-up" ]; then
+    "$ROOT/SERVICES/aethvNAS/bin/aethvnas-up" || true
+    sleep 1
+  fi
+  curl -fsS --max-time 4 http://127.0.0.1:3940/status.json 2>&1 | sed -n '1,20p' || echo "AETHVNAS_STILL_NOT_READY"
+fi
+
+echo
+echo "=== 03 BUILD CONFIG-MODE TUNNEL FILE ==="
+
+CF_BIN="$LAUNCH/TOOLIO/bin/cloudflared"
+[ -x "$CF_BIN" ] || CF_BIN="$(command -v cloudflared || true)"
+
+if [ -z "${CF_BIN:-}" ] || [ ! -x "$CF_BIN" ]; then
+  echo "STOP: CLOUDFLARED_BINARY_NOT_FOUND"
+  echo "WSL_STILL_ACTIVE=$(pwd)"
+  exit 0
+fi
+
+CF_CALL="$HOME/.aether/callable/cloudflared/.cloudflared"
+CF_SRC="$ROOT/VAULT/AUTH/CALLABLE/CLOUDFLARED/.cloudflared"
+
+mkdir -p "$CF_CALL"
+
+if [ -d "$CF_SRC" ]; then
+  cp -a "$CF_SRC"/. "$CF_CALL"/ 2>/dev/null || true
+fi
+
+TUNNEL_ID="9fb8bf65-80e3-417a-9c23-488d41ec5768"
+CRED_FILE="$CF_CALL/${TUNNEL_ID}.json"
+
+if [ ! -s "$CRED_FILE" ]; then
+  echo "STOP: TUNNEL_CREDENTIAL_FILE_MISSING_PATH_ONLY=$CRED_FILE"
+  echo "WSL_STILL_ACTIVE=$(pwd)"
+  exit 0
+fi
+
+CF_CONFIG="$CF_CALL/aetherport_rubiii_configmode.yml"
+
+cat > "$CF_CONFIG" <<EOF
+tunnel: $TUNNEL_ID
+credentials-file: $CRED_FILE
+
+ingress:
+  - hostname: aethieaopsys.thematriculation.cc
+    service: http://127.0.0.1:3000
+  - hostname: aethernet.thematriculation.cc
+    service: http://127.0.0.1:3900
+  - hostname: aenet.thematriculation.cc
+    service: http://127.0.0.1:3900
+  - hostname: aethvnas.aethiea.net
+    service: http://127.0.0.1:3940
+  - hostname: vrag.aethiea.net
+    service: http://127.0.0.1:3935
+  - hostname: scrapegpt.aethiea.net
+    service: http://127.0.0.1:3925
+  - hostname: aevps.aethiea.net
+    service: http://127.0.0.1:3935
+  - service: http_status:404
+EOF
+
+cp "$CF_CONFIG" "$ROOT/SERVICES/cloudflared/aetherport_rubiii_configmode.yml"
+
+echo "CF_CONFIG=$CF_CONFIG"
+echo "TUNNEL_ID=$TUNNEL_ID"
+
+echo
+echo "=== 04 ATTEMPT DNS ROUTE BINDINGS — NO SECRET PRINT ==="
+
+for host in \
+  aethieaopsys.thematriculation.cc \
+  aethernet.thematriculation.cc \
+  aenet.thematriculation.cc \
+  aethvnas.aethiea.net \
+  vrag.aethiea.net \
+  scrapegpt.aethiea.net \
+  aevps.aethiea.net
+do
+  echo "--- ROUTE DNS $host ---"
+  "$CF_BIN" tunnel route dns "$TUNNEL_ID" "$host" 2>&1 | redact | tee -a "$OUT/cloudflared_route_dns.txt" || true
+  echo
+done
+
+echo
+echo "=== 05 START CONFIG-MODE CONNECTOR, THEN RETIRE TOKEN MODE IF LIVE ==="
+
+TOKEN_PIDS="$(pgrep -f 'cloudflared tunnel run --token' 2>/dev/null || true)"
+echo "TOKEN_MODE_PIDS=${TOKEN_PIDS:-NONE}" | tee "$OUT/token_mode_pids.txt"
+
+nohup "$CF_BIN" --config "$CF_CONFIG" tunnel run \
+  > "$OUT/cloudflared_configmode.log" 2>&1 &
+
+CONFIG_PID="$!"
+echo "$CONFIG_PID" > "$ROOT/RUN/cloudflared/aetherport_rubiii_configmode.pid"
+
+sleep 6
+
+if pgrep -f "cloudflared.*aetherport_rubiii_configmode.yml" >/dev/null 2>&1; then
+  echo "CONFIG_MODE_CONNECTOR_STARTED=1"
+
+  if [ -n "${TOKEN_PIDS:-}" ]; then
+    for p in $TOKEN_PIDS; do
+      kill "$p" 2>/dev/null || true
+      echo "TOKEN_MODE_PID_STOPPED=$p"
+    done
+  fi
+else
+  echo "CONFIG_MODE_CONNECTOR_STARTED=0"
+  echo "CONFIG_MODE_LOG_HEAD:"
+  sed -n '1,100p' "$OUT/cloudflared_configmode.log" | redact || true
+fi
+
+echo
+echo "=== 06 RECHECK LOCAL + PUBLIC DOOR ==="
+
+{
+  echo "timestamp_utc=$ISO"
+  echo
+  echo "=== PROCESSES ==="
+  pgrep -af cloudflared 2>/dev/null | redact || true
+  echo
+  echo "=== LOCAL ==="
+  for url in \
+    http://127.0.0.1:3000 \
+    http://127.0.0.1:3900/status.json \
+    http://127.0.0.1:3925/status.json \
+    http://127.0.0.1:3935/status.json \
+    http://127.0.0.1:3940/status.json
+  do
+    echo "--- $url ---"
+    curl -fsS --max-time 4 "$url" 2>&1 | sed -n '1,16p' || echo "LOCAL_PENDING"
+    echo
+  done
+
+  echo "=== PUBLIC ==="
+  for url in \
+    https://thematriculation.cc \
+    https://aethieaopsys.thematriculation.cc \
+    https://aethernet.thematriculation.cc/status.json \
+    https://aenet.thematriculation.cc \
+    https://aethvnas.aethiea.net/status.json \
+    https://vrag.aethiea.net/status.json \
+    https://scrapegpt.aethiea.net/status.json \
+    https://aevps.aethiea.net/status.json
+  do
+    echo "--- $url ---"
+    curl -I --max-time 12 "$url" 2>&1 | sed -n '1,16p' || echo "PUBLIC_PENDING"
+    echo
+  done
+} | tee "$OUT/recheck_local_public.txt"
+
+echo
+echo "=== 07 WRITE ROUTE NORMALIZATION MAP + RECEIPT ==="
+
+python3 - "$ROOT" "$ISO" "$OUT" "$TUNNEL_ID" "$CF_CONFIG" <<'PY'
+import json, sys
+from pathlib import Path
+
+root, iso, out, tunnel_id, cf_config = sys.argv[1:]
+
+doc = {
+  "system": "AETHIEAOPSYS",
+  "sealed_utc": iso,
+  "map": "CLOUDFLARE_DOOR_NORMALIZATION_V1",
+  "rule": "Cloudflare routes. AETHIEAOPSYS remains corpus body.",
+  "tunnel": {
+    "id": tunnel_id,
+    "mode_target": "config_mode",
+    "config_path": cf_config
+  },
+  "ingress": {
+    "aethieaopsys.thematriculation.cc": "http://127.0.0.1:3000",
+    "aethernet.thematriculation.cc": "http://127.0.0.1:3900",
+    "aenet.thematriculation.cc": "http://127.0.0.1:3900",
+    "aethvnas.aethiea.net": "http://127.0.0.1:3940",
+    "vrag.aethiea.net": "http://127.0.0.1:3935",
+    "scrapegpt.aethiea.net": "http://127.0.0.1:3925",
+    "aevps.aethiea.net": "http://127.0.0.1:3935"
+  },
+  "local_origin_rule": "Local origins must prove before Cloudflare public routes are treated as ready.",
+  "forbidden": [
+    "printing cloudflared token",
+    "printing cert.pem contents",
+    "printing credential JSON contents",
+    "treating Cloudflare as corpus owner",
+    "creating a second corpus body"
+  ],
+  "audit": out
+}
+
+p = Path(root) / "CONFIG/network/cloudflare-door-normalization-v1.json"
+p.parent.mkdir(parents=True, exist_ok=True)
+p.write_text(json.dumps(doc, indent=2) + "\n")
+print(f"WROTE|{p}")
+PY
+
+cat > "$ROOT/DATA/STATUS/receipts/cloudflare_door_normalization_${TS}.md" <<EOF
+# AETHIEAOPSYS — CLOUDFLARE DOOR NORMALIZATION V1
+
+Timestamp UTC: $ISO
+
+Root:
+
+$ROOT
+
+Audit:
+
+$OUT
+
+Config-mode tunnel file:
+
+$CF_CONFIG
+
+Tunnel ID:
+
+$TUNNEL_ID
+
+## Action
+
+Started missing local status origins for vRAG and SCRAPEGPT when ports were free.
+Verified AETHvNAS local status origin.
+Built config-mode Cloudflare ingress.
+Attempted DNS route bindings.
+Started config-mode connector and retired token-mode connector only if config-mode came up.
+
+## Rule
+
+Cloudflare routes.
+AETHIEAOPSYS remains corpus body.
+No token printed.
+No cert body printed.
+No credential body printed.
+EOF
+
+cp "$ROOT/DATA/STATUS/receipts/cloudflare_door_normalization_${TS}.md" \
+   "$ROOT/DATA/STATUS/storage/cloudflare-door-normalization-latest.md"
+
+echo
+echo "=== 08 INSTALL PERSISTENT COMMAND COPY ==="
+
+cp /tmp/aether_cloudflare_door_normalize_v1.sh "$ROOT/TOOLIO/bin/aether-cloudflare-door-normalize"
+chmod +x "$ROOT/TOOLIO/bin/aether-cloudflare-door-normalize"
+cp "$ROOT/TOOLIO/bin/aether-cloudflare-door-normalize" "$LAUNCH/TOOLIO/bin/aether-cloudflare-door-normalize"
+chmod +x "$LAUNCH/TOOLIO/bin/aether-cloudflare-door-normalize"
+
+echo "INSTALLED=$ROOT/TOOLIO/bin/aether-cloudflare-door-normalize"
+echo "INSTALLED=$LAUNCH/TOOLIO/bin/aether-cloudflare-door-normalize"
+
+echo
+echo "=== 09 COMMIT + PUSH SAFE MATERIAL ==="
+
+PUSH_STATUS="NOT_ATTEMPTED"
+
+if [ -d "$GIT_DIR" ]; then
+  git --git-dir="$GIT_DIR" --work-tree="$ROOT" add \
+    CONFIG/network/cloudflare-door-normalization-v1.json \
+    DATA/STATUS/receipts/cloudflare_door_normalization_${TS}.md \
+    DATA/STATUS/storage/cloudflare-door-normalization-latest.md \
+    SERVICES/cloudflared/aetherport_rubiii_configmode.yml \
+    SERVICES/vrag/www/status.json \
+    SERVICES/vrag/www/index.html \
+    SERVICES/scrapegpt/www/status.json \
+    SERVICES/scrapegpt/www/index.html \
+    TOOLIO/bin/aether-cloudflare-door-normalize
+
+  git --git-dir="$GIT_DIR" --work-tree="$ROOT" commit -m "Normalize Cloudflare Door config-mode ingress" || true
+
+  if ssh -n -T git@github.com 2>&1 | tee "$OUT/github_ssh_check.txt" | grep -qi "successfully authenticated"; then
+    if git --git-dir="$GIT_DIR" --work-tree="$ROOT" push origin main 2>&1 | tee "$OUT/git_push_origin_main.txt"; then
+      PUSH_STATUS="PUSH_OK"
+    else
+      PUSH_STATUS="PUSH_FAILED"
+    fi
+  else
+    PUSH_STATUS="SSH_AUTH_NOT_ACCEPTED"
+  fi
+else
+  PUSH_STATUS="BARE_GIT_DIR_MISSING"
+fi
+
+echo
+echo "AETHER_CLOUDFLARE_DOOR_NORMALIZE_V1_COMPLETE"
+echo "PUSH_STATUS=$PUSH_STATUS"
+echo "OUT=$OUT"
+echo "MAP=$ROOT/CONFIG/network/cloudflare-door-normalization-v1.json"
+echo "LATEST=$ROOT/DATA/STATUS/storage/cloudflare-door-normalization-latest.md"
+echo "WSL_STILL_ACTIVE=$(pwd)"

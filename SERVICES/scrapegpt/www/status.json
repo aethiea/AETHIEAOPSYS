@@ -1,0 +1,10 @@
+{
+  "system": "AETHIEAOPSYS",
+  "surface": "SCRAPEGPT",
+  "status": "ORIGIN_READY",
+  "hostname": "scrapegpt.aethiea.net",
+  "local_origin": "http://127.0.0.1:3925",
+  "route_membrane": "Cloudflare",
+  "authority_rule": "Cloudflare routes. AETHIEAOPSYS remains corpus body.",
+  "sealed_utc": "2026-07-12T20:34:11Z"
+}

@@ -1,0 +1,10 @@
+{
+  "system": "AETHIEAOPSYS",
+  "surface": "vRAG",
+  "status": "ORIGIN_READY",
+  "hostname": "vrag.aethiea.net",
+  "local_origin": "http://127.0.0.1:3935",
+  "route_membrane": "Cloudflare",
+  "authority_rule": "Cloudflare routes. AETHIEAOPSYS remains corpus body.",
+  "sealed_utc": "2026-07-12T20:34:11Z"
+}

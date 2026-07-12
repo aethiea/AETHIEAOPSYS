@@ -1,0 +1,29 @@
+{
+  "system": "AETHIEAOPSYS",
+  "sealed_utc": "2026-07-12T20:34:11Z",
+  "map": "CLOUDFLARE_DOOR_NORMALIZATION_V1",
+  "rule": "Cloudflare routes. AETHIEAOPSYS remains corpus body.",
+  "tunnel": {
+    "id": "9fb8bf65-80e3-417a-9c23-488d41ec5768",
+    "mode_target": "config_mode",
+    "config_path": "/home/d_ny5u5/.aether/callable/cloudflared/.cloudflared/aetherport_rubiii_configmode.yml"
+  },
+  "ingress": {
+    "aethieaopsys.thematriculation.cc": "http://127.0.0.1:3000",
+    "aethernet.thematriculation.cc": "http://127.0.0.1:3900",
+    "aenet.thematriculation.cc": "http://127.0.0.1:3900",
+    "aethvnas.aethiea.net": "http://127.0.0.1:3940",
+    "vrag.aethiea.net": "http://127.0.0.1:3935",
+    "scrapegpt.aethiea.net": "http://127.0.0.1:3925",
+    "aevps.aethiea.net": "http://127.0.0.1:3935"
+  },
+  "local_origin_rule": "Local origins must prove before Cloudflare public routes are treated as ready.",
+  "forbidden": [
+    "printing cloudflared token",
+    "printing cert.pem contents",
+    "printing credential JSON contents",
+    "treating Cloudflare as corpus owner",
+    "creating a second corpus body"
+  ],
+  "audit": "/mnt/k/AETHIEAOPSYS/DATA/STATUS/audits/cloudflare_door_normalize_20260712T203411Z"
+}

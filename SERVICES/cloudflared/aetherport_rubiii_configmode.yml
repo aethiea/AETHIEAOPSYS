@@ -1,0 +1,19 @@
+tunnel: 9fb8bf65-80e3-417a-9c23-488d41ec5768
+credentials-file: /home/d_ny5u5/.aether/callable/cloudflared/.cloudflared/9fb8bf65-80e3-417a-9c23-488d41ec5768.json
+
+ingress:
+  - hostname: aethieaopsys.thematriculation.cc
+    service: http://127.0.0.1:3000
+  - hostname: aethernet.thematriculation.cc
+    service: http://127.0.0.1:3900
+  - hostname: aenet.thematriculation.cc
+    service: http://127.0.0.1:3900
+  - hostname: aethvnas.aethiea.net
+    service: http://127.0.0.1:3940
+  - hostname: vrag.aethiea.net
+    service: http://127.0.0.1:3935
+  - hostname: scrapegpt.aethiea.net
+    service: http://127.0.0.1:3925
+  - hostname: aevps.aethiea.net
+    service: http://127.0.0.1:3935
+  - service: http_status:404
