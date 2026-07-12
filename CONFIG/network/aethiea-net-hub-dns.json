@@ -1,6 +1,6 @@
 {
   "system": "AETHIEAOPSYS",
-  "sealed_utc": "2026-07-12T21:18:08Z",
+  "sealed_utc": "2026-07-12T21:33:23Z",
   "map": "AETHIEA_NET_HUB_DNS",
   "zone": "aethiea.net",
   "not_zone": "thematriculation.cc",
@@ -22,7 +22,7 @@
     "scrapegpt.aethiea.net": "3925 SCRAPEGPT status",
     "aevps.aethiea.net": "3935 temporary AEVPS status route"
   },
-  "audit": "/mnt/k/AETHIEAOPSYS/DATA/STATUS/audits/aethiea_net_hub_dns_20260712T211808Z",
+  "audit": "/mnt/k/AETHIEAOPSYS/DATA/STATUS/audits/aethiea_net_hub_dns_20260712T213323Z",
   "forbidden": [
     "printing Cloudflare API token",
     "creating *.aethiea.net.thematriculation.cc",
