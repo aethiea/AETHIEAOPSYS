@@ -1,0 +1,305 @@
+#!/usr/bin/env bash
+set -u
+
+echo "=== AETHER CLOUDFLARE DOOR DNS CONFLICT REPAIR V2 — NO SECRET PRINT ==="
+
+LAUNCH="/home/d_ny5u5/AETHIEAOPSYS"
+ROOT="$("$LAUNCH/TOOLIO/lib/aether_hostless.py" root 2>/dev/null || true)"
+TS="$(date -u +%Y%m%dT%H%M%SZ)"
+ISO="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+GIT_DIR="$HOME/.aethiea_git/AETHIEAOPSYS.git"
+
+if [ -z "${ROOT:-}" ] || [ ! -d "$ROOT" ]; then
+  echo "STOP: HOSTLESS_ROOT_NOT_RESOLVED"
+  echo "WSL_STILL_ACTIVE=$(pwd)"
+  exit 0
+fi
+
+OUT="$ROOT/DATA/STATUS/audits/cloudflare_door_dns_conflict_repair_${TS}"
+mkdir -p "$OUT" "$ROOT/CONFIG/network" "$ROOT/DATA/STATUS/receipts" "$ROOT/DATA/STATUS/storage" "$ROOT/TOOLIO/bin"
+
+redact() {
+  sed -E \
+    -e 's/(eyJ[A-Za-z0-9._=-]+)/[REDACTED_JWT]/g' \
+    -e 's#([A-Za-z]:\\\\[^ ]*cert\.pem|/[^ ]*cert\.pem)#[PEM_PATH_REDACTED]#g' \
+    -e 's#([A-Za-z]:\\\\[^ ]*credentials[^ ]*|/[^ ]*credentials[^ ]*)#[CREDENTIAL_PATH_REDACTED]#g'
+}
+
+CF_BIN="$LAUNCH/TOOLIO/bin/cloudflared"
+[ -x "$CF_BIN" ] || CF_BIN="$(command -v cloudflared || true)"
+
+if [ -z "${CF_BIN:-}" ] || [ ! -x "$CF_BIN" ]; then
+  echo "STOP: CLOUDFLARED_BINARY_NOT_FOUND"
+  echo "WSL_STILL_ACTIVE=$(pwd)"
+  exit 0
+fi
+
+TUNNEL_ID="9fb8bf65-80e3-417a-9c23-488d41ec5768"
+TUNNEL_TARGET="${TUNNEL_ID}.cfargotunnel.com"
+
+echo "root=$ROOT"
+echo "out=$OUT"
+echo "tunnel_id=$TUNNEL_ID"
+echo "target=$TUNNEL_TARGET"
+echo
+
+echo "=== 01 CURRENT DNS / ROUTE TRUTH ==="
+
+{
+  echo "timestamp_utc=$ISO"
+  echo "target=$TUNNEL_TARGET"
+  echo
+
+  for host in \
+    aethieaopsys.thematriculation.cc \
+    aethernet.thematriculation.cc \
+    aenet.thematriculation.cc \
+    aethvnas.aethiea.net \
+    vrag.aethiea.net \
+    scrapegpt.aethiea.net \
+    aevps.aethiea.net \
+    aethvnas.aethiea.net.thematriculation.cc \
+    vrag.aethiea.net.thematriculation.cc \
+    scrapegpt.aethiea.net.thematriculation.cc \
+    aevps.aethiea.net.thematriculation.cc
+  do
+    echo "--- DNS $host ---"
+    getent hosts "$host" 2>/dev/null || true
+    command -v dig >/dev/null 2>&1 && dig +short CNAME "$host" 2>/dev/null || true
+    command -v nslookup >/dev/null 2>&1 && nslookup -type=CNAME "$host" 2>/dev/null | sed -n '1,12p' || true
+    echo
+  done
+
+  echo "=== CLOUDFLARED TUNNEL INFO — REDACTED ==="
+  "$CF_BIN" tunnel info "$TUNNEL_ID" 2>&1 | redact || true
+  echo
+
+  echo "=== CLOUDFLARED ROUTE DNS HELP FLAG CHECK ==="
+  "$CF_BIN" tunnel route dns --help 2>&1 | sed -n '1,120p' | redact || true
+} | tee "$OUT/current_dns_route_truth.txt"
+
+echo
+echo "=== 02 OVERWRITE EXISTING THEMATRICULATION RECORDS WHEN SUPPORTED ==="
+
+OVERWRITE_FLAG=""
+
+if "$CF_BIN" tunnel route dns --help 2>&1 | grep -q -- '--overwrite-dns'; then
+  OVERWRITE_FLAG="--overwrite-dns"
+  echo "OVERWRITE_DNS_SUPPORTED=1"
+else
+  echo "OVERWRITE_DNS_SUPPORTED=0"
+fi
+
+for host in \
+  aethieaopsys.thematriculation.cc \
+  aethernet.thematriculation.cc \
+  aenet.thematriculation.cc
+do
+  echo "--- REPAIR THEMATRICULATION $host ---"
+  if [ -n "$OVERWRITE_FLAG" ]; then
+    "$CF_BIN" tunnel route dns "$OVERWRITE_FLAG" "$TUNNEL_ID" "$host" 2>&1 | redact | tee -a "$OUT/route_dns_repair_thematriculation.txt" || true
+  else
+    "$CF_BIN" tunnel route dns "$TUNNEL_ID" "$host" 2>&1 | redact | tee -a "$OUT/route_dns_repair_thematriculation.txt" || true
+  fi
+  echo
+done
+
+echo
+echo "=== 03 TEST AETHIEA.NET BIND WITH TRAILING DOT TO AVOID ZONE SUFFIX ==="
+
+for host in \
+  aethvnas.aethiea.net. \
+  vrag.aethiea.net. \
+  scrapegpt.aethiea.net. \
+  aevps.aethiea.net.
+do
+  echo "--- ROUTE DNS AETHIEA DOT $host ---"
+  if [ -n "$OVERWRITE_FLAG" ]; then
+    "$CF_BIN" tunnel route dns "$OVERWRITE_FLAG" "$TUNNEL_ID" "$host" 2>&1 | redact | tee -a "$OUT/route_dns_repair_aethiea_dot.txt" || true
+  else
+    "$CF_BIN" tunnel route dns "$TUNNEL_ID" "$host" 2>&1 | redact | tee -a "$OUT/route_dns_repair_aethiea_dot.txt" || true
+  fi
+  echo
+done
+
+echo
+echo "=== 04 RECHECK CLOUDFARED PROCESS + LOCAL ORIGINS ==="
+
+{
+  echo "timestamp_utc=$ISO"
+  echo
+
+  echo "=== PROCESSES ==="
+  pgrep -af cloudflared 2>/dev/null | redact || true
+  echo
+
+  echo "=== LOCAL ORIGINS ==="
+  for url in \
+    http://127.0.0.1:3000 \
+    http://127.0.0.1:3900/status.json \
+    http://127.0.0.1:3925/status.json \
+    http://127.0.0.1:3935/status.json \
+    http://127.0.0.1:3940/status.json
+  do
+    echo "--- $url ---"
+    curl -fsS --max-time 4 "$url" 2>&1 | sed -n '1,16p' || echo "LOCAL_PENDING"
+    echo
+  done
+} | tee "$OUT/process_and_local_recheck.txt"
+
+echo
+echo "=== 05 RECHECK PUBLIC ROUTES ==="
+
+{
+  echo "timestamp_utc=$ISO"
+  for url in \
+    https://thematriculation.cc \
+    https://aethieaopsys.thematriculation.cc \
+    https://aethernet.thematriculation.cc/status.json \
+    https://aenet.thematriculation.cc \
+    https://aethvnas.aethiea.net/status.json \
+    https://vrag.aethiea.net/status.json \
+    https://scrapegpt.aethiea.net/status.json \
+    https://aevps.aethiea.net/status.json \
+    https://aethvnas.aethiea.net.thematriculation.cc/status.json \
+    https://vrag.aethiea.net.thematriculation.cc/status.json \
+    https://scrapegpt.aethiea.net.thematriculation.cc/status.json \
+    https://aevps.aethiea.net.thematriculation.cc/status.json
+  do
+    echo "--- $url ---"
+    curl -I --max-time 12 "$url" 2>&1 | sed -n '1,18p' || echo "PUBLIC_PENDING"
+    echo
+  done
+} | tee "$OUT/public_route_recheck.txt"
+
+echo
+echo "=== 06 WRITE DNS CONFLICT REPAIR MAP ==="
+
+python3 - "$ROOT" "$ISO" "$OUT" "$TUNNEL_ID" "$TUNNEL_TARGET" <<'PY'
+import json, sys
+from pathlib import Path
+
+root, iso, out, tunnel_id, target = sys.argv[1:]
+
+doc = {
+  "system": "AETHIEAOPSYS",
+  "sealed_utc": iso,
+  "map": "CLOUDFLARE_DOOR_DNS_CONFLICT_REPAIR_V2",
+  "rule": "Cloudflare routes. AETHIEAOPSYS remains corpus body.",
+  "tunnel": {
+    "id": tunnel_id,
+    "target": target
+  },
+  "observed_problem": {
+    "thematriculation_records": "records already existed, so route dns returned code 1003 before overwrite repair",
+    "aethiea_net_records": "previous route command created hostnames under thematriculation.cc suffix, showing wrong zone/cert context"
+  },
+  "repair_attempt": {
+    "thematriculation": "attempted overwrite when cloudflared supports --overwrite-dns",
+    "aethiea_net": "attempted trailing-dot FQDN bind to avoid suffix expansion"
+  },
+  "manual_if_still_pending": {
+    "aethiea_net_zone": "In Cloudflare DNS for aethiea.net, create proxied CNAME records aethvnas, vrag, scrapegpt, and aevps pointing to the tunnel target.",
+    "target": target,
+    "public_hostnames": {
+      "aethvnas.aethiea.net": "http://127.0.0.1:3940",
+      "vrag.aethiea.net": "http://127.0.0.1:3935",
+      "scrapegpt.aethiea.net": "http://127.0.0.1:3925",
+      "aevps.aethiea.net": "http://127.0.0.1:3935"
+    }
+  },
+  "forbidden": [
+    "printing cloudflared token",
+    "printing cert.pem contents",
+    "printing credential JSON contents",
+    "treating Cloudflare as corpus owner",
+    "creating a second corpus body"
+  ],
+  "audit": out
+}
+
+p = Path(root) / "CONFIG/network/cloudflare-door-dns-conflict-repair-v2.json"
+p.parent.mkdir(parents=True, exist_ok=True)
+p.write_text(json.dumps(doc, indent=2) + "\n")
+print(f"WROTE|{p}")
+PY
+
+cat > "$ROOT/DATA/STATUS/receipts/cloudflare_door_dns_conflict_repair_${TS}.md" <<EOF
+# AETHIEAOPSYS — CLOUDFLARE DOOR DNS CONFLICT REPAIR V2
+
+Timestamp UTC: $ISO
+
+Root:
+
+$ROOT
+
+Audit:
+
+$OUT
+
+Tunnel:
+
+$TUNNEL_ID
+
+Target:
+
+$TUNNEL_TARGET
+
+## Action
+
+Inspected current DNS route truth.
+Attempted overwrite repair for existing thematriculation.cc records when supported.
+Attempted trailing-dot FQDN route repair for aethiea.net records.
+Rechecked local origins and public routes.
+
+## Rule
+
+Cloudflare routes.
+AETHIEAOPSYS remains corpus body.
+No token printed.
+No cert body printed.
+No credential body printed.
+EOF
+
+cp "$ROOT/DATA/STATUS/receipts/cloudflare_door_dns_conflict_repair_${TS}.md" \
+   "$ROOT/DATA/STATUS/storage/cloudflare-door-dns-conflict-repair-latest.md"
+
+echo
+echo "=== 07 INSTALL COMMAND + COMMIT + PUSH ==="
+
+cp /tmp/aether_cloudflare_door_dns_conflict_repair_v2.sh "$ROOT/TOOLIO/bin/aether-cloudflare-door-dns-repair"
+chmod +x "$ROOT/TOOLIO/bin/aether-cloudflare-door-dns-repair"
+cp "$ROOT/TOOLIO/bin/aether-cloudflare-door-dns-repair" "$LAUNCH/TOOLIO/bin/aether-cloudflare-door-dns-repair"
+chmod +x "$LAUNCH/TOOLIO/bin/aether-cloudflare-door-dns-repair"
+
+PUSH_STATUS="NOT_ATTEMPTED"
+
+if [ -d "$GIT_DIR" ]; then
+  git --git-dir="$GIT_DIR" --work-tree="$ROOT" add \
+    CONFIG/network/cloudflare-door-dns-conflict-repair-v2.json \
+    DATA/STATUS/receipts/cloudflare_door_dns_conflict_repair_${TS}.md \
+    DATA/STATUS/storage/cloudflare-door-dns-conflict-repair-latest.md \
+    TOOLIO/bin/aether-cloudflare-door-dns-repair
+
+  git --git-dir="$GIT_DIR" --work-tree="$ROOT" commit -m "Repair Cloudflare Door DNS conflicts" || true
+
+  if ssh -n -T git@github.com 2>&1 | tee "$OUT/github_ssh_check.txt" | grep -qi "successfully authenticated"; then
+    if git --git-dir="$GIT_DIR" --work-tree="$ROOT" push origin main 2>&1 | tee "$OUT/git_push_origin_main.txt"; then
+      PUSH_STATUS="PUSH_OK"
+    else
+      PUSH_STATUS="PUSH_FAILED"
+    fi
+  else
+    PUSH_STATUS="SSH_AUTH_NOT_ACCEPTED"
+  fi
+else
+  PUSH_STATUS="BARE_GIT_DIR_MISSING"
+fi
+
+echo
+echo "AETHER_CLOUDFLARE_DOOR_DNS_CONFLICT_REPAIR_V2_COMPLETE"
+echo "PUSH_STATUS=$PUSH_STATUS"
+echo "OUT=$OUT"
+echo "MAP=$ROOT/CONFIG/network/cloudflare-door-dns-conflict-repair-v2.json"
+echo "LATEST=$ROOT/DATA/STATUS/storage/cloudflare-door-dns-conflict-repair-latest.md"
+echo "WSL_STILL_ACTIVE=$(pwd)"

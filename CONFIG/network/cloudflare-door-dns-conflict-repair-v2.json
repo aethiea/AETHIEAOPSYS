@@ -1,0 +1,36 @@
+{
+  "system": "AETHIEAOPSYS",
+  "sealed_utc": "2026-07-12T20:38:58Z",
+  "map": "CLOUDFLARE_DOOR_DNS_CONFLICT_REPAIR_V2",
+  "rule": "Cloudflare routes. AETHIEAOPSYS remains corpus body.",
+  "tunnel": {
+    "id": "9fb8bf65-80e3-417a-9c23-488d41ec5768",
+    "target": "9fb8bf65-80e3-417a-9c23-488d41ec5768.cfargotunnel.com"
+  },
+  "observed_problem": {
+    "thematriculation_records": "records already existed, so route dns returned code 1003 before overwrite repair",
+    "aethiea_net_records": "previous route command created hostnames under thematriculation.cc suffix, showing wrong zone/cert context"
+  },
+  "repair_attempt": {
+    "thematriculation": "attempted overwrite when cloudflared supports --overwrite-dns",
+    "aethiea_net": "attempted trailing-dot FQDN bind to avoid suffix expansion"
+  },
+  "manual_if_still_pending": {
+    "aethiea_net_zone": "In Cloudflare DNS for aethiea.net, create proxied CNAME records aethvnas, vrag, scrapegpt, and aevps pointing to the tunnel target.",
+    "target": "9fb8bf65-80e3-417a-9c23-488d41ec5768.cfargotunnel.com",
+    "public_hostnames": {
+      "aethvnas.aethiea.net": "http://127.0.0.1:3940",
+      "vrag.aethiea.net": "http://127.0.0.1:3935",
+      "scrapegpt.aethiea.net": "http://127.0.0.1:3925",
+      "aevps.aethiea.net": "http://127.0.0.1:3935"
+    }
+  },
+  "forbidden": [
+    "printing cloudflared token",
+    "printing cert.pem contents",
+    "printing credential JSON contents",
+    "treating Cloudflare as corpus owner",
+    "creating a second corpus body"
+  ],
+  "audit": "/mnt/k/AETHIEAOPSYS/DATA/STATUS/audits/cloudflare_door_dns_conflict_repair_20260712T203858Z"
+}
