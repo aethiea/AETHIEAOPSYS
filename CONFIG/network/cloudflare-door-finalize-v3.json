@@ -1,6 +1,6 @@
 {
   "system": "AETHIEAOPSYS",
-  "sealed_utc": "2026-07-12T20:43:45Z",
+  "sealed_utc": "2026-07-12T20:44:49Z",
   "map": "CLOUDFLARE_DOOR_FINALIZE_V3",
   "rule": "Cloudflare routes. AETHIEAOPSYS remains corpus body.",
   "tunnel": {
@@ -31,5 +31,5 @@
     "printing credential JSON contents",
     "treating Cloudflare as corpus owner"
   ],
-  "audit": "/mnt/k/AETHIEAOPSYS/DATA/STATUS/audits/cloudflare_door_finalize_v3_20260712T204345Z"
+  "audit": "/mnt/k/AETHIEAOPSYS/DATA/STATUS/audits/cloudflare_door_finalize_v3_20260712T204449Z"
 }
