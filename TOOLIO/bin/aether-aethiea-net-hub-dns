@@ -1,0 +1,430 @@
+#!/usr/bin/env bash
+set -u
+
+echo "=== AETHER AETHIEA.NET HUB DNS + INGRESS ==="
+
+LAUNCH="/home/d_ny5u5/AETHIEAOPSYS"
+ROOT="$("$LAUNCH/TOOLIO/lib/aether_hostless.py" root 2>/dev/null || true)"
+TS="$(date -u +%Y%m%dT%H%M%SZ)"
+ISO="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+GIT_DIR="$HOME/.aethiea_git/AETHIEAOPSYS.git"
+
+if [ -z "${ROOT:-}" ] || [ ! -d "$ROOT" ]; then
+  echo "STOP: HOSTLESS_ROOT_NOT_RESOLVED"
+  echo "WSL_STILL_ACTIVE=$(pwd)"
+  exit 0
+fi
+
+OUT="$ROOT/DATA/STATUS/audits/aethiea_net_hub_dns_${TS}"
+mkdir -p \
+  "$OUT" \
+  "$ROOT/CONFIG/network" \
+  "$ROOT/DATA/STATUS/receipts" \
+  "$ROOT/DATA/STATUS/storage" \
+  "$ROOT/SERVICES/cloudflared" \
+  "$ROOT/RUN/cloudflared" \
+  "$ROOT/TOOLIO/bin"
+
+CF_BIN="$LAUNCH/TOOLIO/bin/cloudflared"
+[ -x "$CF_BIN" ] || CF_BIN="$(command -v cloudflared || true)"
+
+TUNNEL_ID="9fb8bf65-80e3-417a-9c23-488d41ec5768"
+TUNNEL_TARGET="${TUNNEL_ID}.cfargotunnel.com"
+CF_CALL="$HOME/.aether/callable/cloudflared/.cloudflared"
+CF_CONFIG="$CF_CALL/aetherport_rubiii_configmode.yml"
+CRED_FILE="$CF_CALL/${TUNNEL_ID}.json"
+
+echo "root=$ROOT"
+echo "out=$OUT"
+echo "zone=aethiea.net"
+echo "target=$TUNNEL_TARGET"
+echo
+
+if [ ! -s "$CRED_FILE" ]; then
+  echo "STOP: TUNNEL_CREDENTIAL_FILE_MISSING_PATH_ONLY=$CRED_FILE"
+  echo "WSL_STILL_ACTIVE=$(pwd)"
+  exit 0
+fi
+
+echo "=== 01 PATCH LOCAL CLOUDFLARED INGRESS FOR AETHIEA.NET HUB ==="
+
+cat > "$CF_CONFIG" <<EOF
+tunnel: $TUNNEL_ID
+credentials-file: $CRED_FILE
+
+ingress:
+  - hostname: aethieaopsys.thematriculation.cc
+    service: http://127.0.0.1:3000
+
+  - hostname: aethernet.thematriculation.cc
+    service: http://127.0.0.1:3910
+  - hostname: aenet.thematriculation.cc
+    service: http://127.0.0.1:3910
+
+  - hostname: hub.aethiea.net
+    service: http://127.0.0.1:3910
+  - hostname: status.aethiea.net
+    service: http://127.0.0.1:3910
+  - hostname: api.aethiea.net
+    service: http://127.0.0.1:3910
+  - hostname: aenet.aethiea.net
+    service: http://127.0.0.1:3910
+  - hostname: aethernet.aethiea.net
+    service: http://127.0.0.1:3910
+  - hostname: rubiii.aethiea.net
+    service: http://127.0.0.1:3910
+  - hostname: rubiii-status.aethiea.net
+    service: http://127.0.0.1:3910
+
+  - hostname: aethvnas.aethiea.net
+    service: http://127.0.0.1:3940
+  - hostname: vrag.aethiea.net
+    service: http://127.0.0.1:3935
+  - hostname: scrapegpt.aethiea.net
+    service: http://127.0.0.1:3925
+  - hostname: aevps.aethiea.net
+    service: http://127.0.0.1:3935
+
+  - service: http_status:404
+EOF
+
+cp "$CF_CONFIG" "$ROOT/SERVICES/cloudflared/aetherport_rubiii_configmode.yml"
+
+echo "CF_CONFIG_PATCHED=$CF_CONFIG"
+
+pkill -f "cloudflared.*aetherport_rubiii_configmode.yml" 2>/dev/null || true
+sleep 2
+
+nohup "$CF_BIN" --config "$CF_CONFIG" tunnel run \
+  > "$OUT/cloudflared_hub_restart.log" 2>&1 &
+
+echo $! > "$ROOT/RUN/cloudflared/aetherport_rubiii_configmode.pid"
+sleep 6
+
+pgrep -af cloudflared | sed -E 's/(eyJ[A-Za-z0-9._=-]+)/[REDACTED_JWT]/g' | tee "$OUT/cloudflared_process_after_hub_patch.txt" || true
+
+echo
+echo "=== 02 READ CLOUDFLARE API TOKEN LOCALLY ==="
+
+CF_TOKEN="${CF_API_TOKEN:-${CLOUDFLARE_API_TOKEN:-}}"
+
+if [ -z "$CF_TOKEN" ]; then
+  read -r -s -p "Cloudflare API token with DNS edit for aethiea.net: " CF_TOKEN
+  echo
+fi
+
+if [ -z "$CF_TOKEN" ]; then
+  echo "STOP: NO_TOKEN_ENTERED"
+  echo "No DNS changes made."
+  echo "WSL_STILL_ACTIVE=$(pwd)"
+  exit 0
+fi
+
+echo "TOKEN_RECEIVED_LOCALLY_NOT_PRINTED"
+
+echo
+echo "=== 03 UPSERT AETHIEA.NET HUB DNS RECORDS ==="
+
+CF_API_TOKEN="$CF_TOKEN" python3 - "$OUT" "$TUNNEL_TARGET" <<'PY'
+import json
+import os
+import sys
+import urllib.parse
+import urllib.request
+import urllib.error
+from pathlib import Path
+
+out, target = sys.argv[1:]
+token = os.environ["CF_API_TOKEN"]
+
+base = "https://api.cloudflare.com/client/v4"
+headers = {
+    "Authorization": f"Bearer {token}",
+    "Content-Type": "application/json",
+}
+
+zone_name = "aethiea.net"
+
+records = {
+    "hub": "hub.aethiea.net",
+    "status": "status.aethiea.net",
+    "api": "api.aethiea.net",
+    "aenet": "aenet.aethiea.net",
+    "aethernet": "aethernet.aethiea.net",
+    "rubiii": "rubiii.aethiea.net",
+    "rubiii-status": "rubiii-status.aethiea.net",
+    "aethvnas": "aethvnas.aethiea.net",
+    "vrag": "vrag.aethiea.net",
+    "scrapegpt": "scrapegpt.aethiea.net",
+    "aevps": "aevps.aethiea.net",
+}
+
+audit = {
+    "system": "AETHIEAOPSYS",
+    "zone": zone_name,
+    "target": target,
+    "token_printed": False,
+    "records": {},
+}
+
+def cf(method, path, payload=None):
+    data = None if payload is None else json.dumps(payload).encode()
+    req = urllib.request.Request(base + path, data=data, method=method, headers=headers)
+    try:
+        with urllib.request.urlopen(req, timeout=45) as resp:
+            return json.loads(resp.read().decode())
+    except urllib.error.HTTPError as e:
+        body = e.read().decode(errors="replace")
+        try:
+            parsed = json.loads(body)
+        except Exception:
+            parsed = {"raw_error_body": body}
+        raise RuntimeError(json.dumps({
+            "http_status": e.code,
+            "reason": e.reason,
+            "cloudflare_response": parsed
+        }, indent=2))
+
+try:
+    zones = cf("GET", "/zones?" + urllib.parse.urlencode({"name": zone_name}))
+    if not zones.get("success") or not zones.get("result"):
+        audit["status"] = "ZONE_LOOKUP_FAILED"
+        audit["errors"] = zones.get("errors", [])
+    else:
+        zone_id = zones["result"][0]["id"]
+        audit["zone_id_found"] = True
+
+        for short, fqdn in records.items():
+            existing = cf("GET", f"/zones/{zone_id}/dns_records?" + urllib.parse.urlencode({"name": fqdn}))
+            existing_records = existing.get("result", [])
+
+            payload = {
+                "type": "CNAME",
+                "name": short,
+                "content": target,
+                "ttl": 1,
+                "proxied": True,
+                "comment": "AETHIEAOPSYS hub DNS route. aethiea.net is its own Cloudflare zone."
+            }
+
+            if existing_records:
+                # update first exact record, delete extras
+                first = existing_records[0]
+                result = cf("PUT", f"/zones/{zone_id}/dns_records/{first['id']}", payload)
+                action = "UPDATED"
+
+                deleted_extras = []
+                for extra in existing_records[1:]:
+                    d = cf("DELETE", f"/zones/{zone_id}/dns_records/{extra['id']}")
+                    deleted_extras.append({
+                        "name": extra.get("name"),
+                        "type": extra.get("type"),
+                        "success": d.get("success")
+                    })
+            else:
+                result = cf("POST", f"/zones/{zone_id}/dns_records", payload)
+                action = "CREATED"
+                deleted_extras = []
+
+            audit["records"][fqdn] = {
+                "action": action,
+                "success": bool(result.get("success")),
+                "errors": result.get("errors", []),
+                "target": target,
+                "deleted_extras": deleted_extras
+            }
+
+        audit["status"] = "AETHIEA_NET_HUB_DNS_UPSERT_COMPLETE"
+
+except Exception as e:
+    audit["status"] = "AETHIEA_NET_HUB_DNS_UPSERT_ERROR"
+    audit["error_type"] = type(e).__name__
+    audit["error"] = str(e)
+
+Path(out, "aethiea_net_hub_dns_api.json").write_text(json.dumps(audit, indent=2) + "\n")
+
+print(audit["status"])
+if audit["status"].endswith("ERROR"):
+    print(audit.get("error", ""))
+
+for fqdn, info in audit.get("records", {}).items():
+    print(f"{fqdn} {info.get('action')} success={info.get('success')} target={info.get('target')}")
+PY
+
+echo
+echo "=== 04 DNS + PUBLIC RECHECK ==="
+
+sleep 30
+
+{
+  echo "timestamp_utc=$ISO"
+  echo "zone=aethiea.net"
+  echo "target=$TUNNEL_TARGET"
+  echo
+
+  for host in \
+    hub.aethiea.net \
+    status.aethiea.net \
+    api.aethiea.net \
+    aenet.aethiea.net \
+    aethernet.aethiea.net \
+    rubiii.aethiea.net \
+    rubiii-status.aethiea.net \
+    aethvnas.aethiea.net \
+    vrag.aethiea.net \
+    scrapegpt.aethiea.net \
+    aevps.aethiea.net
+  do
+    echo "--- DNS $host ---"
+    getent hosts "$host" 2>/dev/null || true
+    echo
+  done
+
+  for url in \
+    https://hub.aethiea.net/status.json \
+    https://status.aethiea.net/status.json \
+    https://api.aethiea.net/status.json \
+    https://aenet.aethiea.net/status.json \
+    https://aethernet.aethiea.net/status.json \
+    https://rubiii.aethiea.net/status.json \
+    https://rubiii-status.aethiea.net/status.json \
+    https://aethvnas.aethiea.net/status.json \
+    https://vrag.aethiea.net/status.json \
+    https://scrapegpt.aethiea.net/status.json \
+    https://aevps.aethiea.net/status.json
+  do
+    echo "--- PUBLIC $url ---"
+    curl -I --max-time 20 "$url" 2>&1 | sed -n '1,14p'
+    echo
+  done
+} | tee "$OUT/aethiea_net_hub_recheck.txt"
+
+echo
+echo "=== 05 WRITE MAP + RECEIPT + INSTALL ==="
+
+python3 - "$ROOT" "$ISO" "$OUT" "$TUNNEL_ID" "$TUNNEL_TARGET" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+root, iso, out, tunnel_id, target = sys.argv[1:]
+
+doc = {
+    "system": "AETHIEAOPSYS",
+    "sealed_utc": iso,
+    "map": "AETHIEA_NET_HUB_DNS",
+    "zone": "aethiea.net",
+    "not_zone": "thematriculation.cc",
+    "rule": "aethiea.net is the AETHIEA system namespace. thematriculation.cc is a separate Matriculation/AENET public route zone.",
+    "tunnel": {
+        "id": tunnel_id,
+        "target": target
+    },
+    "hub_records": {
+        "hub.aethiea.net": "3910 AENET hub status",
+        "status.aethiea.net": "3910 AENET hub status",
+        "api.aethiea.net": "3910 API/status placeholder",
+        "aenet.aethiea.net": "3910 AENET hub status",
+        "aethernet.aethiea.net": "3910 AETHERNet status",
+        "rubiii.aethiea.net": "3910 RUBIII status route",
+        "rubiii-status.aethiea.net": "3910 RUBIII status route",
+        "aethvnas.aethiea.net": "3940 AETHvNAS status",
+        "vrag.aethiea.net": "3935 vRAG status",
+        "scrapegpt.aethiea.net": "3925 SCRAPEGPT status",
+        "aevps.aethiea.net": "3935 temporary AEVPS status route"
+    },
+    "audit": out,
+    "forbidden": [
+        "printing Cloudflare API token",
+        "creating *.aethiea.net.thematriculation.cc",
+        "commingling aethiea.net with thematriculation.cc"
+    ]
+}
+
+p = Path(root) / "CONFIG/network/aethiea-net-hub-dns.json"
+p.parent.mkdir(parents=True, exist_ok=True)
+p.write_text(json.dumps(doc, indent=2) + "\n")
+print(f"WROTE|{p}")
+PY
+
+cat > "$ROOT/DATA/STATUS/receipts/aethiea_net_hub_dns_${TS}.md" <<EOF
+# AETHIEAOPSYS — AETHIEA.NET HUB DNS
+
+Timestamp UTC: $ISO
+
+Root:
+
+$ROOT
+
+Audit:
+
+$OUT
+
+Zone:
+
+aethiea.net
+
+Tunnel target:
+
+$TUNNEL_TARGET
+
+## Hub DNS Endpoints
+
+hub.aethiea.net -> AETHERPort_RUBIII
+status.aethiea.net -> AETHERPort_RUBIII
+api.aethiea.net -> AETHERPort_RUBIII
+aenet.aethiea.net -> AETHERPort_RUBIII
+aethernet.aethiea.net -> AETHERPort_RUBIII
+rubiii.aethiea.net -> AETHERPort_RUBIII
+rubiii-status.aethiea.net -> AETHERPort_RUBIII
+aethvnas.aethiea.net -> AETHERPort_RUBIII
+vrag.aethiea.net -> AETHERPort_RUBIII
+scrapegpt.aethiea.net -> AETHERPort_RUBIII
+aevps.aethiea.net -> AETHERPort_RUBIII
+
+## Rule
+
+aethiea.net and thematriculation.cc are separate domains and separate Cloudflare zones.
+No token printed.
+No credential body printed.
+EOF
+
+cp "$ROOT/DATA/STATUS/receipts/aethiea_net_hub_dns_${TS}.md" \
+   "$ROOT/DATA/STATUS/storage/aethiea-net-hub-dns-latest.md"
+
+cp /tmp/aether_aethiea_net_hub_dns.sh "$ROOT/TOOLIO/bin/aether-aethiea-net-hub-dns"
+chmod +x "$ROOT/TOOLIO/bin/aether-aethiea-net-hub-dns"
+cp "$ROOT/TOOLIO/bin/aether-aethiea-net-hub-dns" "$LAUNCH/TOOLIO/bin/aether-aethiea-net-hub-dns"
+chmod +x "$LAUNCH/TOOLIO/bin/aether-aethiea-net-hub-dns"
+
+PUSH_STATUS="NOT_ATTEMPTED"
+if [ -d "$GIT_DIR" ]; then
+  git --git-dir="$GIT_DIR" --work-tree="$ROOT" add \
+    CONFIG/network/aethiea-net-hub-dns.json \
+    DATA/STATUS/receipts/aethiea_net_hub_dns_${TS}.md \
+    DATA/STATUS/storage/aethiea-net-hub-dns-latest.md \
+    SERVICES/cloudflared/aetherport_rubiii_configmode.yml \
+    TOOLIO/bin/aether-aethiea-net-hub-dns
+
+  git --git-dir="$GIT_DIR" --work-tree="$ROOT" commit -m "Add aethiea.net hub DNS endpoints" || true
+
+  if ssh -n -T git@github.com 2>&1 | tee "$OUT/github_ssh_check.txt" | grep -qi "successfully authenticated"; then
+    if git --git-dir="$GIT_DIR" --work-tree="$ROOT" push origin main 2>&1 | tee "$OUT/git_push_origin_main.txt"; then
+      PUSH_STATUS="PUSH_OK"
+    else
+      PUSH_STATUS="PUSH_FAILED"
+    fi
+  else
+    PUSH_STATUS="SSH_AUTH_NOT_ACCEPTED"
+  fi
+fi
+
+unset CF_TOKEN
+
+echo
+echo "AETHER_AETHIEA_NET_HUB_DNS_COMPLETE"
+echo "PUSH_STATUS=$PUSH_STATUS"
+echo "OUT=$OUT"
+echo "MAP=$ROOT/CONFIG/network/aethiea-net-hub-dns.json"
+echo "LATEST=$ROOT/DATA/STATUS/storage/aethiea-net-hub-dns-latest.md"
+echo "WSL_STILL_ACTIVE=$(pwd)"

@@ -1,0 +1,31 @@
+{
+  "system": "AETHIEAOPSYS",
+  "sealed_utc": "2026-07-12T21:18:08Z",
+  "map": "AETHIEA_NET_HUB_DNS",
+  "zone": "aethiea.net",
+  "not_zone": "thematriculation.cc",
+  "rule": "aethiea.net is the AETHIEA system namespace. thematriculation.cc is a separate Matriculation/AENET public route zone.",
+  "tunnel": {
+    "id": "9fb8bf65-80e3-417a-9c23-488d41ec5768",
+    "target": "9fb8bf65-80e3-417a-9c23-488d41ec5768.cfargotunnel.com"
+  },
+  "hub_records": {
+    "hub.aethiea.net": "3910 AENET hub status",
+    "status.aethiea.net": "3910 AENET hub status",
+    "api.aethiea.net": "3910 API/status placeholder",
+    "aenet.aethiea.net": "3910 AENET hub status",
+    "aethernet.aethiea.net": "3910 AETHERNet status",
+    "rubiii.aethiea.net": "3910 RUBIII status route",
+    "rubiii-status.aethiea.net": "3910 RUBIII status route",
+    "aethvnas.aethiea.net": "3940 AETHvNAS status",
+    "vrag.aethiea.net": "3935 vRAG status",
+    "scrapegpt.aethiea.net": "3925 SCRAPEGPT status",
+    "aevps.aethiea.net": "3935 temporary AEVPS status route"
+  },
+  "audit": "/mnt/k/AETHIEAOPSYS/DATA/STATUS/audits/aethiea_net_hub_dns_20260712T211808Z",
+  "forbidden": [
+    "printing Cloudflare API token",
+    "creating *.aethiea.net.thematriculation.cc",
+    "commingling aethiea.net with thematriculation.cc"
+  ]
+}
