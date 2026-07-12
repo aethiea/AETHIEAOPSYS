@@ -1,0 +1,35 @@
+{
+  "system": "AETHIEAOPSYS",
+  "sealed_utc": "2026-07-12T20:43:45Z",
+  "map": "CLOUDFLARE_DOOR_FINALIZE_V3",
+  "rule": "Cloudflare routes. AETHIEAOPSYS remains corpus body.",
+  "tunnel": {
+    "id": "9fb8bf65-80e3-417a-9c23-488d41ec5768",
+    "target": "9fb8bf65-80e3-417a-9c23-488d41ec5768.cfargotunnel.com"
+  },
+  "repairs": {
+    "aenet_status_origin": "created clean status-only origin on 127.0.0.1:3910",
+    "aethernet_thematriculation_cc": "routed to 3910",
+    "aenet_thematriculation_cc": "routed to 3910",
+    "aethiea_net_dns": "attempted API upsert only if CF_API_TOKEN or CLOUDFLARE_API_TOKEN existed in environment"
+  },
+  "manual_aethiea_net_dns_if_needed": {
+    "type": "CNAME",
+    "proxied": true,
+    "target": "9fb8bf65-80e3-417a-9c23-488d41ec5768.cfargotunnel.com",
+    "records": [
+      "aethvnas",
+      "vrag",
+      "scrapegpt",
+      "aevps"
+    ]
+  },
+  "forbidden": [
+    "printing cloudflared token",
+    "printing Cloudflare API token",
+    "printing cert.pem contents",
+    "printing credential JSON contents",
+    "treating Cloudflare as corpus owner"
+  ],
+  "audit": "/mnt/k/AETHIEAOPSYS/DATA/STATUS/audits/cloudflare_door_finalize_v3_20260712T204345Z"
+}

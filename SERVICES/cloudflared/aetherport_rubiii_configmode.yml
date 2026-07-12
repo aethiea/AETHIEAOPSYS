@@ -5,9 +5,9 @@ ingress:
   - hostname: aethieaopsys.thematriculation.cc
     service: http://127.0.0.1:3000
   - hostname: aethernet.thematriculation.cc
-    service: http://127.0.0.1:3900
+    service: http://127.0.0.1:3910
   - hostname: aenet.thematriculation.cc
-    service: http://127.0.0.1:3900
+    service: http://127.0.0.1:3910
   - hostname: aethvnas.aethiea.net
     service: http://127.0.0.1:3940
   - hostname: vrag.aethiea.net

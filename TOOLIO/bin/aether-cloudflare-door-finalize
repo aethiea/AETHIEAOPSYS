@@ -1,0 +1,399 @@
+#!/usr/bin/env bash
+set -u
+
+echo "=== AETHER CLOUDFLARE DOOR FINALIZE V3 — AENET STATUS + AETHIEA.NET ZONE ==="
+
+LAUNCH="/home/d_ny5u5/AETHIEAOPSYS"
+ROOT="$("$LAUNCH/TOOLIO/lib/aether_hostless.py" root 2>/dev/null || true)"
+TS="$(date -u +%Y%m%dT%H%M%SZ)"
+ISO="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+GIT_DIR="$HOME/.aethiea_git/AETHIEAOPSYS.git"
+
+if [ -z "${ROOT:-}" ] || [ ! -d "$ROOT" ]; then
+  echo "STOP: HOSTLESS_ROOT_NOT_RESOLVED"
+  echo "WSL_STILL_ACTIVE=$(pwd)"
+  exit 0
+fi
+
+OUT="$ROOT/DATA/STATUS/audits/cloudflare_door_finalize_v3_${TS}"
+mkdir -p \
+  "$OUT" \
+  "$ROOT/CONFIG/network" \
+  "$ROOT/DATA/STATUS/receipts" \
+  "$ROOT/DATA/STATUS/storage" \
+  "$ROOT/SERVICES/aenet/www" \
+  "$ROOT/SERVICES/cloudflared" \
+  "$ROOT/RUN/cloudflared" \
+  "$ROOT/TOOLIO/bin"
+
+CF_BIN="$LAUNCH/TOOLIO/bin/cloudflared"
+[ -x "$CF_BIN" ] || CF_BIN="$(command -v cloudflared || true)"
+
+TUNNEL_ID="9fb8bf65-80e3-417a-9c23-488d41ec5768"
+TUNNEL_TARGET="${TUNNEL_ID}.cfargotunnel.com"
+CF_CALL="$HOME/.aether/callable/cloudflared/.cloudflared"
+CF_CONFIG="$CF_CALL/aetherport_rubiii_configmode.yml"
+CRED_FILE="$CF_CALL/${TUNNEL_ID}.json"
+
+redact() {
+  sed -E \
+    -e 's/(eyJ[A-Za-z0-9._=-]+)/[REDACTED_JWT]/g' \
+    -e 's/(Bearer )[A-Za-z0-9._-]+/\1[REDACTED]/g' \
+    -e 's#([A-Za-z]:\\\\[^ ]*cert\.pem|/[^ ]*cert\.pem)#[PEM_PATH_REDACTED]#g' \
+    -e 's#([A-Za-z]:\\\\[^ ]*credentials[^ ]*|/[^ ]*credentials[^ ]*)#[CREDENTIAL_PATH_REDACTED]#g'
+}
+
+echo "root=$ROOT"
+echo "out=$OUT"
+echo "tunnel_target=$TUNNEL_TARGET"
+echo
+
+echo "=== 01 CREATE CLEAN AENET / AETHERNet STATUS ORIGIN ON 3910 ==="
+
+cat > "$ROOT/SERVICES/aenet/www/status.json" <<EOF
+{
+  "system": "AETHIEAOPSYS",
+  "surface": "AENET_AETHERNet",
+  "status": "ORIGIN_READY",
+  "local_origin": "http://127.0.0.1:3910",
+  "public_hosts": [
+    "aethernet.thematriculation.cc",
+    "aenet.thematriculation.cc"
+  ],
+  "route_membrane": "Cloudflare",
+  "authority_rule": "Cloudflare routes. AETHIEAOPSYS remains corpus body.",
+  "sealed_utc": "$ISO"
+}
+EOF
+
+cat > "$ROOT/SERVICES/aenet/www/index.html" <<EOF
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>AENET / AETHERNet</title></head>
+<body><pre>AENET_AETHERNet ORIGIN_READY
+AETHIEAOPSYS remains corpus body.
+Cloudflare routes.</pre></body>
+</html>
+EOF
+
+if ss -ltn 2>/dev/null | grep -q ':3910 '; then
+  echo "AENET_3910_ALREADY_LISTENING"
+else
+  nohup python3 -m http.server 3910 --bind 127.0.0.1 --directory "$ROOT/SERVICES/aenet/www" \
+    > "$ROOT/RUN/aenet_3910.log" 2>&1 &
+  echo $! > "$ROOT/RUN/aenet_3910.pid"
+  sleep 1
+  echo "AENET_3910_STARTED"
+fi
+
+curl -fsS --max-time 4 http://127.0.0.1:3910/status.json | sed -n '1,24p' || echo "AENET_3910_NOT_READY"
+
+echo
+echo "=== 02 PATCH CONFIG-MODE INGRESS TO CLEAN 3910 ==="
+
+if [ ! -s "$CRED_FILE" ]; then
+  echo "STOP: TUNNEL_CREDENTIAL_FILE_MISSING_PATH_ONLY=$CRED_FILE"
+  echo "WSL_STILL_ACTIVE=$(pwd)"
+  exit 0
+fi
+
+cat > "$CF_CONFIG" <<EOF
+tunnel: $TUNNEL_ID
+credentials-file: $CRED_FILE
+
+ingress:
+  - hostname: aethieaopsys.thematriculation.cc
+    service: http://127.0.0.1:3000
+  - hostname: aethernet.thematriculation.cc
+    service: http://127.0.0.1:3910
+  - hostname: aenet.thematriculation.cc
+    service: http://127.0.0.1:3910
+  - hostname: aethvnas.aethiea.net
+    service: http://127.0.0.1:3940
+  - hostname: vrag.aethiea.net
+    service: http://127.0.0.1:3935
+  - hostname: scrapegpt.aethiea.net
+    service: http://127.0.0.1:3925
+  - hostname: aevps.aethiea.net
+    service: http://127.0.0.1:3935
+  - service: http_status:404
+EOF
+
+cp "$CF_CONFIG" "$ROOT/SERVICES/cloudflared/aetherport_rubiii_configmode.yml"
+echo "CF_CONFIG_PATCHED=$CF_CONFIG"
+
+echo
+echo "=== 03 RESTART CONFIG-MODE CONNECTOR ==="
+
+pkill -f "cloudflared.*aetherport_rubiii_configmode.yml" 2>/dev/null || true
+sleep 2
+
+nohup "$CF_BIN" --config "$CF_CONFIG" tunnel run \
+  > "$OUT/cloudflared_configmode_restart.log" 2>&1 &
+
+echo $! > "$ROOT/RUN/cloudflared/aetherport_rubiii_configmode.pid"
+sleep 6
+
+pgrep -af cloudflared 2>/dev/null | redact | tee "$OUT/cloudflared_process_after_restart.txt" || true
+
+echo
+echo "=== 04 OPTIONAL AETHIEA.NET API DNS UPSERT — TOKEN ENV ONLY ==="
+
+CF_TOKEN="${CF_API_TOKEN:-${CLOUDFLARE_API_TOKEN:-}}"
+
+if [ -z "$CF_TOKEN" ]; then
+  echo "AETHIEA_NET_API_DNS_SKIPPED=NO_CF_API_TOKEN_ENV"
+  echo "MANUAL_DNS_REQUIRED_FOR_AETHIEA_NET=1"
+  echo "TARGET=$TUNNEL_TARGET"
+else
+  python3 - "$CF_TOKEN" "$TUNNEL_TARGET" "$OUT" <<'PY'
+import json, sys, urllib.parse, urllib.request
+from pathlib import Path
+
+token, target, out = sys.argv[1:]
+zone_name = "aethiea.net"
+records = {
+    "aethvnas.aethiea.net": "aethvnas",
+    "vrag.aethiea.net": "vrag",
+    "scrapegpt.aethiea.net": "scrapegpt",
+    "aevps.aethiea.net": "aevps",
+}
+
+base = "https://api.cloudflare.com/client/v4"
+headers = {
+    "Authorization": f"Bearer {token}",
+    "Content-Type": "application/json",
+}
+
+def req(method, path, payload=None):
+    data = None if payload is None else json.dumps(payload).encode()
+    r = urllib.request.Request(base + path, data=data, method=method, headers=headers)
+    with urllib.request.urlopen(r, timeout=30) as resp:
+        return json.loads(resp.read().decode())
+
+audit = {"zone": zone_name, "target": target, "records": {}}
+
+try:
+    zones = req("GET", "/zones?" + urllib.parse.urlencode({"name": zone_name}))
+    if not zones.get("success") or not zones.get("result"):
+        audit["status"] = "ZONE_LOOKUP_FAILED"
+        audit["errors"] = zones.get("errors")
+    else:
+        zone_id = zones["result"][0]["id"]
+        audit["zone_id_found"] = True
+
+        for fqdn, short in records.items():
+            existing = req("GET", f"/zones/{zone_id}/dns_records?" + urllib.parse.urlencode({"name": fqdn, "type": "CNAME"}))
+            payload = {
+                "type": "CNAME",
+                "name": short,
+                "content": target,
+                "proxied": True,
+                "ttl": 1,
+                "comment": "AETHIEAOPSYS Cloudflare Door route; corpus remains AETHIEAOPSYS."
+            }
+
+            if existing.get("result"):
+                rec_id = existing["result"][0]["id"]
+                result = req("PUT", f"/zones/{zone_id}/dns_records/{rec_id}", payload)
+                action = "UPDATED"
+            else:
+                result = req("POST", f"/zones/{zone_id}/dns_records", payload)
+                action = "CREATED"
+
+            audit["records"][fqdn] = {
+                "action": action,
+                "success": bool(result.get("success")),
+                "errors": result.get("errors", [])
+            }
+
+        audit["status"] = "AETHIEA_NET_API_UPSERT_ATTEMPTED"
+
+except Exception as e:
+    audit["status"] = "AETHIEA_NET_API_UPSERT_ERROR"
+    audit["error_type"] = type(e).__name__
+    audit["error"] = str(e)
+
+Path(out, "aethiea_net_api_dns_upsert.json").write_text(json.dumps(audit, indent=2) + "\n")
+print(audit["status"])
+for k, v in audit.get("records", {}).items():
+    print(f"{k}={v['action']} success={v['success']}")
+PY
+fi
+
+echo
+echo "=== 05 RECHECK PUBLIC ROUTES ==="
+
+{
+  echo "timestamp_utc=$ISO"
+  echo
+  echo "=== LOCAL ==="
+  for url in \
+    http://127.0.0.1:3910/status.json \
+    http://127.0.0.1:3925/status.json \
+    http://127.0.0.1:3935/status.json \
+    http://127.0.0.1:3940/status.json
+  do
+    echo "--- $url ---"
+    curl -fsS --max-time 4 "$url" 2>&1 | sed -n '1,18p' || echo "LOCAL_PENDING"
+    echo
+  done
+
+  echo "=== PUBLIC ==="
+  for url in \
+    https://aethieaopsys.thematriculation.cc \
+    https://aethernet.thematriculation.cc/status.json \
+    https://aenet.thematriculation.cc/status.json \
+    https://aethvnas.aethiea.net/status.json \
+    https://vrag.aethiea.net/status.json \
+    https://scrapegpt.aethiea.net/status.json \
+    https://aevps.aethiea.net/status.json
+  do
+    echo "--- $url ---"
+    curl -I --max-time 12 "$url" 2>&1 | sed -n '1,18p' || echo "PUBLIC_PENDING"
+    echo
+  done
+} | tee "$OUT/public_recheck_after_finalize.txt"
+
+echo
+echo "=== 06 WRITE FINALIZE MAP + RECEIPT ==="
+
+python3 - "$ROOT" "$ISO" "$OUT" "$TUNNEL_ID" "$TUNNEL_TARGET" <<'PY'
+import json, sys
+from pathlib import Path
+
+root, iso, out, tunnel_id, target = sys.argv[1:]
+
+doc = {
+  "system": "AETHIEAOPSYS",
+  "sealed_utc": iso,
+  "map": "CLOUDFLARE_DOOR_FINALIZE_V3",
+  "rule": "Cloudflare routes. AETHIEAOPSYS remains corpus body.",
+  "tunnel": {
+    "id": tunnel_id,
+    "target": target
+  },
+  "repairs": {
+    "aenet_status_origin": "created clean status-only origin on 127.0.0.1:3910",
+    "aethernet_thematriculation_cc": "routed to 3910",
+    "aenet_thematriculation_cc": "routed to 3910",
+    "aethiea_net_dns": "attempted API upsert only if CF_API_TOKEN or CLOUDFLARE_API_TOKEN existed in environment"
+  },
+  "manual_aethiea_net_dns_if_needed": {
+    "type": "CNAME",
+    "proxied": True,
+    "target": target,
+    "records": ["aethvnas", "vrag", "scrapegpt", "aevps"]
+  },
+  "forbidden": [
+    "printing cloudflared token",
+    "printing Cloudflare API token",
+    "printing cert.pem contents",
+    "printing credential JSON contents",
+    "treating Cloudflare as corpus owner"
+  ],
+  "audit": out
+}
+
+p = Path(root) / "CONFIG/network/cloudflare-door-finalize-v3.json"
+p.parent.mkdir(parents=True, exist_ok=True)
+p.write_text(json.dumps(doc, indent=2) + "\n")
+print(f"WROTE|{p}")
+PY
+
+cat > "$ROOT/DATA/STATUS/receipts/cloudflare_door_finalize_v3_${TS}.md" <<EOF
+# AETHIEAOPSYS — CLOUDFLARE DOOR FINALIZE V3
+
+Timestamp UTC: $ISO
+
+Root:
+
+$ROOT
+
+Audit:
+
+$OUT
+
+Tunnel:
+
+$TUNNEL_ID
+
+Target:
+
+$TUNNEL_TARGET
+
+## Action
+
+Created clean AENET/AETHERNet status origin on 3910.
+Patched config-mode ingress for aethernet/aenet to 3910.
+Restarted config-mode cloudflared.
+Attempted aethiea.net DNS repair only through environment token if available.
+Rechecked public routes.
+
+## Manual DNS if still pending
+
+Cloudflare zone:
+
+aethiea.net
+
+Create proxied CNAME records:
+
+aethvnas -> $TUNNEL_TARGET
+vrag -> $TUNNEL_TARGET
+scrapegpt -> $TUNNEL_TARGET
+aevps -> $TUNNEL_TARGET
+
+## Rule
+
+Cloudflare routes.
+AETHIEAOPSYS remains corpus body.
+No token printed.
+No cert body printed.
+No credential body printed.
+EOF
+
+cp "$ROOT/DATA/STATUS/receipts/cloudflare_door_finalize_v3_${TS}.md" \
+   "$ROOT/DATA/STATUS/storage/cloudflare-door-finalize-latest.md"
+
+echo
+echo "=== 07 INSTALL COMMAND + COMMIT + PUSH ==="
+
+cp /tmp/aether_cloudflare_door_finalize_v3.sh "$ROOT/TOOLIO/bin/aether-cloudflare-door-finalize"
+chmod +x "$ROOT/TOOLIO/bin/aether-cloudflare-door-finalize"
+cp "$ROOT/TOOLIO/bin/aether-cloudflare-door-finalize" "$LAUNCH/TOOLIO/bin/aether-cloudflare-door-finalize"
+chmod +x "$LAUNCH/TOOLIO/bin/aether-cloudflare-door-finalize"
+
+PUSH_STATUS="NOT_ATTEMPTED"
+
+if [ -d "$GIT_DIR" ]; then
+  git --git-dir="$GIT_DIR" --work-tree="$ROOT" add \
+    CONFIG/network/cloudflare-door-finalize-v3.json \
+    DATA/STATUS/receipts/cloudflare_door_finalize_v3_${TS}.md \
+    DATA/STATUS/storage/cloudflare-door-finalize-latest.md \
+    SERVICES/aenet/www/status.json \
+    SERVICES/aenet/www/index.html \
+    SERVICES/cloudflared/aetherport_rubiii_configmode.yml \
+    TOOLIO/bin/aether-cloudflare-door-finalize
+
+  git --git-dir="$GIT_DIR" --work-tree="$ROOT" commit -m "Finalize Cloudflare Door status routes" || true
+
+  if ssh -n -T git@github.com 2>&1 | tee "$OUT/github_ssh_check.txt" | grep -qi "successfully authenticated"; then
+    if git --git-dir="$GIT_DIR" --work-tree="$ROOT" push origin main 2>&1 | tee "$OUT/git_push_origin_main.txt"; then
+      PUSH_STATUS="PUSH_OK"
+    else
+      PUSH_STATUS="PUSH_FAILED"
+    fi
+  else
+    PUSH_STATUS="SSH_AUTH_NOT_ACCEPTED"
+  fi
+else
+  PUSH_STATUS="BARE_GIT_DIR_MISSING"
+fi
+
+echo
+echo "AETHER_CLOUDFLARE_DOOR_FINALIZE_V3_COMPLETE"
+echo "PUSH_STATUS=$PUSH_STATUS"
+echo "OUT=$OUT"
+echo "MAP=$ROOT/CONFIG/network/cloudflare-door-finalize-v3.json"
+echo "LATEST=$ROOT/DATA/STATUS/storage/cloudflare-door-finalize-latest.md"
+echo "WSL_STILL_ACTIVE=$(pwd)"
