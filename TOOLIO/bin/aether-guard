@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+LIB_DIR="$(cd "$SCRIPT_DIR/../lib" && pwd -P)"
+python3 "$LIB_DIR/aether_policy.py" validate
+if [ "${AETHIEA_HOST_BIND:-0}" = "1" ]; then echo "DENY: AETHIEA_HOST_BIND=1"; exit 10; fi
+if [ "${AETHIEA_FORCE_MOUNT_AEUSB:-0}" = "1" ]; then echo "DENY: AETHIEA_FORCE_MOUNT_AEUSB=1"; exit 11; fi
+echo "AETHER_GUARD_OK"

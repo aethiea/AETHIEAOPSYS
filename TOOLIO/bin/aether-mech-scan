@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set +e
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+LIB_DIR="$(cd "$SCRIPT_DIR/../lib" && pwd -P)"
+python3 "$LIB_DIR/aether_policy.py" scan

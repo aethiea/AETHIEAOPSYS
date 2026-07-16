@@ -1,0 +1,10 @@
+{
+  "system": "AETHIEAOPSYS",
+  "schema": "aether_corpus_signature_v1",
+  "corpus_id": "AETHIEAOPSYS_CORPUS_BODY",
+  "bind_to": "AETHER",
+  "hostless": true,
+  "host_bind": false,
+  "force_mount_aeusb": false,
+  "rule": "Resolve by corpus signature and AETHER policy, not by host path."
+}

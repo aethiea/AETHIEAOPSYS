@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+LIB_DIR="$(cd "$SCRIPT_DIR/../lib" && pwd -P)"
+ROOT="$(python3 "$LIB_DIR/aether_hostless.py" root)"
+BIN="$ROOT/TOOLIO/bin"
+
+[ "$#" -ge 1 ] || { echo "usage: aether-run <command> [args...]"; exit 2; }
+
+"$BIN/aether-preflight"
+
+cmd="$1"
+shift
+
+if [ -x "$BIN/$cmd" ]; then
+  exec "$BIN/$cmd" "$@"
+else
+  exec "$cmd" "$@"
+fi

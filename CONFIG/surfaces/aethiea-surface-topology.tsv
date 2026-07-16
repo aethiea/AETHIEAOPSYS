@@ -1,0 +1,7 @@
+surface	class	role	locator	authority
+AEUSB	authority_surface	portable_seed_proof_recovery	AUTHORITY_MARKERS	YES
+AEXHD	heavy_surface	mirror_continuity_heavy_payload	HEAVY_MARKERS	NO
+RUBIII	host_surface	local_execution_bridge	RUNTIME_OBSERVATION	NO
+LOLITA	host_surface	portable_interface_and_runtime	RUNTIME_OBSERVATION	NO
+OLIVIA	host_surface	portable_interface_and_runtime	RUNTIME_OBSERVATION	NO
+AEVPS	persistent_runtime_surface	always_on_remote_body	NETWORK_ROUTE	NO

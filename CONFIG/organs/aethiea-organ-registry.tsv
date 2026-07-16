@@ -1,0 +1,7 @@
+organ	role	implementation	authority
+AERAG	memory_proof_provenance_receipts_indexing_retrieval_continuity	DATA/MEMORY_AND_RETRIEVAL_STACK	NO
+BÆ_MESH	challenge_validation_containment_synthesis	MODS/B43-RU5	NO
+ÆPI	interface_and_api_organ	API_AND_INTERFACE_ROUTES	NO
+AEHUB	status_and_orchestration_hub	STATUS_MESH	NO
+FLÆR	edge_door_and_access_membrane	LAYERS/AENET/CLOUDFLARE	NO
+vRAG	vector_engine_beneath_AERAG	AERAG_IMPLEMENTATION	NO

@@ -1,0 +1,73 @@
+{
+  "system": "AETHIEAOPSYS",
+  "schema": "aether_hostless_policy_v1",
+  "lock": "BOUND_LESS_ONLY_BIND_TO_AETHER",
+  "scope": "HOSTLESS_CORPUS_SIGNATURE_POLICY",
+  "policy": {
+    "bind_to": "AETHER",
+    "host_bind_allowed": false,
+    "force_mount_aeusb_allowed": false,
+    "drive_letter_authority_allowed": false,
+    "env_root_authority_allowed": false,
+    "hardcoded_host_root_allowed": false,
+    "tool_second_body_allowed": false,
+    "aether_is_interface_binding": true,
+    "aethieaopsys_is_source_body": true
+  },
+  "surfaces": {
+    "AETHER": {
+      "role": "continuity/interface binding layer",
+      "binding_rule": "ONLY_BIND"
+    },
+    "AETHIEAOPSYS": {
+      "role": "filesystem corpus body",
+      "locator_rule": "CORPUS_SIGNATURE+AUTHORITY_ROLE_MARKERS+HEAVY_MARKER_REJECTION"
+    },
+    "AEUSB": {
+      "role": "portable authority / seed / proof / recovery",
+      "locator_rule": "AEUSB_OR_HOSTLESS_AUTHORITY_MARKERS_WHEN_LIVE_NO_FORCE_BIND"
+    },
+    "AEXHD": {
+      "role": "mirror continuity / heavy payload body",
+      "locator_rule": "DISCOVER_BY_HEAVY_MARKERS_WHEN_PRESENT_NEVER_ROOT_AUTHORITY"
+    },
+    "RUBIII": {
+      "role": "local fallback bridge / executor",
+      "locator_rule": "RUNTIME_SURFACE_OBSERVATION_ONLY"
+    },
+    "AEVPS": {
+      "role": "AECloud persistent runtime body",
+      "locator_rule": "NETWORK_SURFACE_NOT_OWNER"
+    },
+    "Cloudflare": {
+      "role": "edge Door",
+      "locator_rule": "ROUTES_NOT_OWNER"
+    },
+    "AENET": {
+      "role": "routing/control membrane",
+      "locator_rule": "MAPS_NOT_BODY"
+    },
+    "AERAG": {
+      "role": "memory / proof / provenance / receipt / indexing / retrieval / continuity organ",
+      "locator_rule": "ORGAN_WITHIN_AETHIEAOPSYS_NOT_BODY"
+    },
+    "vRAG": {
+      "role": "vector retrieval engine beneath AERAG",
+      "locator_rule": "SUBORDINATE_IMPLEMENTATION_NOT_BODY"
+    }
+  },
+  "invariants": [
+    "Only AETHER is the continuity binding layer.",
+    "AETHIEAOPSYS remains the source corpus body.",
+    "Resolve by corpus signature, not host path.",
+    "No forced AEUSB host mount.",
+    "No env var becomes authority.",
+    "No drive letter is authority.",
+    "No tool creates a second body.",
+    "Corpus proves.",
+    "AEUSB authority is proven by role markers, not a drive letter.",
+    "AEXHD is heavy continuity storage and never ROOT authority.",
+    "AERAG is the canonical memory, proof, provenance, indexing, retrieval, and continuity organ.",
+    "vRAG may exist only as a subordinate vector or retrieval implementation beneath AERAG."
+  ]
+}
