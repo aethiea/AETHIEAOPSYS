@@ -1,0 +1,353 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+ROOT="${AETHIEA_ROOT:-/mnt/j/AETHIEAOPSYS}"
+SOURCE=""
+MODE="dry-run"
+FORCED_CLASS=""
+TARGET="auto"
+SHOW_STATUS=0
+
+usage() {
+  cat <<'HELP'
+Usage:
+  aether-metabolize --source PATH [options]
+  aether-metabolize --status
+
+Options:
+  --source PATH       Source file to metabolize
+  --class CLASS       Override automatic classification
+  --target ROUTE      Override proposed destination
+  --dry-run           Prepare and receipt without operational promotion
+  --apply             Execute governed low-risk derivation
+  --status            Show recent metabolism jobs
+  --root PATH         Override AETHIEAOPSYS root
+  -h, --help          Show help
+HELP
+}
+
+die() {
+  printf 'ERROR=%s\n' "$*" >&2
+  exit 1
+}
+
+json_escape() {
+  python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))'
+}
+
+hash_file() {
+  sha256sum "$1" | awk '{print $1}'
+}
+
+classify_source() {
+  local source="$1"
+  local name mime
+
+  name="$(basename "$source" | tr '[:upper:]' '[:lower:]')"
+  mime="$(file --brief --mime-type "$source" 2>/dev/null || echo application/octet-stream)"
+
+  if grep -IqiE \
+    'BEGIN (RSA |OPENSSH |EC )?PRIVATE KEY|github_pat_|gho_|api[_-]?key[[:space:]]*[:=]|client[_-]?secret[[:space:]]*[:=]|bearer[[:space:]]+[A-Za-z0-9._-]+' \
+    "$source" 2>/dev/null; then
+    printf 'credential_sensitive\n'
+    return
+  fi
+
+  case "$name" in
+    *receipt*|*.sha256) printf 'receipt\n' ;;
+    *status*|*health*|*runtime*) printf 'runtime_status\n' ;;
+    *inventory*|*manifest*|*.tsv|*.csv) printf 'inventory\n' ;;
+    *log*|*.log) printf 'technical_log\n' ;;
+    *trust*|*doctrine*|*policy*) printf 'doctrine\n' ;;
+    *legal*|*court*|*agreement*) printf 'legal\n' ;;
+    *finance*|*budget*|*invoice*) printf 'financial\n' ;;
+    *royalt*|*isrc*|*ipi*|*publishing*) printf 'rights_metadata\n' ;;
+    *identity*|*passport*|*birth*) printf 'identity\n' ;;
+    *topology*|*architecture*|*route-map*) printf 'canonical_topology\n' ;;
+    *.md|*.txt|text/*) printf 'documentation\n' ;;
+    *) printf 'unknown\n' ;;
+  esac
+}
+
+route_for_class() {
+  local class="$1"
+  local registry="$ROOT/CONFIG/metabolism/metabolism-route-registry.tsv"
+
+  awk -F '\t' -v class="$class" '
+    NR > 1 && $1 == class {
+      print $2
+      found=1
+      exit
+    }
+    END {
+      if (!found) print "PIPELINES/METABOLISM/review/unknown"
+    }
+  ' "$registry"
+}
+
+authority_for_class() {
+  local class="$1"
+  local registry="$ROOT/CONFIG/metabolism/metabolism-route-registry.tsv"
+
+  awk -F '\t' -v class="$class" '
+    NR > 1 && $1 == class {
+      print $3
+      found=1
+      exit
+    }
+    END {
+      if (!found) print "PREPARE"
+    }
+  ' "$registry"
+}
+
+extract_structure() {
+  local source="$1"
+
+  if file --brief --mime-type "$source" 2>/dev/null | grep -q '^text/'; then
+    {
+      printf '## Extracted headings\n\n'
+      grep -nE '^[[:space:]]*(#{1,6}[[:space:]]+|[A-Z][A-Z0-9 _:/.-]{4,}:?[[:space:]]*$)' \
+        "$source" 2>/dev/null |
+        head -40 || true
+
+      printf '\n## Extracted key-value signals\n\n'
+      grep -nE '^[[:space:]]*[A-Za-zÆØÅ][A-Za-z0-9ÆØÅ_ ./:-]{1,50}[=:][[:space:]]*[^[:space:]].*$' \
+        "$source" 2>/dev/null |
+        head -60 || true
+
+      printf '\n## Source preview\n\n'
+      sed -n '1,120p' "$source" 2>/dev/null || true
+    }
+  else
+    printf 'Binary or non-text source. Structural extraction deferred.\n'
+  fi
+}
+
+show_status() {
+  local jobs="$ROOT/DATA/METABOLISM/jobs"
+
+  printf 'ROOT=%s\n' "$ROOT"
+  printf 'JOBS=%s\n' "$(find "$jobs" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l)"
+  printf '\nRECENT JOBS\n'
+
+  find "$jobs" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' 2>/dev/null |
+    sort -r |
+    head -20
+}
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --source)
+      SOURCE="${2:-}"
+      shift 2
+      ;;
+    --class)
+      FORCED_CLASS="${2:-}"
+      shift 2
+      ;;
+    --target)
+      TARGET="${2:-}"
+      shift 2
+      ;;
+    --dry-run)
+      MODE="dry-run"
+      shift
+      ;;
+    --apply)
+      MODE="apply"
+      shift
+      ;;
+    --status)
+      SHOW_STATUS=1
+      shift
+      ;;
+    --root)
+      ROOT="${2:-}"
+      shift 2
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      die "Unknown argument: $1"
+      ;;
+  esac
+done
+
+if [ "$SHOW_STATUS" -eq 1 ]; then
+  show_status
+  exit 0
+fi
+
+[ -n "$SOURCE" ] || {
+  usage
+  exit 2
+}
+
+[ -f "$SOURCE" ] || die "Source file not found: $SOURCE"
+[ -d "$ROOT" ] || die "AETHIEAOPSYS root not found: $ROOT"
+
+STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
+JOB_ID="AEMET-${STAMP}-$$"
+JOB_DIR="$ROOT/DATA/METABOLISM/jobs/$JOB_ID"
+RAW_DIR="$ROOT/PIPELINES/METABOLISM/intake/raw/$JOB_ID"
+WORK_DIR="$ROOT/PIPELINES/METABOLISM/working/$JOB_ID"
+DERIVED_DIR="$ROOT/PIPELINES/METABOLISM/derived/$JOB_ID"
+RECEIPT="$ROOT/DATA/METABOLISM/receipts/${JOB_ID}.receipt"
+STATUS_FILE="$ROOT/DATA/METABOLISM/status/${JOB_ID}.status"
+SOURCE_HASH="$(hash_file "$SOURCE")"
+SOURCE_SIZE="$(stat -c '%s' "$SOURCE" 2>/dev/null || wc -c < "$SOURCE")"
+SOURCE_MIME="$(file --brief --mime-type "$SOURCE" 2>/dev/null || echo unknown)"
+CLASS="${FORCED_CLASS:-$(classify_source "$SOURCE")}"
+PROPOSED_ROUTE="$(route_for_class "$CLASS")"
+AUTHORITY="$(authority_for_class "$CLASS")"
+
+if [ "$TARGET" != "auto" ]; then
+  PROPOSED_ROUTE="$TARGET"
+fi
+
+mkdir -p "$JOB_DIR" "$RAW_DIR" "$WORK_DIR" "$DERIVED_DIR"
+
+printf 'JOB_ID=%s\n' "$JOB_ID"
+printf 'SOURCE=%s\n' "$SOURCE"
+printf 'SOURCE_HASH=%s\n' "$SOURCE_HASH"
+printf 'CLASS=%s\n' "$CLASS"
+printf 'PROPOSED_ROUTE=%s\n' "$PROPOSED_ROUTE"
+printf 'AUTHORITY=%s\n' "$AUTHORITY"
+printf 'MODE=%s\n' "$MODE"
+
+cp -- "$SOURCE" "$RAW_DIR/$(basename "$SOURCE")"
+printf 'PRESERVED=%s\n' "$RAW_DIR/$(basename "$SOURCE")"
+
+{
+  printf '# ÆBSTRACTION Derived Object\n\n'
+  printf 'JOB_ID=%s\n' "$JOB_ID"
+  printf 'SOURCE_HASH=%s\n' "$SOURCE_HASH"
+  printf 'SOURCE_MIME=%s\n' "$SOURCE_MIME"
+  printf 'CLASS=%s\n' "$CLASS"
+  printf 'PROPOSED_ROUTE=%s\n' "$PROPOSED_ROUTE"
+  printf 'AUTHORITY=%s\n\n' "$AUTHORITY"
+
+  printf '## Interpretation\n\n'
+  printf 'The source was classified as `%s` and entered governed metabolism.\n\n' "$CLASS"
+
+  printf '## Abstraction\n\n'
+  printf 'The source is preserved separately from this derived representation.\n'
+  printf 'Host, path, application, and interface details are treated as replaceable surfaces unless explicitly canonical.\n\n'
+
+  printf '## Generalization\n\n'
+  printf 'Only structural signals directly present in the source are extracted automatically.\n'
+  printf 'No generated statement is promoted to canonical doctrine by this stage.\n\n'
+
+  printf '## Normalization\n\n'
+  printf 'STATE=PREPARED\n'
+  printf 'SOURCE_PRESERVED=YES\n'
+  printf 'ROUTE_STATUS=PROPOSED\n'
+  printf 'CANONICAL_PROMOTION=NO\n\n'
+
+  extract_structure "$SOURCE"
+} > "$DERIVED_DIR/derived.md"
+
+DERIVED_HASH="$(hash_file "$DERIVED_DIR/derived.md")"
+
+EXECUTION_STATE="PREPARED"
+VALIDATION_STATE="PASS"
+PROMOTION_STATE="NOT_PROMOTED"
+
+case "$AUTHORITY" in
+  DENY)
+    EXECUTION_STATE="DENIED"
+    VALIDATION_STATE="SENSITIVE_HOLD"
+    ;;
+  ESCALATE)
+    EXECUTION_STATE="AWAITING_APPROVAL"
+    ;;
+  PREPARE)
+    EXECUTION_STATE="PREPARED"
+    ;;
+  EXECUTE_GOVERNED|EXECUTE_REVERSIBLE)
+    if [ "$MODE" = "apply" ]; then
+      DEST="$ROOT/$PROPOSED_ROUTE/$JOB_ID"
+      mkdir -p "$DEST"
+      cp -- "$DERIVED_DIR/derived.md" "$DEST/derived.md"
+      EXECUTION_STATE="EXECUTED"
+    fi
+    ;;
+esac
+
+python3 - "$JOB_DIR/job.json" <<PY
+import json
+from pathlib import Path
+
+payload = {
+    "job_id": "$JOB_ID",
+    "state": "$EXECUTION_STATE",
+    "mode": "$MODE",
+    "source": {
+        "path": "$SOURCE",
+        "sha256": "$SOURCE_HASH",
+        "size": int("$SOURCE_SIZE"),
+        "mime": "$SOURCE_MIME",
+        "preserved": True
+    },
+    "classification": {
+        "class": "$CLASS"
+    },
+    "route": {
+        "proposed": "$PROPOSED_ROUTE"
+    },
+    "autonomy": {
+        "decision": "$AUTHORITY"
+    },
+    "derived": {
+        "path": "$DERIVED_DIR/derived.md",
+        "sha256": "$DERIVED_HASH"
+    },
+    "validation": {
+        "state": "$VALIDATION_STATE"
+    },
+    "promotion": {
+        "state": "$PROMOTION_STATE"
+    }
+}
+
+Path("$JOB_DIR/job.json").write_text(
+    json.dumps(payload, indent=2) + "\n",
+    encoding="utf-8"
+)
+PY
+
+{
+  printf 'JOB_ID=%s\n' "$JOB_ID"
+  printf 'TIMESTAMP_UTC=%s\n' "$STAMP"
+  printf 'SOURCE=%s\n' "$SOURCE"
+  printf 'SOURCE_SHA256=%s\n' "$SOURCE_HASH"
+  printf 'SOURCE_PRESERVED=YES\n'
+  printf 'CLASS=%s\n' "$CLASS"
+  printf 'ABSTRACTION=PASS\n'
+  printf 'GENERALIZATION=BOUNDED\n'
+  printf 'NORMALIZATION=PASS\n'
+  printf 'PROPOSED_ROUTE=%s\n' "$PROPOSED_ROUTE"
+  printf 'AUTHORITY=%s\n' "$AUTHORITY"
+  printf 'MODE=%s\n' "$MODE"
+  printf 'EXECUTION=%s\n' "$EXECUTION_STATE"
+  printf 'VALIDATION=%s\n' "$VALIDATION_STATE"
+  printf 'DERIVED_SHA256=%s\n' "$DERIVED_HASH"
+  printf 'CANONICAL_PROMOTION=%s\n' "$PROMOTION_STATE"
+} > "$RECEIPT"
+
+cp -- "$RECEIPT" "$ROOT/PIPELINES/METABOLISM/receipts/${JOB_ID}.receipt"
+
+{
+  printf 'JOB_ID=%s\n' "$JOB_ID"
+  printf 'STATE=%s\n' "$EXECUTION_STATE"
+  printf 'CLASS=%s\n' "$CLASS"
+  printf 'AUTHORITY=%s\n' "$AUTHORITY"
+  printf 'RECEIPT=%s\n' "$RECEIPT"
+} > "$STATUS_FILE"
+
+printf 'DERIVED=%s\n' "$DERIVED_DIR/derived.md"
+printf 'RECEIPT=%s\n' "$RECEIPT"
+printf 'STATE=%s\n' "$EXECUTION_STATE"

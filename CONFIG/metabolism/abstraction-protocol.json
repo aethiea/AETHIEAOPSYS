@@ -1,0 +1,30 @@
+{
+  "protocol": "AEBSTRACTION",
+  "version": "1.0.0",
+  "stages": [
+    "CAPTURED",
+    "PRESERVED",
+    "FINGERPRINTED",
+    "CLASSIFIED",
+    "INTERPRETED",
+    "ABSTRACTED",
+    "GENERALIZED",
+    "NORMALIZED",
+    "ROUTE_PROPOSED",
+    "AUTHORITY_EVALUATED",
+    "PREPARED",
+    "AUTHORIZED",
+    "EXECUTED",
+    "VALIDATED",
+    "RECEIPTED",
+    "INDEXED",
+    "PROMOTED"
+  ],
+  "principles": {
+    "source_preserved": true,
+    "derived_separated": true,
+    "execution_after_authority": true,
+    "canonical_promotion_is_distinct": true,
+    "failed_jobs_are_receipted": true
+  }
+}

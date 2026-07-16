@@ -1,0 +1,26 @@
+{
+  "module": "AEBSTRACTION",
+  "type": "native_mod",
+  "role": "meaning_transformation",
+  "orchestration_owner": {
+    "id": "AAER",
+    "display_name": "AÆR",
+    "role": "autonomy_gate"
+  },
+  "interpretation_owner": {
+    "id": "AAE",
+    "display_name": "AÆ",
+    "role": "meaning_interpretation"
+  },
+  "routing_owner": {
+    "id": "UAER",
+    "display_name": "UÆR",
+    "role": "placement_routing"
+  },
+  "provenance_owner": {
+    "id": "AERAG",
+    "display_name": "AERAG",
+    "role": "proof_provenance_retrieval"
+  },
+  "duplicate_corpus_allowed": false
+}
