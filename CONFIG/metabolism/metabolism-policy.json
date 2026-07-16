@@ -1,0 +1,39 @@
+{
+  "policy": "AER_AUTONOMOUS_METABOLISM",
+  "version": "1.0.0",
+  "default_mode": "dry-run",
+  "autonomy_levels": [
+    "OBSERVE",
+    "INTERPRET",
+    "RECOMMEND",
+    "PREPARE",
+    "EXECUTE_REVERSIBLE",
+    "EXECUTE_GOVERNED",
+    "ESCALATE",
+    "DENY"
+  ],
+  "automatic_classes": [
+    "runtime_status",
+    "technical_log",
+    "inventory",
+    "receipt",
+    "documentation"
+  ],
+  "approval_required_classes": [
+    "doctrine",
+    "ownership",
+    "trust_governance",
+    "legal",
+    "financial",
+    "rights_metadata",
+    "identity",
+    "canonical_topology",
+    "public_infrastructure"
+  ],
+  "denied_actions": [
+    "delete_source",
+    "expose_credentials",
+    "overwrite_canonical_without_approval",
+    "publish_external_without_approval"
+  ]
+}

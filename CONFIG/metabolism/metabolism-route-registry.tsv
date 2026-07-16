@@ -1,0 +1,14 @@
+class	proposed_route	authority_default
+technical_log	DATA/METABOLISM/derived/technical	EXECUTE_GOVERNED
+runtime_status	DATA/METABOLISM/derived/status	EXECUTE_GOVERNED
+inventory	DATA/METABOLISM/derived/inventory	EXECUTE_GOVERNED
+receipt	DATA/METABOLISM/receipts	EXECUTE_GOVERNED
+documentation	DATA/METABOLISM/derived/documentation	PREPARE
+doctrine	PIPELINES/METABOLISM/review/doctrine	ESCALATE
+legal	PIPELINES/METABOLISM/review/legal	ESCALATE
+financial	PIPELINES/METABOLISM/review/financial	ESCALATE
+rights_metadata	PIPELINES/METABOLISM/review/rights	ESCALATE
+identity	PIPELINES/METABOLISM/review/identity	ESCALATE
+canonical_topology	PIPELINES/METABOLISM/review/topology	ESCALATE
+credential_sensitive	PIPELINES/METABOLISM/quarantine	DENY
+unknown	PIPELINES/METABOLISM/review/unknown	PREPARE
