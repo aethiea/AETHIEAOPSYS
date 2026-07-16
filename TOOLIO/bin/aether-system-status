@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+LIB_DIR="$(cd "$SCRIPT_DIR/../lib" && pwd -P)"
+ROOT="$(python3 "$LIB_DIR/aether_hostless.py" root)"
+
+echo "=== HOSTLESS ROOT ==="
+python3 "$LIB_DIR/aether_hostless.py" status
+
+echo
+echo "=== AETHER POLICY STATUS ==="
+python3 "$LIB_DIR/aether_policy.py" status
+
+echo
+echo "=== ROUTE REGISTRY ==="
+column -t -s $'\t' "$ROOT/CONFIG/network/aether-route-registry.tsv"
+
+echo
+echo "=== BOUNDLESS ROUTE LOCK ==="
+column -t -s $'\t' "$ROOT/CONFIG/network/boundless-aether-route-lock.tsv"
+
+echo
+echo "=== ACTIVE GUARD ==="
+"$SCRIPT_DIR/aether-guard"
+
+echo
+echo "=== SURFACE RESOLUTION ==="
+for s in AETHER ROOT AEUSB AEXHD AEVPS; do
+  echo "--- $s ---"
+  "$SCRIPT_DIR/aether-resolve" "$s"
+done

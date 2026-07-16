@@ -1,0 +1,22 @@
+{
+  "system": "AETHIEAOPSYS",
+  "class": "modular_node_contract",
+  "contract": "XOFIT",
+  "required_files": {
+    "config.json": "machine-readable identity and configuration",
+    "role.txt": "assigned operational function",
+    "rules.txt": "authority boundaries and prohibitions",
+    "README.md": "human-readable explanation and interface"
+  },
+  "authority_invariants": {
+    "human_executive_required": true,
+    "can_decide": false,
+    "may_prepare": true,
+    "may_validate": true,
+    "may_block": true,
+    "may_route": true,
+    "may_stage": true,
+    "may_self_authorize_irreversible_execution": false
+  },
+  "generated_utc": "20260716T212430Z"
+}

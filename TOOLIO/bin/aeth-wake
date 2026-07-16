@@ -1,45 +1,176 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -Eeuo pipefail
 
-resolve_root() {
-  local r
-  if command -v aeth_root >/dev/null 2>&1; then
-    r="$(aeth_root 2>/dev/null || true)"
-    [ -n "$r" ] && [ -d "$r" ] && [ -f "$r/.aeth_root" ] && { printf '%s\n' "$r"; return 0; }
-  fi
+SCRIPT_DIR="$(
+    cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &&
+    pwd -P
+)"
 
-  for r in "${AETH_ROOT:-}" "${AETHIEA:-}" /mnt/[a-z]/AETHIEAOPSYS /media/*/AETHIEAOPSYS /run/media/*/AETHIEAOPSYS /Volumes/*/AETHIEAOPSYS "$HOME/AETHIEAOPSYS" /opt/AETHIEAOPSYS; do
-    [ -d "$r" ] || continue
-    [ -f "$r/.aeth_root" ] || continue
-    [ -f "$r/STATUS.md" ] || continue
-    [ ! -f "$r/AE320GB_HEAVY_BODY" ] || continue
-    [ ! -f "$r/.aeth_heavy_body" ] || continue
-    printf '%s\n' "$r"
-    return 0
-  done
+SELF_ROOT="$(
+    cd -- "$SCRIPT_DIR/../.." &&
+    pwd -P
+)"
 
-  return 1
+valid_authority() {
+    local root="${1:-}"
+
+    [ -n "$root" ] || return 1
+    [ -d "$root" ] || return 1
+    [ -f "$root/.aeth_root" ] || return 1
+    [ -f "$root/ENV/SURFACES/bootstrap.sh" ] || return 1
+
+    if [ -s "$root/.aeth_surface" ]; then
+        [ "$(tr -d '\r\n' < "$root/.aeth_surface")" = "AEUSB" ] ||
+            return 1
+    elif [ -s "$root/.aeth_role" ]; then
+        grep -qi 'HOSTLESS_AUTHORITY' "$root/.aeth_role" ||
+            return 1
+    else
+        return 1
+    fi
 }
 
-ROOT="$(resolve_root)"
-export AETH_ROOT="$ROOT"
-export AETHIEA="$ROOT"
+resolve_authority() {
+    local root
 
-[ -f "$ROOT/ENV/SHELL/aethiea_env.sh" ] && . "$ROOT/ENV/SHELL/aethiea_env.sh" || true
+    for root in \
+      "$SELF_ROOT" \
+      "${AETHIEA_ROOT:-}" \
+      "${AETH_ROOT:-}" \
+      "${AETHIEA:-}" \
+      "${AEUSB:-}"
+    do
+        if valid_authority "$root"; then
+            printf '%s\n' "$root"
+            return 0
+        fi
+    done
 
-cd "$ROOT"
+    for root in \
+      /mnt/*/AETHIEAOPSYS \
+      /media/*/AETHIEAOPSYS \
+      /run/media/*/AETHIEAOPSYS \
+      /Volumes/*/AETHIEAOPSYS
+    do
+        if valid_authority "$root"; then
+            printf '%s\n' "$root"
+            return 0
+        fi
+    done
 
-echo "=== AETHIEA WAKE ==="
-echo "ROOT: $AETH_ROOT"
-echo "HOST: $(hostname)"
-echo "USER: $(whoami)"
-echo
+    return 1
+}
 
-for cmd in aeth-ssh-agent aeth-bodies aeth-components aeth-hid; do
-  if command -v "$cmd" >/dev/null 2>&1; then
-    "$cmd" || true
-    echo
-  fi
-done
+find_heavy() {
+    local root
 
-git --git-dir="$HOME/.aethiea_git/AETHIEAOPSYS.git" --work-tree="$ROOT" status --short
+    for root in \
+      "${AEXHD_ROOT:-}" \
+      "${AEHEAVY_ROOT:-}" \
+      /mnt/*/AETHIEAOPSYS \
+      /media/*/AETHIEAOPSYS \
+      /run/media/*/AETHIEAOPSYS \
+      /Volumes/*/AETHIEAOPSYS
+    do
+        [ -n "$root" ] || continue
+        [ -d "$root" ] || continue
+        [ "$root" != "$ROOT" ] || continue
+
+        if [ -f "$root/.aexhd_root" ] ||
+           [ -f "$root/.aeth_memory_body" ] ||
+           [ -f "$root/.aeth_heavy_body" ] ||
+           [ -f "$root/AE320GB_HEAVY_BODY" ]
+        then
+            printf '%s\n' "$root"
+            return 0
+        fi
+    done
+
+    return 1
+}
+
+ROOT="$(resolve_authority)" || {
+    echo "AETH_WAKE_AUTHORITY_NOT_FOUND" >&2
+    exit 127
+}
+
+BOOTSTRAP="$ROOT/ENV/SURFACES/bootstrap.sh"
+CONTRACT="$ROOT/CONFIG/WAKE/ONE_WAKE_PROTOCOL.env"
+PROBE="$ROOT/TOOLIO/bin/aeth-surface-probe"
+PLUGPLAY="$ROOT/TOOLIO/bin/aether-bootstrap-plugplay"
+MODE="${1:-wake}"
+
+shift || true
+
+case "$MODE" in
+    wake|show|status)
+        export AETHIEA_ROOT="$ROOT"
+        export AETH_ROOT="$ROOT"
+        export AETHIEA="$ROOT"
+        export AETHIEAOPSYS="$ROOT"
+        export AEUSB="$ROOT"
+        export AETH_FORCE_BOOTSTRAP=1
+
+        # Canonical visible startup owner.
+        # shellcheck disable=SC1090
+        . "$BOOTSTRAP"
+        ;;
+
+    contract)
+        [ -f "$CONTRACT" ] || {
+            echo "AETH_WAKE_CONTRACT_MISSING" >&2
+            exit 1
+        }
+
+        cat "$CONTRACT"
+        ;;
+
+    paths)
+        printf 'ROOT=%s\n' "$ROOT"
+        printf 'BOOTSTRAP=%s\n' "$BOOTSTRAP"
+        printf 'CONTRACT=%s\n' "$CONTRACT"
+        printf 'PROBE=%s\n' "$PROBE"
+        printf 'PLUGPLAY=%s\n' "$PLUGPLAY"
+
+        if HEAVY="$(find_heavy 2>/dev/null)"; then
+            printf 'AEXHD_ROOT=%s\n' "$HEAVY"
+        else
+            printf 'AEXHD_ROOT=OFFLINE\n'
+        fi
+        ;;
+
+    env)
+        printf 'export AETHIEA_ROOT=%q\n' "$ROOT"
+        printf 'export AETH_ROOT=%q\n' "$ROOT"
+        printf 'export AETHIEA=%q\n' "$ROOT"
+        printf 'export AETHIEAOPSYS=%q\n' "$ROOT"
+        printf 'export AEUSB=%q\n' "$ROOT"
+
+        if HEAVY="$(find_heavy 2>/dev/null)"; then
+            printf 'export AEXHD_ROOT=%q\n' "$HEAVY"
+            printf 'export AEHEAVY_ROOT=%q\n' "$HEAVY"
+        fi
+        ;;
+
+    probe)
+        exec bash "$PROBE" "$@"
+        ;;
+
+    plugplay)
+        [ -f "$PLUGPLAY" ] || {
+            echo "AETH_WAKE_PLUGPLAY_MISSING" >&2
+            exit 1
+        }
+
+        exec bash "$PLUGPLAY" "$@"
+        ;;
+
+    help|--help|-h)
+        echo "usage: aeth-wake {wake|show|status|contract|paths|env|probe|plugplay}"
+        ;;
+
+    *)
+        echo "usage: aeth-wake {wake|show|status|contract|paths|env|probe|plugplay}" >&2
+        exit 64
+        ;;
+esac

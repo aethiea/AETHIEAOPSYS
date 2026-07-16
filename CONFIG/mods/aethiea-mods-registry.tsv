@@ -1,0 +1,3 @@
+implementation	architectural_role	module_class	member_scope	authority_rule
+MODS/B43-RU5	BÆ_MESH	governed_agent_mesh	BÆ:000-BÆ:016	HUMAN_EXECUTIVE_REQUIRED
+MODS/P47H30N	PANTHEON	named_human_and_system_nodes	NODES/*	OPERATOR_GOVERNED

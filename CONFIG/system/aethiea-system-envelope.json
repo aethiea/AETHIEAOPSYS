@@ -1,0 +1,29 @@
+{
+  "system": "AETHIEA",
+  "class": "operating_system_governance_envelope",
+  "corpus_body": "AETHIEAOPSYS",
+  "pointer": "$AETHIEA",
+  "native_layers": [
+    "UAER",
+    "AAE",
+    "AENET",
+    "AETHER",
+    "AE1OF1"
+  ],
+  "authority": "DNY-5U5",
+  "execution_rule": {
+    "self_authorizing_layers": false,
+    "endpoint_required": true,
+    "gcr_validation_required": true,
+    "operator_authority_required": true
+  },
+  "doctrine": [
+    "AETHIEA contains and governs the architecture.",
+    "AETHIEAOPSYS is the filesystem corpus body.",
+    "Tools integrate into the corpus logic.",
+    "No tool creates a second body.",
+    "Separation with coordination.",
+    "DON'T MINGLE."
+  ],
+  "generated_utc": "20260716T212430Z"
+}

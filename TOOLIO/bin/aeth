@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+LIB_DIR="$(cd "$SCRIPT_DIR/../lib" && pwd -P)"
+ROOT="$(python3 "$LIB_DIR/aether_hostless.py" root)"
+BIN="$ROOT/TOOLIO/bin"
+
+cmd="${1:-status}"
+shift || true
+
+case "$cmd" in
+  preflight) exec "$BIN/aether-preflight" "$@" ;;
+  status) exec "$BIN/aether-run" aether-system-status "$@" ;;
+  scan) exec "$BIN/aether-run" aether-mech-scan "$@" ;;
+  resolve) exec "$BIN/aether-run" aether-resolve "${1:-ROOT}" ;;
+  run) exec "$BIN/aether-run" "$@" ;;
+  *) echo "usage: aeth {preflight|status|scan|resolve|run}"; exit 2 ;;
+esac

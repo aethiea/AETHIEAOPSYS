@@ -1,0 +1,8 @@
+surface	role	locator_rule	allowed_action	denied_action
+AETHIEA	operating_system_governance_envelope	CONFIG/system/aethiea-system-envelope.json	GOVERN	BECOME_HOST_OR_TOOL
+AETHIEAOPSYS	filesystem_corpus_body	CONFIG/corpus/aethieaopsys-corpus-body.json	PROVE_SOURCE	DUPLICATE_BODY
+NATIVE_LAYERS	internal_processing_graph	CONFIG/layers/aethiea-native-layer-graph.json	INTERPRET_ROUTE_INTERFACE	SELF_AUTHORIZE_EXECUTION
+MODS	modular_operating_organs	CONFIG/mods/aethiea-mods-registry.tsv	PREPARE_VALIDATE_ROUTE	BECOME_EXECUTIVE
+SURFACES	authority_heavy_runtime_hosts	CONFIG/surfaces/aethiea-surface-topology.tsv	CARRY_OR_EXECUTE	OWN_CONTINUITY
+ORGANS	specialized_system_functions	CONFIG/organs/aethiea-organ-registry.tsv	PERFORM_SPECIALIZED_FUNCTION	CREATE_SECOND_BODY
+PIPELINES	lane_routed_workflows	CONFIG/pipelines/aethiea-pipeline-registry.tsv	ROUTE_TO_DOMAIN	COMMINGLE_DOMAINS

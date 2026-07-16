@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+LIB_DIR="$(cd "$SCRIPT_DIR/../lib" && pwd -P)"
+ROOT="$(python3 "$LIB_DIR/aether_hostless.py" root)"
+BIN="$ROOT/TOOLIO/bin"
+LOCK="$ROOT/DATA/STATUS/HOSTLESS_ACTIVE_LOCK.json"
+
+echo "=== AETHER PREFLIGHT V3 ==="
+echo "resolved_root=$ROOT"
+
+echo
+echo "=== ACTIVE LOCK JSON ==="
+python3 -m json.tool "$LOCK" >/dev/null
+echo "HOSTLESS_ACTIVE_LOCK_JSON_VALID"
+
+echo
+echo "=== LOCK VALUES ==="
+python3 - "$LOCK" <<'PYEOF'
+import json, sys
+from pathlib import Path
+
+lock = json.loads(Path(sys.argv[1]).read_text())
+
+required = {
+    "active_lock": "BOUND_LESS_ONLY_BIND_TO_AETHER",
+    "resolution": "HOSTLESS_CORPUS_SIGNATURE",
+    "bind_to": "AETHER",
+    "host_bind": False,
+    "force_mount_aeusb": False,
+    "mechanical_scan": "NO_MECHANICAL_VIOLATIONS",
+    "host_bind_denial": "CONFIRMED",
+    "force_mount_denial": "CONFIRMED",
+}
+
+bad = []
+for k, v in required.items():
+    if lock.get(k) != v:
+        bad.append(f"{k}={lock.get(k)!r}, expected {v!r}")
+
+proof = lock.get("final_proof")
+if not proof or not Path(proof).exists():
+    bad.append(f"final_proof_missing={proof!r}")
+
+if bad:
+    print("HOSTLESS_ACTIVE_LOCK_INVALID")
+    for item in bad:
+        print(item)
+    raise SystemExit(30)
+
+print("HOSTLESS_ACTIVE_LOCK_VALUES_OK")
+print(f"FINAL_PROOF_OK={proof}")
+PYEOF
+
+echo
+echo "=== POLICY / GUARD ==="
+"$BIN/aether-guard"
+
+echo
+echo "=== OPTIONAL ACTIVE SCAN / DISABLED ==="
+echo "ACTIVE_SCAN_DISABLED_BY_POLICY"
+echo "Using sealed HOSTLESS_ACTIVE_LOCK as gate source."
+echo
+
+echo "=== DENIAL CONTROLS ==="
+AETHIEA_HOST_BIND=1 "$BIN/aether-guard" >/tmp/aether-hostbind-test.$$ 2>&1 && {
+  cat /tmp/aether-hostbind-test.$$
+  rm -f /tmp/aether-hostbind-test.$$
+  echo "HOST_BIND_DENIAL_FAILED"
+  exit 10
+} || true
+rm -f /tmp/aether-hostbind-test.$$
+echo "HOST_BIND_DENIAL_OK"
+
+AETHIEA_FORCE_MOUNT_AEUSB=1 "$BIN/aether-guard" >/tmp/aether-forcemount-test.$$ 2>&1 && {
+  cat /tmp/aether-forcemount-test.$$
+  rm -f /tmp/aether-forcemount-test.$$
+  echo "FORCE_MOUNT_DENIAL_FAILED"
+  exit 11
+} || true
+rm -f /tmp/aether-forcemount-test.$$
+echo "FORCE_MOUNT_DENIAL_OK"
+
+echo
+echo "AETHER_PREFLIGHT_OK"

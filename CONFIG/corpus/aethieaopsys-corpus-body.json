@@ -1,0 +1,21 @@
+{
+  "system": "AETHIEAOPSYS",
+  "class": "filesystem_corpus_body",
+  "authority_resolution": "CORPUS_SIGNATURE+AUTHORITY_ROLE_MARKERS+HEAVY_MARKER_REJECTION",
+  "authority_surface": {
+    "name": "AEUSB",
+    "current_root": "/mnt/j/AETHIEAOPSYS",
+    "role": "HOSTLESS_AUTHORITY",
+    "drive_letter_is_authority": false
+  },
+  "heavy_surface": {
+    "name": "AEXHD",
+    "current_root": "/mnt/k/AETHIEAOPSYS",
+    "role": "MIRROR_CONTINUITY_HEAVY_PAYLOAD_BODY",
+    "may_become_root_authority": false
+  },
+  "continuity_owner": "AETHIEAOPSYS",
+  "host_owned": false,
+  "tool_owned": false,
+  "generated_utc": "20260716T212430Z"
+}

@@ -1,0 +1,104 @@
+{
+  "system": "AETHIEA",
+  "corpus_body": "AETHIEAOPSYS",
+  "class": "native_internal_layer_graph",
+  "source_system": "DATA/MEMORY/SYSTEM/aethiea.json",
+  "source_routes": "DATA/MEMORY/ROUTES/layer_map.json",
+  "layers": {
+    "UAER": {
+      "implementation": "LAYERS/UAER/MAPPING.json",
+      "role": "pre-interpretation routing",
+      "function": [
+        "intake classification",
+        "first-pass routing",
+        "prevent premature interpretation",
+        "direct signal to correct processor"
+      ],
+      "routes_to": [
+        "AAE",
+        "AENET",
+        "B43-RU5"
+      ],
+      "execution_support": true,
+      "endpoint_required": true,
+      "execution_authority": "operator_gated"
+    },
+    "AAE": {
+      "implementation": "LAYERS/AAE/MAPPING.json",
+      "role": "analogy engine / cross-domain mapping",
+      "function": [
+        "map analogies",
+        "compare structures",
+        "translate across domains",
+        "identify reusable patterns"
+      ],
+      "routes_to": [
+        "AETHER",
+        "AENET",
+        "B43-RU5"
+      ],
+      "execution_support": true,
+      "endpoint_required": true,
+      "execution_authority": "operator_gated"
+    },
+    "AENET": {
+      "implementation": "LAYERS/AENET/MAPPING.json",
+      "role": "routing membrane / network logic",
+      "function": [
+        "route between system modules",
+        "validate pathways",
+        "coordinate node movement",
+        "support zero-trust flow"
+      ],
+      "routes_to": [
+        "DOMAINS",
+        "GCR",
+        "EXECUTION"
+      ],
+      "execution_support": true,
+      "endpoint_required": true,
+      "execution_authority": "operator_gated"
+    },
+    "AETHER": {
+      "implementation": "LAYERS/AETHER/MAPPING.json",
+      "role": "meaning / compression / continuity medium",
+      "function": [
+        "compress signals",
+        "preserve continuity",
+        "translate meaning",
+        "maintain coherence"
+      ],
+      "routes_to": [
+        "UAER",
+        "AAE",
+        "AE1OF1"
+      ],
+      "execution_support": true,
+      "endpoint_required": true,
+      "execution_authority": "operator_gated"
+    },
+    "AE1OF1": {
+      "implementation": "LAYERS/AE1OF1/MAPPING.json",
+      "role": "HUD / operator interface",
+      "function": [
+        "display system state",
+        "translate system status",
+        "surface operator readouts",
+        "support interface clarity"
+      ],
+      "routes_to": [
+        "OPERATOR"
+      ],
+      "execution_support": true,
+      "endpoint_required": true,
+      "execution_authority": "operator_gated"
+    }
+  },
+  "separation": {
+    "layers": "internal cognition/routing/interface",
+    "gcr": "governance/compliance/risk",
+    "domains": "operational and entity lanes",
+    "execution": "authorized action boundary"
+  },
+  "generated_utc": "20260716T212430Z"
+}
