@@ -1,8 +1,33 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-AEUSB_ROOT="${AEUSB_ROOT:-/mnt/h/AETHIEAOPSYS}"
-AEXHD_ROOT="${AEXHD_ROOT:-/mnt/i/AETHIEAOPSYS}"
+AUTH="$(aeusb-root)" || {
+  echo "HUSH_AE: AEUSB authority root not found" >&2
+  exit 1
+}
+
+AEG_RESOLVER="$AUTH/LAYERS/AEG/resolve.py"
+
+[ -f "$AEG_RESOLVER" ] || {
+  echo "HUSH_AE: AEG resolver missing: $AEG_RESOLVER" >&2
+  exit 1
+}
+
+# shellcheck disable=SC1090
+source <(
+  python3 "$AEG_RESOLVER" --exports |
+  awk '
+    /^export (AEUSB_ROOT|AEXHD_ROOT|AEGNOSTIXXX_RESOLUTION)=/ {
+      print
+    }
+  '
+)
+
+[ "${AEGNOSTIXXX_RESOLUTION:-}" = "PASS" ] || {
+  echo "HUSH_AE: AEGNOSTIXXX resolution failed" >&2
+  exit 1
+}
+
 HUSH_ROOT="$AEXHD_ROOT/DATA/MEMORY/HUSH"
 VAULT="$HUSH_ROOT/vault"
 RUNTIME="$HUSH_ROOT/runtime"
@@ -26,40 +51,81 @@ case "$cmd" in
     echo "AETHIEA HUSH STATUS"
     echo "AEUSB_ROOT=$AEUSB_ROOT"
     echo "AEXHD_ROOT=$AEXHD_ROOT"
+    echo "AEGNOSTIXXX_RESOLUTION=$AEGNOSTIXXX_RESOLUTION"
     echo "VAULT=$VAULT"
     echo "RUNTIME=$RUNTIME"
     echo "AEVPS=$AEVPS_USER@$AEVPS_IP"
-    [ -d "$VAULT" ] && echo "VAULT_OK" || echo "VAULT_MISSING"
-    [ -d "$RUNTIME" ] && echo "RUNTIME_OK" || echo "RUNTIME_MISSING"
+    [ -d "$VAULT" ] &&
+      echo "VAULT_OK" ||
+      echo "VAULT_MISSING"
+    [ -d "$RUNTIME" ] &&
+      echo "RUNTIME_OK" ||
+      echo "RUNTIME_MISSING"
     ;;
   list)
-    find "$VAULT" -maxdepth 1 -type f -name '*.env.gpg' -printf '%f\n' 2>/dev/null | sed 's/\.env\.gpg$//' || true
+    find "$VAULT" \
+      -maxdepth 1 \
+      -type f \
+      -name '*.env.gpg' \
+      -printf '%f\n' \
+      2>/dev/null |
+    sed 's/\.env\.gpg$//' ||
+    true
     ;;
   seal)
-    [ -n "$name" ] || { usage; exit 2; }
+    [ -n "$name" ] || {
+      usage
+      exit 2
+    }
+
     src="/dev/shm/${name}.env"
     dest="$VAULT/${name}.env.gpg"
+
     [ -f "$src" ] || {
       echo "MISSING_MEMORY_FILE=$src"
       echo "Create it with: nano $src"
       exit 1
     }
+
     mkdir -p "$VAULT"
     chmod 700 "$VAULT"
-    gpg --symmetric --cipher-algo AES256 --output "$dest" "$src"
+
+    gpg \
+      --symmetric \
+      --cipher-algo AES256 \
+      --output "$dest" \
+      "$src"
+
     chmod 600 "$dest"
     sha256sum "$dest" > "$dest.sha256"
     rm -f "$src"
+
     echo "SEALED=$dest"
     echo "SHA=$dest.sha256"
     echo "PLAINTEXT_REMOVED_FROM_DEV_SHM"
     ;;
   push-aevps)
-    [ -n "$name" ] || { usage; exit 2; }
+    [ -n "$name" ] || {
+      usage
+      exit 2
+    }
+
     src="$VAULT/${name}.env.gpg"
-    [ -f "$src" ] || { echo "NO_SUCH_VAULT_SECRET=$src"; exit 1; }
-    ssh "$AEVPS_USER@$AEVPS_IP" 'mkdir -p /opt/AETHIEAOPSYS/HUSH/runtime && chmod 700 /opt/AETHIEAOPSYS/HUSH /opt/AETHIEAOPSYS/HUSH/runtime'
-    gpg --decrypt "$src" | ssh "$AEVPS_USER@$AEVPS_IP" "cat > /opt/AETHIEAOPSYS/HUSH/runtime/${name}.env && chmod 600 /opt/AETHIEAOPSYS/HUSH/runtime/${name}.env"
+
+    [ -f "$src" ] || {
+      echo "NO_SUCH_VAULT_SECRET=$src"
+      exit 1
+    }
+
+    ssh "$AEVPS_USER@$AEVPS_IP" \
+      'mkdir -p /opt/AETHIEAOPSYS/HUSH/runtime &&
+       chmod 700 /opt/AETHIEAOPSYS/HUSH /opt/AETHIEAOPSYS/HUSH/runtime'
+
+    gpg --decrypt "$src" |
+    ssh "$AEVPS_USER@$AEVPS_IP" \
+      "cat > /opt/AETHIEAOPSYS/HUSH/runtime/${name}.env &&
+       chmod 600 /opt/AETHIEAOPSYS/HUSH/runtime/${name}.env"
+
     echo "PUSHED_TO_AEVPS=/opt/AETHIEAOPSYS/HUSH/runtime/${name}.env"
     ;;
   *)

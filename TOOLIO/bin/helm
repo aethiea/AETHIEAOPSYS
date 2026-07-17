@@ -1,5 +1,43 @@
 #!/usr/bin/env bash
-export HELM_CACHE_HOME="/mnt/i/AETHIEAOPSYS/DATA/MEMORY/KUBERNETES/helm/cache"
-export HELM_CONFIG_HOME="/mnt/i/AETHIEAOPSYS/DATA/MEMORY/KUBERNETES/helm/config"
-export HELM_DATA_HOME="/mnt/i/AETHIEAOPSYS/DATA/MEMORY/KUBERNETES/helm/data"
-exec /mnt/i/AETHIEAOPSYS/TOOLIO/KUBERNETES/bin/helm "$@"
+set -euo pipefail
+
+AUTH="$(aeusb-root)" || {
+  echo "HELM_AE: AEUSB authority root not found" >&2
+  exit 1
+}
+
+AEG_RESOLVER="$AUTH/LAYERS/AEG/resolve.py"
+
+[ -f "$AEG_RESOLVER" ] || {
+  echo "HELM_AE: AEG resolver missing: $AEG_RESOLVER" >&2
+  exit 1
+}
+
+# shellcheck disable=SC1090
+source <(
+  python3 "$AEG_RESOLVER" --exports |
+  awk '
+    /^export (AEUSB_ROOT|AEXHD_ROOT|AEGNOSTIXXX_RESOLUTION)=/ {
+      print
+    }
+  '
+)
+
+[ "${AEGNOSTIXXX_RESOLUTION:-}" = "PASS" ] || {
+  echo "HELM_AE: AEGNOSTIXXX resolution failed" >&2
+  exit 1
+}
+
+HELM_MEMORY="$AEXHD_ROOT/DATA/MEMORY/KUBERNETES/helm"
+PAYLOAD="$AEXHD_ROOT/TOOLIO/KUBERNETES/bin/helm"
+
+export HELM_CACHE_HOME="$HELM_MEMORY/cache"
+export HELM_CONFIG_HOME="$HELM_MEMORY/config"
+export HELM_DATA_HOME="$HELM_MEMORY/data"
+
+[ -x "$PAYLOAD" ] || {
+  echo "HELM_AE: payload unavailable: $PAYLOAD" >&2
+  exit 127
+}
+
+exec "$PAYLOAD" "$@"

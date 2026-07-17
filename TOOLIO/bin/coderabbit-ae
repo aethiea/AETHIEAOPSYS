@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT="${AETHIEA_ROOT:-/mnt/h/AETHIEAOPSYS}"
+ROOT="$(aeusb-root)" || {
+  echo "CODERABBIT_AE: AEUSB authority root not found" >&2
+  exit 1
+}
+
 CR_BIN="${CODERABBIT_BIN:-$HOME/.local/bin/coderabbit}"
 AETH_GIT_DIR="${AETHIEA_GIT_DIR:-$HOME/.aethiea_git/AETHIEAOPSYS.git}"
 

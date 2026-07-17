@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-ROOT="${AETHIEA_ROOT:-/mnt/j/AETHIEAOPSYS}"
+ROOT="$(aeusb-root)" || {
+  echo "AETHER_METABOLIZE: AEUSB authority root not found" >&2
+  exit 1
+}
 SOURCE=""
 MODE="dry-run"
 FORCED_CLASS=""

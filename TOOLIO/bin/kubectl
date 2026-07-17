@@ -1,2 +1,38 @@
 #!/usr/bin/env bash
-exec /mnt/i/AETHIEAOPSYS/TOOLIO/KUBERNETES/bin/kubectl "$@"
+set -euo pipefail
+
+AUTH="$(aeusb-root)" || {
+  echo "KUBECTL_AE: AEUSB authority root not found" >&2
+  exit 1
+}
+
+AEG_RESOLVER="$AUTH/LAYERS/AEG/resolve.py"
+
+[ -f "$AEG_RESOLVER" ] || {
+  echo "KUBECTL_AE: AEG resolver missing: $AEG_RESOLVER" >&2
+  exit 1
+}
+
+# shellcheck disable=SC1090
+source <(
+  python3 "$AEG_RESOLVER" --exports |
+  awk '
+    /^export (AEUSB_ROOT|AEXHD_ROOT|AEGNOSTIXXX_RESOLUTION)=/ {
+      print
+    }
+  '
+)
+
+[ "${AEGNOSTIXXX_RESOLUTION:-}" = "PASS" ] || {
+  echo "KUBECTL_AE: AEGNOSTIXXX resolution failed" >&2
+  exit 1
+}
+
+PAYLOAD="$AEXHD_ROOT/TOOLIO/KUBERNETES/bin/kubectl"
+
+[ -x "$PAYLOAD" ] || {
+  echo "KUBECTL_AE: payload unavailable: $PAYLOAD" >&2
+  exit 127
+}
+
+exec "$PAYLOAD" "$@"

@@ -1,7 +1,56 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-AUTH="$(aeusb-root)"
+# AESOFT AUDIT
+# Rule:
+#   Software is audited as callable capacity, not just package presence.
+#   Host executes. AEUSB carries. Host does not own.
+#   AEUSB is authority and ignition.
+#   AEXHD is heavy body and carried tools.
+#   RUBIII is execution surface.
+
+source "$HOME/.aethiea_env" 2>/dev/null || true
+source "$HOME/.aethiea_heavy_env" 2>/dev/null || true
+
+AUTH="$(aeusb-root)" || {
+  echo "AESOFT_AUDIT: AEUSB authority root not found" >&2
+  exit 1
+}
+
+AEG_RESOLVER="$AUTH/LAYERS/AEG/resolve.py"
+
+[ -f "$AEG_RESOLVER" ] || {
+  echo "AESOFT_AUDIT: AEG resolver missing: $AEG_RESOLVER" >&2
+  exit 1
+}
+
+# shellcheck disable=SC1090
+source <(
+  python3 "$AEG_RESOLVER" --exports |
+  awk '
+    /^export (AEUSB_ROOT|AEXHD_ROOT|AEGNOSTIXXX_RESOLUTION)=/ {
+      print
+    }
+  '
+)
+
+[ "${AEGNOSTIXXX_RESOLUTION:-}" = "PASS" ] || {
+  echo "AESOFT_AUDIT: AEGNOSTIXXX resolution failed" >&2
+  exit 1
+}
+
+[ -n "${AEUSB_ROOT:-}" ] || {
+  echo "AESOFT_AUDIT: resolved AEUSB root is empty" >&2
+  exit 1
+}
+
+[ -n "${AEXHD_ROOT:-}" ] || {
+  echo "AESOFT_AUDIT: resolved AEXHD root is empty" >&2
+  exit 1
+}
+
+AUTH="$AEUSB_ROOT"
+AEXHD="$AEXHD_ROOT"
 STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
 HOST="$(hostname 2>/dev/null || echo UNKNOWN)"
 
@@ -10,25 +59,155 @@ VERIFY_DIR="$AUTH/PROGRAMS/VERIFY"
 RUNTIME_DIR="$AUTH/DATA/RUNTIME"
 STATUS="$RUNTIME_DIR/AESOFT_AUDIT_STATUS.md"
 
+AEXHD_VERIFY_DIR="$AEXHD/PROGRAMS/VERIFY"
+AEXHD_RUNTIME_DIR="$AEXHD/DATA/RUNTIME"
+AEXHD_STATUS="$AEXHD_RUNTIME_DIR/AESOFT_AUDIT_STATUS.md"
+
 mkdir -p "$RUNTIME_DIR" "$VERIFY_DIR"
+
+KNOWN_BIN_DIRS="
+$HOME/bin
+$HOME/.local/bin
+/usr/bin
+/usr/sbin
+/usr/local/bin
+/usr/local/sbin
+$AUTH/TOOLIO/bin
+$AUTH/TOOLIO/KUBERNETES/bin
+$AUTH/TOOLIO
+$AUTH/PROGRAMS
+$AUTH/SERVICES
+$AEXHD/TOOLIO/bin
+$AEXHD/TOOLIO/KUBERNETES/bin
+$AEXHD/TOOLIO
+$AEXHD/HEAVY/TOOLIO
+$AEXHD/HEAVY/TOOLIO/LLM
+$AEXHD/HEAVY/TOOLIO/CLOUD
+$AEXHD/HEAVY/TOOLIO/DEV
+$AEXHD/HEAVY/TOOLIO/AUTOMATION
+$AEXHD/MODELS/llama.cpp
+$AEXHD/DOCKER
+$AEXHD/SERVICES
+"
+
+resolve_cmd() {
+  local cmd="$1"
+
+  if command -v "$cmd" >/dev/null 2>&1; then
+    command -v "$cmd"
+    return 0
+  fi
+
+  while IFS= read -r d; do
+    [ -n "$d" ] || continue
+    [ -d "$d" ] || continue
+    if [ -x "$d/$cmd" ]; then
+      printf '%s\n' "$d/$cmd"
+      return 0
+    fi
+  done <<< "$KNOWN_BIN_DIRS"
+
+  return 1
+}
 
 {
   printf "software\tcommand\tstate\tpath\tversion_probe\n"
 
   check() {
-    name="$1"
-    cmd="$2"
-    version_cmd="${3:-$2 --version}"
+    local name="$1"
+    local cmd="$2"
+    local version_cmd="${3:-$2 --version}"
+    local path
+    local version_cmd_resolved
+    local probe_output
+    local probe_rc
+    local state
+    local version
 
-    if command -v "$cmd" >/dev/null 2>&1; then
-      path="$(command -v "$cmd")"
-      version="$(bash -lc "$version_cmd" 2>&1 | head -1 | tr '\t' ' ' || true)"
-      printf "%s\t%s\tFOUND\t%s\t%s\n" "$name" "$cmd" "$path" "$version"
+    if path="$(resolve_cmd "$cmd")"; then
+      if [[ "$version_cmd" == "$cmd"* ]]; then
+        version_cmd_resolved="${version_cmd/#$cmd/\"$path\"}"
+      else
+        version_cmd_resolved="$version_cmd"
+      fi
+
+      probe_rc=0
+
+      if probe_output="$(bash -lc "$version_cmd_resolved" 2>&1)"; then
+        state="FOUND_CALLABLE"
+      else
+        probe_rc=$?
+        state="FOUND_BROKEN"
+      fi
+
+      version="$(
+        printf '%s\n' "$probe_output" |
+        head -1 |
+        tr '\t' ' ' ||
+        true
+      )"
+
+      [ -n "$version" ] || version="NO_PROBE_OUTPUT"
+
+      printf "%s\t%s\t%s\t%s\t%s [rc=%s]\n" \
+        "$name" \
+        "$cmd" \
+        "$state" \
+        "$path" \
+        "$version" \
+        "$probe_rc"
     else
       printf "%s\t%s\tMISSING\t\t\n" "$name" "$cmd"
     fi
   }
 
+  check_subcommand() {
+    local name="$1"
+    local label="$2"
+    local probe="$3"
+    local base="${label%% *}"
+    local base_path
+    local probe_resolved
+    local probe_output
+    local probe_rc
+    local state
+    local version
+
+    if ! base_path="$(resolve_cmd "$base")"; then
+      printf "%s\t%s\tMISSING\t\t\n" "$name" "$label"
+      return
+    fi
+
+    probe_resolved="${probe/#$base/\"$base_path\"}"
+    probe_rc=0
+
+    if probe_output="$(bash -lc "$probe_resolved" 2>&1)"; then
+      state="FOUND_CALLABLE"
+    else
+      probe_rc=$?
+      state="FOUND_BROKEN"
+    fi
+
+    version="$(
+      printf '%s\n' "$probe_output" |
+      head -1 |
+      tr '\t' ' ' ||
+      true
+    )"
+
+    [ -n "$version" ] || version="NO_PROBE_OUTPUT"
+
+    printf "%s\t%s\t%s\t%s %s\t%s [rc=%s]\n" \
+      "$name" \
+      "$label" \
+      "$state" \
+      "$base_path" \
+      "${label#* }" \
+      "$version" \
+      "$probe_rc"
+  }
+
+  # Existing baseline
   check "Git" "git" "git --version"
   check "Hetzner CLI" "hcloud" "hcloud version"
   check "Node.js" "node" "node --version"
@@ -45,16 +224,40 @@ mkdir -p "$RUNTIME_DIR" "$VERIFY_DIR"
   check "Cloudflared" "cloudflared" "cloudflared --version"
   check "Hermes" "hermes" "hermes --help"
   check "Prometheus" "prometheus" "prometheus --version"
-  check "Grafana" "grafana-server" "grafana-server -v"
+  check "Grafana Legacy" "grafana-server" "grafana-server -v"
   check "Rust Cargo" "cargo" "cargo --version"
   check "Rust Compiler" "rustc" "rustc --version"
   check "rclone" "rclone" "rclone version"
-  check "Redis" "redis-server" "redis-server --version"
-  check "Postgres" "psql" "psql --version"
+  check "Redis Server" "redis-server" "redis-server --version"
+  check "Postgres Client" "psql" "psql --version"
   check "JuiceFS" "juicefs" "juicefs version"
   check "Fabric" "fabric" "fabric --version"
   check "jq" "jq" "jq --version"
   check "yq" "yq" "yq --version"
+
+  # Expansion locked from full scrape
+  check "GitHub CLI" "gh" "gh --version"
+  check "GitLab CLI" "glab" "glab --version"
+  check "npx" "npx" "npx --version"
+  check "Go" "go" "go version"
+  check_subcommand "Docker Compose" "docker compose" "docker compose version"
+  check "kubectl" "kubectl" "kubectl version --client=true"
+  check "helm" "helm" "helm version --short"
+  check "kind" "kind" "kind version"
+  check "RunPod CLI" "runpodctl" "runpodctl --version"
+  check "Wrangler" "wrangler" "wrangler --version"
+  check "Grafana New" "grafana" "grafana -v"
+  check "Redis CLI" "redis-cli" "redis-cli --version"
+  check "SQLite" "sqlite3" "sqlite3 --version"
+
+  # Deferred add-if-found, not required
+  check "pnpm" "pnpm" "pnpm --version"
+  check "yarn" "yarn" "yarn --version"
+  check "Bun" "bun" "bun --version"
+  check "Deno" "deno" "deno --version"
+  check "Docker Compose v1" "docker-compose" "docker-compose --version"
+  check "Postgres Server" "postgres" "postgres --version"
+
 } > "$OUT"
 
 SHA="$(sha256sum "$OUT" | awk '{print $1}')"
@@ -67,13 +270,24 @@ cat > "$STATUS" <<STATUS_EOF
 Timestamp UTC: $(date -u +%FT%TZ)
 Host: $HOST
 Authority Root: $AUTH
+AEXHD Root: $AEXHD
 Receipt: $(basename "$OUT")
 SHA256: $SHA
 
 Rule:
 Software is audited as callable capacity, not just package presence.
 Host executes. AEUSB carries. Host does not own.
+
+Expansion:
+Added gh, glab, npx, go, docker compose, kubectl, helm, kind, runpodctl, wrangler, grafana, redis-cli, sqlite3.
+Deferred pnpm, yarn, bun, deno, docker-compose, postgres unless future routing requires them.
 STATUS_EOF
+
+if [ -d "$AEXHD" ]; then
+  mkdir -p "$AEXHD_VERIFY_DIR" "$AEXHD_RUNTIME_DIR"
+  cp "$OUT" "$AEXHD_VERIFY_DIR/"
+  cp "$STATUS" "$AEXHD_STATUS"
+fi
 
 echo "=== AESOFT AUDIT ==="
 if command -v column >/dev/null 2>&1; then
