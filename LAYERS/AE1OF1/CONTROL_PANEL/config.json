@@ -1,0 +1,31 @@
+{
+  "component": "AE1OF1_CONTROL_PANEL",
+  "parent_layer": "AE1OF1",
+  "role": "operator_control_surface",
+  "authority": "operator_gated",
+  "execution_support": true,
+  "execution_authority": false,
+  "capabilities": [
+    "inspect_apt_package_state",
+    "inspect_aesoft_callable_capacity",
+    "submit_governed_metabolism",
+    "display_metabolism_status"
+  ],
+  "route": [
+    "AE1OF1_CONTROL_PANEL",
+    "AAE",
+    "AEBSTRACTION",
+    "UAER",
+    "AAER",
+    "EXECUTION",
+    "AERAG"
+  ],
+  "rules": [
+    "AE1OF1 interfaces but does not self-authorize.",
+    "APT package presence does not equal callable capacity.",
+    "AESOFT proves callable software capacity.",
+    "AAER gates execution.",
+    "AERAG records provenance and receipts.",
+    "No component creates a second body."
+  ]
+}

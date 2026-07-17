@@ -5,8 +5,20 @@
     "display system state",
     "translate system status",
     "surface operator readouts",
-    "support interface clarity"
+    "support interface clarity",
+    "provide operator-gated controls"
   ],
+  "components": {
+    "HUD": {
+      "role": "system readout and visualization surface",
+      "implementation": "LAYERS/AE1OF1/HUD"
+    },
+    "CONTROL_PANEL": {
+      "role": "operator-gated control surface",
+      "implementation": "LAYERS/AE1OF1/CONTROL_PANEL",
+      "execution_authority": "operator_gated"
+    }
+  },
   "execution_support": true,
   "endpoint_required": true,
   "execution_authority": "operator_gated"

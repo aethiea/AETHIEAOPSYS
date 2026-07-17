@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+# AE1OF1 Control Panel launcher.
+# Thin interface only; implementation remains inside LAYERS/AE1OF1.
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+SOURCE_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd -P)"
+COMPONENT_REL="LAYERS/AE1OF1/CONTROL_PANEL/bin/software-metabolize"
+
+if [ -x "$SOURCE_ROOT/$COMPONENT_REL" ]; then
+  exec "$SOURCE_ROOT/$COMPONENT_REL" "$@"
+fi
+
+valid_authority_body() {
+  local root="${1:-}"
+
+  [ -n "$root" ] || return 1
+  [ -d "$root" ] || return 1
+  [ -f "$root/.aeth_root" ] || return 1
+  [ -f "$root/STATUS.md" ] || return 1
+  [ ! -f "$root/.aeth_heavy_body" ] || return 1
+  [ ! -f "$root/AE320GB_HEAVY_BODY" ] || return 1
+}
+
+for root in \
+  "${AETHIEA_ROOT:-}" \
+  "${AETH_ROOT:-}" \
+  "${AETHIEA:-}" \
+  "${AETHIEAOPSYS:-}" \
+  /mnt/*/AETHIEAOPSYS
+do
+  if valid_authority_body "$root" &&
+     [ -x "$root/$COMPONENT_REL" ]; then
+    exec "$root/$COMPONENT_REL" "$@"
+  fi
+done
+
+echo "AE1OF1_ERROR=Control Panel implementation not found" >&2
+exit 1

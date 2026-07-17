@@ -1,0 +1,288 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+# AE1OF1 Control Panel software metabolism implementation
+#
+# AE1OF1 interfaces.
+# AÆ interprets.
+# UÆR routes.
+# AÆR gates.
+# AERAG records.
+#
+# This component does not duplicate the metabolism engine.
+
+valid_authority_body() {
+  local root="${1:-}"
+
+  [ -n "$root" ] || return 1
+  [ -d "$root" ] || return 1
+  [ -f "$root/.aeth_root" ] || return 1
+  [ -f "$root/STATUS.md" ] || return 1
+  [ ! -f "$root/.aeth_heavy_body" ] || return 1
+  [ ! -f "$root/AE320GB_HEAVY_BODY" ] || return 1
+}
+
+resolve_root() {
+  local candidate current
+
+  for candidate in \
+    "${AETHIEA_ROOT:-}" \
+    "${AETH_ROOT:-}" \
+    "${AETHIEA:-}" \
+    "${AETHIEAOPSYS:-}"
+  do
+    if valid_authority_body "$candidate"; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+  done
+
+  current="$PWD"
+
+  while [ "$current" != "/" ]; do
+    if valid_authority_body "$current"; then
+      printf '%s\n' "$current"
+      return 0
+    fi
+
+    current="$(dirname "$current")"
+  done
+
+  for candidate in /mnt/*/AETHIEAOPSYS; do
+    if valid_authority_body "$candidate"; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+  done
+
+  return 1
+}
+
+usage() {
+  cat <<'HELP'
+Usage:
+  ae1of1-metabolize apt PACKAGE [PACKAGE ...] [--dry-run|--apply]
+  ae1of1-metabolize aesoft [--dry-run|--apply]
+  ae1of1-metabolize all PACKAGE [PACKAGE ...] [--dry-run|--apply]
+  ae1of1-metabolize status
+
+Examples:
+  ae1of1-metabolize apt jq
+  ae1of1-metabolize apt jq curl --apply
+  ae1of1-metabolize aesoft
+  ae1of1-metabolize all jq --apply
+
+Meaning:
+  apt      Capture and metabolize APT/dpkg package state.
+  aesoft   Audit and metabolize callable software capacity.
+  all      Process both package state and AESOFT capacity.
+  status   Show metabolism job status.
+HELP
+}
+
+die() {
+  printf 'AE1OF1_ERROR=%s\n' "$*" >&2
+  exit 1
+}
+
+safe_name() {
+  printf '%s' "$1" |
+    tr '[:upper:]' '[:lower:]' |
+    tr -cs 'a-z0-9._+-' '-'
+}
+
+ROOT="$(resolve_root)" || die "authority corpus body not found"
+
+export AETHIEA_ROOT="$ROOT"
+export AETH_ROOT="$ROOT"
+export AETHIEA="$ROOT"
+export AETHIEAOPSYS="$ROOT"
+
+METABOLIZER="$ROOT/TOOLIO/bin/aether-metabolize"
+AESOFT_AUDIT="$ROOT/TOOLIO/bin/aesoft-audit"
+STAGING="$ROOT/TEMP/AE1OF1/CONTROL_PANEL/SOFTWARE"
+
+[ -x "$METABOLIZER" ] ||
+  die "metabolism engine is not executable: $METABOLIZER"
+
+mkdir -p "$STAGING"
+
+ACTION="${1:-}"
+[ -n "$ACTION" ] || {
+  usage
+  exit 2
+}
+shift || true
+
+MODE="dry-run"
+PACKAGES=()
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --dry-run)
+      MODE="dry-run"
+      shift
+      ;;
+    --apply)
+      MODE="apply"
+      shift
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    --)
+      shift
+      while [ "$#" -gt 0 ]; do
+        PACKAGES+=("$1")
+        shift
+      done
+      ;;
+    *)
+      PACKAGES+=("$1")
+      shift
+      ;;
+  esac
+done
+
+metabolize_inventory() {
+  local source="$1"
+  local source_kind="$2"
+  local mode_flag="--dry-run"
+
+  if [ "$MODE" = "apply" ]; then
+    mode_flag="--apply"
+  fi
+
+  printf '\n=== AE1OF1 METABOLISM ===\n'
+  printf 'SOURCE_KIND=%s\n' "$source_kind"
+  printf 'SOURCE=%s\n' "$source"
+  printf 'MODE=%s\n' "$MODE"
+
+  "$METABOLIZER" \
+    --root "$ROOT" \
+    --source "$source" \
+    --class inventory \
+    "$mode_flag"
+}
+
+capture_apt_inventory() {
+  local stamp host package safe output
+
+  [ "${#PACKAGES[@]}" -gt 0 ] ||
+    die "apt metabolism requires at least one package name"
+
+  stamp="$(date -u +%Y%m%dT%H%M%SZ)"
+  host="$(hostname 2>/dev/null || printf UNKNOWN)"
+  output="$STAGING/apt-package-inventory_${host}_${stamp}.txt"
+
+  {
+    printf 'SCHEMA=AE1OF1_APT_PACKAGE_INVENTORY_V1\n'
+    printf 'SOURCE_KIND=APT_PACKAGE\n'
+    printf 'TIMESTAMP_UTC=%s\n' "$stamp"
+    printf 'HOST=%s\n' "$host"
+    printf 'AUTHORITY_ROOT=%s\n' "$ROOT"
+    printf 'PACKAGE_COUNT=%s\n' "${#PACKAGES[@]}"
+    printf 'RULE=PACKAGE_PRESENCE_IS_NOT_CALLABLE_CAPACITY\n'
+    printf 'RULE=HOST_EXECUTES_AEUSB_AUTHORIZES_HOST_DOES_NOT_OWN\n'
+
+    for package in "${PACKAGES[@]}"; do
+      safe="$(safe_name "$package")"
+
+      printf '\n============================================================\n'
+      printf 'PACKAGE=%s\n' "$package"
+      printf 'SAFE_NAME=%s\n' "$safe"
+      printf '============================================================\n'
+
+      printf '\n--- DPKG STATUS ---\n'
+      dpkg-query \
+        -W \
+        -f='STATUS=${db:Status-Abbrev}\nPACKAGE=${binary:Package}\nVERSION=${Version}\nARCHITECTURE=${Architecture}\n' \
+        "$package" 2>&1 ||
+        printf 'DPKG_STATE=NOT_INSTALLED_OR_UNKNOWN\n'
+
+      printf '\n--- APT POLICY ---\n'
+      apt-cache policy "$package" 2>&1 || true
+
+      printf '\n--- APT PACKAGE RECORD ---\n'
+      apt-cache show "$package" 2>&1 |
+        sed -n '1,180p' || true
+
+      printf '\n--- INSTALLED FILE COMMAND CANDIDATES ---\n'
+      dpkg-query -L "$package" 2>/dev/null |
+        grep -E '/(s?bin)/[^/]+$' |
+        head -100 || true
+    done
+  } > "$output"
+
+  metabolize_inventory "$output" "APT_PACKAGE"
+}
+
+capture_aesoft_inventory() {
+  local stamp host output body rc audit
+
+  stamp="$(date -u +%Y%m%dT%H%M%SZ)"
+  host="$(hostname 2>/dev/null || printf UNKNOWN)"
+  output="$STAGING/aesoft-callable-capacity_${host}_${stamp}.txt"
+  body="$output.body"
+
+  if [ -x "$AESOFT_AUDIT" ]; then
+    audit="$AESOFT_AUDIT"
+  elif command -v aesoft-audit >/dev/null 2>&1; then
+    audit="$(command -v aesoft-audit)"
+  else
+    die "aesoft-audit command not found"
+  fi
+
+  set +e
+  "$audit" > "$body" 2>&1
+  rc=$?
+  set -e
+
+  {
+    printf 'SCHEMA=AE1OF1_AESOFT_CAPACITY_INVENTORY_V1\n'
+    printf 'SOURCE_KIND=AESOFT_CALLABLE_CAPACITY\n'
+    printf 'TIMESTAMP_UTC=%s\n' "$stamp"
+    printf 'HOST=%s\n' "$host"
+    printf 'AUTHORITY_ROOT=%s\n' "$ROOT"
+    printf 'AUDIT_COMMAND=%s\n' "$audit"
+    printf 'AUDIT_EXIT_CODE=%s\n' "$rc"
+    printf 'RULE=CALLABLE_CAPACITY_NOT_PACKAGE_PRESENCE\n'
+    printf 'RULE=HOST_EXECUTES_AEUSB_AUTHORIZES_HOST_DOES_NOT_OWN\n'
+    printf '\n--- AESOFT AUDIT OUTPUT ---\n'
+    cat "$body"
+  } > "$output"
+
+  rm -f "$body"
+
+  metabolize_inventory "$output" "AESOFT_CALLABLE_CAPACITY"
+}
+
+case "$ACTION" in
+  apt)
+    capture_apt_inventory
+    ;;
+  aesoft)
+    [ "${#PACKAGES[@]}" -eq 0 ] ||
+      die "aesoft does not accept package names"
+    capture_aesoft_inventory
+    ;;
+  all)
+    capture_apt_inventory
+    capture_aesoft_inventory
+    ;;
+  status)
+    [ "${#PACKAGES[@]}" -eq 0 ] ||
+      die "status does not accept additional arguments"
+
+    exec "$METABOLIZER" \
+      --root "$ROOT" \
+      --status
+    ;;
+  -h|--help|help)
+    usage
+    ;;
+  *)
+    die "unknown operation: $ACTION"
+    ;;
+esac
