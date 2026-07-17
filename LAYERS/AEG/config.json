@@ -1,0 +1,20 @@
+{
+  "canonical_name": "AEGNOSTIXXX",
+  "corpus_directory": "AETHIEAOPSYS",
+  "creates_authority": false,
+  "drive_letter_is_identity": false,
+  "duplicate_role_policy": "reject",
+  "label_roles": {
+    "AETHIEA128G": "AEUSB",
+    "AETHIEA320G": "AEXHD"
+  },
+  "markers": [
+    ".aeth_root",
+    ".aeth_role",
+    ".aeth_surface"
+  ],
+  "missing_required_role_policy": "reject",
+  "mount_path_is_identity": false,
+  "schema": "aethiea.aeg.config.v1",
+  "type": "foundational_identity_layer"
+}

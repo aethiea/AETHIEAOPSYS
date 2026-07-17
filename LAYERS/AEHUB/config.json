@@ -1,0 +1,14 @@
+{
+  "authority": false,
+  "cloudflare_mutation": false,
+  "components": [
+    "AEG",
+    "AEB",
+    "AEHUB",
+    "AEVPS"
+  ],
+  "public_exposure": false,
+  "schema": "aethiea.aehub.config.v1",
+  "status_filename": "aeg-aeb-aehub.json",
+  "type": "conduction_and_status_hub"
+}

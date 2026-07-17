@@ -1,0 +1,286 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REMOTE_HOST="aevps-001"
+COMPONENT="AEG-AEB-AEHUB"
+STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
+
+: "${AEUSB_ROOT:?AEUSB_ROOT must be exported by AEG}"
+: "${AEXHD_ROOT:?AEXHD_ROOT must be exported by AEG}"
+
+REPO="$AEUSB_ROOT/GITLAB/repos/AETHIEAOPSYS"
+ROUTE_CONFIG="$REPO/CONFIG/AECLOUD/aevps-001.route.json"
+
+[ -d "$REPO/.git" ] || {
+    echo "CANONICAL_REPO=NOT_FOUND"
+    exit 1
+}
+
+[ -f "$ROUTE_CONFIG" ] || {
+    echo "AECLOUD_ROUTE_CONFIG=NOT_FOUND"
+    exit 1
+}
+
+if [ -n "$(git -C "$REPO" status --porcelain)" ]; then
+    echo "CLEAN_SOURCE_GATE=FAIL"
+    git -C "$REPO" status --short
+    exit 1
+fi
+
+COMMIT="$(git -C "$REPO" rev-parse HEAD)"
+BRANCH="$(git -C "$REPO" branch --show-current)"
+
+STAGING="$AEXHD_ROOT/AECLOUD_HEAVY/AEVPS-001/STAGING/$STAMP"
+RELEASE_STORE="$AEXHD_ROOT/AECLOUD_HEAVY/AEVPS-001/RELEASES/$STAMP"
+RECEIPT="$AEUSB_ROOT/DATA/STATUS/AECLOUD/AEVPS-001/$STAMP"
+
+mkdir -p "$STAGING/payload" "$RELEASE_STORE" "$RECEIPT"
+
+PATHS=(
+    "LAYERS/AEG"
+    "LAYERS/AEB"
+    "LAYERS/AEHUB"
+    "SURFACES/AEVPS"
+    "CONFIG/AECLOUD/aevps-001.route.json"
+    "TOOLIO/bin/aecloud-route-aevps-001"
+)
+
+for relative in "${PATHS[@]}"; do
+    [ -e "$REPO/$relative" ] || {
+        echo "RELEASE_SOURCE_MISSING=$relative"
+        exit 1
+    }
+done
+
+(
+    cd "$REPO"
+    tar -cf - "${PATHS[@]}"
+) |
+tar -xf - -C "$STAGING/payload"
+
+cat > "$STAGING/payload/RELEASE.env" <<EOF
+SCHEMA=aethiea.aecloud.release.v1
+UTC=$STAMP
+COMPONENT=$COMPONENT
+SOURCE_BRANCH=$BRANCH
+SOURCE_COMMIT=$COMMIT
+AUTHORITY=false
+MIRROR_OF=AEUSB
+PUBLIC_EXPOSURE=false
+CLOUDFLARE_MUTATION=false
+EOF
+
+(
+    cd "$STAGING/payload"
+    find . \
+        -type f \
+        ! -name RELEASE-MANIFEST.sha256 \
+        -print0 |
+    sort -z |
+    xargs -0 sha256sum \
+        > RELEASE-MANIFEST.sha256
+)
+
+BUNDLE_NAME="${COMPONENT}-${COMMIT:0:12}-${STAMP}.tar.gz"
+BUNDLE="$STAGING/$BUNDLE_NAME"
+BUNDLE_SHA="$BUNDLE.sha256"
+
+tar \
+    --sort=name \
+    --mtime='UTC 1970-01-01' \
+    --owner=0 \
+    --group=0 \
+    --numeric-owner \
+    -czf "$BUNDLE" \
+    -C "$STAGING/payload" \
+    .
+
+( cd "$(dirname "$BUNDLE")"; sha256sum "$(basename "$BUNDLE")" > "$(basename "$BUNDLE_SHA")" )
+
+printf 'AECLOUD_ROUTE=SSH\n'
+printf 'REMOTE_HOST=%s\n' "$REMOTE_HOST"
+printf 'SOURCE_COMMIT=%s\n' "$COMMIT"
+printf 'BUNDLE=%s\n' "$BUNDLE"
+printf 'CLOUDFLARE_MUTATION=NONE\n'
+printf 'PUBLIC_EXPOSURE=NONE\n'
+
+scp -q "$BUNDLE" "$BUNDLE_SHA" "$REMOTE_HOST:/tmp/"
+
+REMOTE_LOG="$RECEIPT/remote-install.txt"
+
+ssh \
+    -o BatchMode=yes \
+    -o ConnectTimeout=12 \
+    "$REMOTE_HOST" \
+    "bash -s -- '$STAMP' '$COMMIT' '$BUNDLE_NAME'" \
+    > "$REMOTE_LOG" <<'REMOTE'
+set -euo pipefail
+
+STAMP="$1"
+COMMIT="$2"
+BUNDLE_NAME="$3"
+
+BUNDLE="/tmp/$BUNDLE_NAME"
+BUNDLE_SHA="$BUNDLE.sha256"
+RELEASE_ROOT="/opt/AETHIEAOPSYS/RELEASES/AEG-AEB-AEHUB/$STAMP"
+CURRENT_PARENT="/opt/AETHIEAOPSYS/CURRENT"
+CURRENT_LINK="$CURRENT_PARENT/AEG-AEB-AEHUB"
+HEAVY_ROOT="/srv/AETHIEAOPSYS_HEAVY/DATA"
+FOREST_ROOT="/srv/AETHIEAOPSYS_FOREST/SURFACES/AEVPS/AEVPS-001"
+STATUS_PATH="$HEAVY_ROOT/AEHUB/STATUS/aeg-aeb-aehub.json"
+
+if [ "$(id -u)" -eq 0 ]; then
+    SUDO=()
+else
+    command -v sudo >/dev/null || {
+        echo "REMOTE_SUDO=UNAVAILABLE"
+        exit 1
+    }
+    sudo -n true || {
+        echo "REMOTE_SUDO_NONINTERACTIVE=FAIL"
+        exit 1
+    }
+    SUDO=(sudo -n)
+fi
+
+[ -f "$BUNDLE" ] || {
+    echo "REMOTE_BUNDLE=ABSENT"
+    exit 1
+}
+
+[ -f "$BUNDLE_SHA" ] || {
+    echo "REMOTE_BUNDLE_SHA=ABSENT"
+    exit 1
+}
+
+(
+    cd /tmp
+    sha256sum -c "$(basename "$BUNDLE_SHA")"
+)
+
+"${SUDO[@]}" install -d -m 0755 \
+    "$RELEASE_ROOT" \
+    "$CURRENT_PARENT" \
+    "$HEAVY_ROOT/AEG/STATE" \
+    "$HEAVY_ROOT/AEG/RECEIPTS" \
+    "$HEAVY_ROOT/AEB/SOURCES" \
+    "$HEAVY_ROOT/AEB/DERIVED" \
+    "$HEAVY_ROOT/AEB/REJECTED" \
+    "$HEAVY_ROOT/AEB/RECEIPTS" \
+    "$HEAVY_ROOT/AEHUB/STATUS" \
+    "$HEAVY_ROOT/AEHUB/EVENTS" \
+    "$HEAVY_ROOT/AEHUB/RECEIPTS" \
+    "$FOREST_ROOT"
+
+if [ -e "$CURRENT_LINK" ] && [ ! -L "$CURRENT_LINK" ]; then
+    echo "CURRENT_LINK_COLLISION=$CURRENT_LINK"
+    exit 1
+fi
+
+"${SUDO[@]}" tar -xzf "$BUNDLE" -C "$RELEASE_ROOT"
+
+(
+    cd "$RELEASE_ROOT"
+    "${SUDO[@]}" sha256sum -c RELEASE-MANIFEST.sha256
+)
+
+"${SUDO[@]}" ln -sfn "$RELEASE_ROOT" "$CURRENT_LINK"
+
+TMP_IDENTITY="$(mktemp)"
+TMP_FOREST="$(mktemp)"
+trap 'rm -f "$TMP_IDENTITY" "$TMP_FOREST" "$BUNDLE" "$BUNDLE_SHA"' EXIT
+
+cat > "$TMP_IDENTITY" <<EOF
+{
+  "schema": "aethiea.heavy-runtime.v1",
+  "authority": false,
+  "mirror_of": "AEUSB",
+  "runtime_surface": "AEVPS-001",
+  "source_commit": "$COMMIT",
+  "release_root": "$RELEASE_ROOT",
+  "public_exposure": false
+}
+EOF
+
+cat > "$TMP_FOREST" <<EOF
+{
+  "schema": "aethiea.forest.surface.v1",
+  "surface": "AEVPS-001",
+  "authority": "AEUSB",
+  "heavy": "AEXHD",
+  "runtime": "AEVPS",
+  "release": "$RELEASE_ROOT",
+  "source_commit": "$COMMIT"
+}
+EOF
+
+"${SUDO[@]}" install -m 0644 \
+    "$TMP_IDENTITY" \
+    "$HEAVY_ROOT/AEHUB/RECEIPTS/runtime-identity.json"
+
+"${SUDO[@]}" install -m 0644 \
+    "$TMP_FOREST" \
+    "$FOREST_ROOT/runtime.json"
+
+"${SUDO[@]}" env \
+    AETHIEA_RELEASE_COMMIT="$COMMIT" \
+    python3 \
+    "$RELEASE_ROOT/LAYERS/AEHUB/status.py" \
+    --root "$RELEASE_ROOT" \
+    --output "$STATUS_PATH"
+
+echo "REMOTE_INSTALL=PASS"
+echo "REMOTE_RELEASE_ROOT=$RELEASE_ROOT"
+echo "REMOTE_CURRENT=$(readlink -f "$CURRENT_LINK")"
+echo "REMOTE_STATUS=$STATUS_PATH"
+echo "REMOTE_AUTHORITY=false"
+echo "REMOTE_PUBLIC_EXPOSURE=false"
+echo "REMOTE_CLOUDFLARE_MUTATION=false"
+REMOTE
+
+cat "$REMOTE_LOG"
+
+ssh \
+    -o BatchMode=yes \
+    -o ConnectTimeout=12 \
+    "$REMOTE_HOST" \
+    'cat /srv/AETHIEAOPSYS_HEAVY/DATA/AEHUB/STATUS/aeg-aeb-aehub.json' \
+    > "$RECEIPT/remote-status.json"
+
+mv "$BUNDLE" "$RELEASE_STORE/"
+mv "$BUNDLE_SHA" "$RELEASE_STORE/"
+cp "$STAGING/payload/RELEASE-MANIFEST.sha256" \
+   "$RELEASE_STORE/RELEASE-MANIFEST.sha256"
+
+cat > "$RECEIPT/receipt.env" <<EOF
+SCHEMA=aethiea.aecloud.route-receipt.v1
+UTC=$STAMP
+REMOTE_HOST=$REMOTE_HOST
+COMPONENT=$COMPONENT
+SOURCE_BRANCH=$BRANCH
+SOURCE_COMMIT=$COMMIT
+AEUSB_ROOT=$AEUSB_ROOT
+AEXHD_ROOT=$AEXHD_ROOT
+AEXHD_RELEASE_STORE=$RELEASE_STORE
+REMOTE_RELEASE_ROOT=/opt/AETHIEAOPSYS/RELEASES/AEG-AEB-AEHUB/$STAMP
+AECLOUD_ROUTE=SSH
+PUBLIC_EXPOSURE=false
+CLOUDFLARE_MUTATION=false
+ROUTE_STATE=PASS
+EOF
+
+find "$RECEIPT" \
+    -maxdepth 1 \
+    -type f \
+    ! -name SHA256SUMS \
+    -print0 |
+sort -z |
+xargs -0 sha256sum \
+    > "$RECEIPT/SHA256SUMS"
+
+rm -rf "$STAGING"
+
+echo "AECLOUD_AEVPS_ROUTE=PASS"
+echo "SOURCE_COMMIT=$COMMIT"
+echo "AEXHD_RELEASE_STORE=$RELEASE_STORE"
+echo "ROUTE_RECEIPT=$RECEIPT"

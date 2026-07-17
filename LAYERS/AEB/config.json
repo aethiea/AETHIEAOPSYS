@@ -1,0 +1,19 @@
+{
+  "autonomy_gate": "AÆR",
+  "canonical_name": "AEBSTRACTION",
+  "default_execution_authority": "none",
+  "default_promotion_state": "unpromoted",
+  "default_validation_state": "draft",
+  "provenance_organ": "AERAG",
+  "schema": "aethiea.aeb.config.v1",
+  "secret_default": "reject",
+  "source_preservation": true,
+  "stages": [
+    "conceptual",
+    "decontextualized",
+    "generalized",
+    "normalized",
+    "operationalized"
+  ],
+  "type": "governed_transformation_layer"
+}
