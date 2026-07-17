@@ -1,0 +1,22 @@
+{
+  "policy": "AEHUB_GITHUB_SSH_PERPETUAL",
+  "version": "1.0.0",
+  "provider": "github.com",
+  "transport": "ssh",
+  "canonical_prefix": "git@github.com:",
+  "rewrites": [
+    "https://github.com/",
+    "http://github.com/",
+    "git://github.com/"
+  ],
+  "mode": "self_healing_on_operator_wake",
+  "credential_mutation": false,
+  "key_rotation": false,
+  "arbitrary_shell_execution": false,
+  "rules": [
+    "AEHUB conducts the transport route but does not own the repository.",
+    "Existing SSH authority is used without interactive username or password prompts.",
+    "Repository-local config is not required for transport rewriting.",
+    "Host executes. AEUSB carries authority. Host does not own."
+  ]
+}
