@@ -77,6 +77,13 @@ def main() -> int:
         print(f"SOURCE_NOT_FOUND={source}", file=sys.stderr)
         return 2
 
+    if source == output:
+        print(
+            f"OUTPUT_ALIASES_SOURCE={output}",
+            file=sys.stderr,
+        )
+        return 3
+
     source_hash = sha256_file(source)
     record = {
         "schema": "aethiea.aeb.abstraction-record.v1",

@@ -8,13 +8,50 @@ STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
 : "${AEUSB_ROOT:?AEUSB_ROOT must be exported by AEG}"
 : "${AEXHD_ROOT:?AEXHD_ROOT must be exported by AEG}"
 
-REPO="$AEUSB_ROOT/GITLAB/repos/AETHIEAOPSYS"
-ROUTE_CONFIG="$REPO/CONFIG/AECLOUD/aevps-001.route.json"
+resolve_repo() {
+    local candidate
+    local candidate_real
+    local top
+    local top_real
 
-[ -d "$REPO/.git" ] || {
+    for candidate in \
+        "$AEUSB_ROOT" \
+        "$AEUSB_ROOT/GITLAB/repos/AETHIEAOPSYS"
+    do
+        [ -d "$candidate" ] || continue
+
+        top="$(
+            git -C "$candidate"                 rev-parse --show-toplevel                 2>/dev/null ||
+            true
+        )"
+
+        [ -n "$top" ] || continue
+
+        candidate_real="$(
+            readlink -f "$candidate"                 2>/dev/null ||
+            printf '%s' "$candidate"
+        )"
+
+        top_real="$(
+            readlink -f "$top"                 2>/dev/null ||
+            printf '%s' "$top"
+        )"
+
+        if [ "$candidate_real" = "$top_real" ]; then
+            printf '%s\n' "$candidate"
+            return 0
+        fi
+    done
+
+    return 1
+}
+
+REPO="$(resolve_repo)" || {
     echo "CANONICAL_REPO=NOT_FOUND"
     exit 1
 }
+
+ROUTE_CONFIG="$REPO/CONFIG/AECLOUD/aevps-001.route.json"
 
 [ -f "$ROUTE_CONFIG" ] || {
     echo "AECLOUD_ROUTE_CONFIG=NOT_FOUND"

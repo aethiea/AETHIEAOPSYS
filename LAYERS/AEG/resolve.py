@@ -62,21 +62,78 @@ ForEach-Object {
     return records
 
 
-def marker_role(corpus: Path) -> str | None:
-    marker = corpus / ".aeth_role"
-    if not marker.is_file():
+def read_marker(path: Path) -> str | None:
+    if not path.is_file():
         return None
 
     try:
-        value = marker.read_text(encoding="utf-8", errors="replace").strip()
+        return path.read_text(
+            encoding="utf-8",
+            errors="replace",
+        ).strip()
     except OSError:
         return None
 
-    upper = value.upper()
+
+def marker_role(corpus: Path) -> str | None:
+    root_marker = corpus / ".aeth_root"
+    role_marker = corpus / ".aeth_role"
+    surface_marker = corpus / ".aeth_surface"
+
+    if not (
+        root_marker.is_file()
+        and role_marker.is_file()
+        and surface_marker.is_file()
+    ):
+        return None
+
+    role_text = read_marker(role_marker)
+    surface_text = read_marker(surface_marker)
+
+    if role_text is None or surface_text is None:
+        return None
+
+    detected: set[str] = set()
+    surface_upper = surface_text.upper()
+    role_upper = role_text.upper()
+
+    if surface_upper in {"AEUSB", "AEXHD"}:
+        detected.add(surface_upper)
+
     for role in ("AEUSB", "AEXHD"):
-        if role in upper:
-            return role
-    return None
+        if role in role_upper:
+            detected.add(role)
+
+    if len(detected) != 1:
+        return None
+
+    return next(iter(detected))
+
+
+def corroborated_role(
+    corpus: Path,
+    label_role: str | None,
+) -> str | None:
+    role = marker_role(corpus)
+
+    if role is None:
+        return None
+
+    if label_role is not None and label_role != role:
+        return None
+
+    heavy_markers = (
+        corpus / ".aeth_heavy_body",
+        corpus / "AE320GB_HEAVY_BODY",
+    )
+
+    if role == "AEUSB" and any(
+        marker.exists()
+        for marker in heavy_markers
+    ):
+        return None
+
+    return role
 
 
 def resolve() -> dict[str, Any]:
@@ -93,7 +150,10 @@ def resolve() -> dict[str, Any]:
         if not corpus.is_dir():
             continue
 
-        role = labels.get(volume["label"]) or marker_role(corpus)
+        role = corroborated_role(
+            corpus,
+            labels.get(volume["label"]),
+        )
         if role not in {"AEUSB", "AEXHD"}:
             continue
 
