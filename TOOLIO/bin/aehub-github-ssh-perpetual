@@ -87,6 +87,8 @@ install_route() {
 
 check_rewrite() {
   local rewrites
+  local required
+  local missing=""
 
   rewrites="$(
     git config --global --get-all \
@@ -94,14 +96,25 @@ check_rewrite() {
     true
   )"
 
-  if printf '%s\n' "$rewrites" |
-     grep -Fxq "https://github.com/"; then
+  for required in \
+    "https://github.com/" \
+    "http://github.com/" \
+    "git://github.com/"
+  do
+    if ! printf '%s\n' "$rewrites" |
+         grep -Fxq "$required"; then
+      missing="${missing}${missing:+ }${required}"
+    fi
+  done
+
+  if [ -z "$missing" ]; then
     REWRITE_STATE="PASS"
   else
     REWRITE_STATE="FAIL"
   fi
 
   REWRITES="$rewrites"
+  MISSING_REWRITES="$missing"
 }
 
 check_ssh() {
@@ -143,6 +156,7 @@ REWRITE_STATE="NOT_CHECKED"
 SSH_AUTH_STATE="NOT_CHECKED"
 SSH_AUTH_MESSAGE="NOT_CHECKED"
 REWRITES=""
+MISSING_REWRITES=""
 
 case "$MODE" in
   install)
@@ -170,6 +184,7 @@ STATUS_FILE="$STATUS_DIR/GITHUB_SSH_TRANSPORT.status"
   printf 'TRANSPORT=SSH\n'
   printf 'CANONICAL_PREFIX=git@github.com:\n'
   printf 'REWRITE_STATE=%s\n' "$REWRITE_STATE"
+  printf 'MISSING_REWRITES=%s\n' "$MISSING_REWRITES"
   printf 'SSH_AUTH_STATE=%s\n' "$SSH_AUTH_STATE"
   printf 'SSH_AUTH_MESSAGE=%s\n' "$SSH_AUTH_MESSAGE"
   printf 'INTERACTIVE_LOGIN_REQUIRED=NO\n'

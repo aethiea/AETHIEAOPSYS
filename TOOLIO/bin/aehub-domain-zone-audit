@@ -25,6 +25,11 @@ def valid_root(path: Path) -> bool:
 def resolve_root() -> Path:
     candidates = []
 
+    # A marked checkout containing this executable is a valid
+    # portable deployment root and must be considered directly.
+    self_root = Path(__file__).resolve().parents[2]
+    candidates.append(self_root)
+
     try:
         result = subprocess.run(
             ["aeusb-root"],
@@ -137,11 +142,33 @@ def main() -> int:
     args = parser.parse_args()
 
     root = resolve_root()
-    repo = root / "GITLAB/repos/AETHIEAOPSYS"
-    policy_file = repo / "CONFIG/network/domain-zone-boundary.json"
 
-    if not policy_file.is_file():
-        print("AEHUB_DOMAIN_ERROR=policy not found", file=sys.stderr)
+    direct_repo = root
+    nested_repo = root / "GITLAB/repos/AETHIEAOPSYS"
+
+    direct_policy = (
+        direct_repo
+        / "CONFIG/network/domain-zone-boundary.json"
+    )
+    nested_policy = (
+        nested_repo
+        / "CONFIG/network/domain-zone-boundary.json"
+    )
+
+    if direct_policy.is_file():
+        repo = direct_repo
+        policy_file = direct_policy
+        repository_layout = "CHECKOUT_ROOT"
+    elif nested_policy.is_file():
+        repo = nested_repo
+        policy_file = nested_policy
+        repository_layout = "NESTED_AUTHORITY_ROOT"
+    else:
+        print(
+            "AEHUB_DOMAIN_ERROR=policy not found "
+            f"checked={direct_policy},{nested_policy}",
+            file=sys.stderr,
+        )
         return 1
 
     policy = json.loads(policy_file.read_text(encoding="utf-8"))
@@ -218,11 +245,39 @@ def main() -> int:
             for host in hostname_pattern.findall(node):
                 yield path_parts, host
 
-    for relative in policy.get("active_route_sources", []):
+    active_route_sources = policy.get(
+        "active_route_sources",
+        [],
+    )
+
+    inspected_active_sources = 0
+
+    if not isinstance(active_route_sources, list):
+        configuration_errors.append(
+            "ACTIVE_ROUTE_SOURCES_NOT_LIST"
+        )
+        active_route_sources = []
+    elif not active_route_sources:
+        configuration_errors.append(
+            "ACTIVE_ROUTE_SOURCES_EMPTY"
+        )
+
+    for relative in active_route_sources:
+        if not isinstance(relative, str) or not relative.strip():
+            configuration_errors.append(
+                "ACTIVE_ROUTE_SOURCE_INVALID_ENTRY"
+            )
+            continue
+
         source = repo / relative
 
         if not source.is_file():
+            configuration_errors.append(
+                f"ACTIVE_SOURCE_MISSING:{relative}"
+            )
             continue
+
+        inspected_active_sources += 1
 
         try:
             source_data = json.loads(
@@ -252,6 +307,14 @@ def main() -> int:
                     f"{relative}:{json_path}:{normalized}"
                 )
 
+    if inspected_active_sources == 0:
+        configuration_errors.append(
+            "ACTIVE_ROUTE_SOURCES_NONE_INSPECTED"
+        )
+
+    configuration_errors = sorted(
+        set(configuration_errors)
+    )
     active_hits = sorted(set(active_hits))
 
     boundary_state = (
@@ -301,7 +364,15 @@ def main() -> int:
         "timestamp_utc": timestamp_iso,
         "host": socket.gethostname(),
         "authority_root": str(root),
+        "repository": str(repo),
+        "repository_layout": repository_layout,
         "policy": str(policy_file),
+        "active_route_sources_declared": len(
+            active_route_sources
+        ),
+        "active_route_sources_inspected": (
+            inspected_active_sources
+        ),
         "policy_sha256": policy_hash,
         "thematriculation_cc": "VALID_SEPARATE_PUBLIC_CORPUS_ZONE",
         "aethiea_net": "VALID_SEPARATE_INFRASTRUCTURE_ZONE",
