@@ -239,6 +239,28 @@ capture_aesoft_inventory() {
   rc=$?
   set -e
 
+  if [ "$rc" -ne 0 ]; then
+    {
+      printf 'SCHEMA=AE1OF1_AESOFT_AUDIT_FAILURE_V1\n'
+      printf 'SOURCE_KIND=AESOFT_AUDIT_FAILURE\n'
+      printf 'TIMESTAMP_UTC=%s\n' "$stamp"
+      printf 'HOST=%s\n' "$host"
+      printf 'AUTHORITY_ROOT=%s\n' "$ROOT"
+      printf 'AUDIT_COMMAND=%s\n' "$audit"
+      printf 'AUDIT_EXIT_CODE=%s\n' "$rc"
+      printf 'STATE=REJECTED\n'
+      printf 'RULE=FAILED_AUDIT_MUST_NOT_BECOME_CAPACITY_INVENTORY\n'
+      printf '\n--- AESOFT AUDIT ERROR OUTPUT ---\n'
+      cat "$body"
+    } > "$output"
+
+    rm -f "$body"
+
+    printf 'AE1OF1_ERROR=AESOFT audit failed with exit code %s\n' "$rc" >&2
+    printf 'FAILURE_RECORD=%s\n' "$output" >&2
+    return "$rc"
+  fi
+
   {
     printf 'SCHEMA=AE1OF1_AESOFT_CAPACITY_INVENTORY_V1\n'
     printf 'SOURCE_KIND=AESOFT_CALLABLE_CAPACITY\n'
