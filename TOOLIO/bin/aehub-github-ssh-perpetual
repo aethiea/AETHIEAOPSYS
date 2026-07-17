@@ -1,0 +1,190 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+MODE="install"
+QUIET=0
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --install)
+      MODE="install"
+      ;;
+    --install-only)
+      MODE="install-only"
+      ;;
+    --check)
+      MODE="check"
+      ;;
+    --quiet)
+      QUIET=1
+      ;;
+    -h|--help)
+      cat <<'HELP'
+Usage:
+  aehub-github-ssh-perpetual --install
+  aehub-github-ssh-perpetual --install-only
+  aehub-github-ssh-perpetual --check
+
+Modes:
+  --install       Apply persistent rewrite and test SSH authority.
+  --install-only  Apply persistent rewrite without network testing.
+  --check         Verify rewrite and SSH authority without mutation.
+HELP
+      exit 0
+      ;;
+    *)
+      printf 'AEHUB_GIT_ERROR=unknown argument: %s\n' "$1" >&2
+      exit 2
+      ;;
+  esac
+  shift
+done
+
+resolve_root() {
+  local root candidate
+
+  root="$(aeusb-root 2>/dev/null || true)"
+
+  if [ -n "$root" ] && [ -d "$root" ]; then
+    printf '%s\n' "$root"
+    return 0
+  fi
+
+  for candidate in \
+    "${AETHIEA_ROOT:-}" \
+    "${AETH_ROOT:-}" \
+    "${AETHIEA:-}" \
+    "${AETHIEAOPSYS:-}" \
+    /mnt/*/AETHIEAOPSYS
+  do
+    [ -n "$candidate" ] || continue
+    [ -d "$candidate" ] || continue
+    [ -f "$candidate/.aeth_root" ] || continue
+    [ -f "$candidate/STATUS.md" ] || continue
+    [ ! -f "$candidate/.aeth_heavy_body" ] || continue
+    [ ! -f "$candidate/AE320GB_HEAVY_BODY" ] || continue
+
+    printf '%s\n' "$candidate"
+    return 0
+  done
+
+  return 1
+}
+
+install_route() {
+  git config --global --replace-all \
+    url."git@github.com:".insteadOf \
+    "https://github.com/"
+
+  git config --global --add \
+    url."git@github.com:".insteadOf \
+    "http://github.com/"
+
+  git config --global --add \
+    url."git@github.com:".insteadOf \
+    "git://github.com/"
+}
+
+check_rewrite() {
+  local rewrites
+
+  rewrites="$(
+    git config --global --get-all \
+      url."git@github.com:".insteadOf 2>/dev/null ||
+    true
+  )"
+
+  if printf '%s\n' "$rewrites" |
+     grep -Fxq "https://github.com/"; then
+    REWRITE_STATE="PASS"
+  else
+    REWRITE_STATE="FAIL"
+  fi
+
+  REWRITES="$rewrites"
+}
+
+check_ssh() {
+  local output
+
+  output="$(
+    ssh \
+      -o BatchMode=yes \
+      -o ConnectTimeout=8 \
+      -T git@github.com 2>&1 ||
+    true
+  )"
+
+  if printf '%s\n' "$output" |
+     grep -qi "successfully authenticated"; then
+    SSH_AUTH_STATE="PASS"
+  else
+    SSH_AUTH_STATE="FAIL"
+  fi
+
+  SSH_AUTH_MESSAGE="$(
+    printf '%s\n' "$output" |
+      head -1 |
+      tr '\t\r\n' '   '
+  )"
+}
+
+ROOT="$(resolve_root 2>/dev/null || true)"
+
+if [ -n "$ROOT" ]; then
+  STATUS_DIR="$ROOT/DATA/STATUS/AEHUB"
+else
+  STATUS_DIR="$HOME/.local/state/aethiea/AEHUB"
+fi
+
+mkdir -p "$STATUS_DIR"
+
+REWRITE_STATE="NOT_CHECKED"
+SSH_AUTH_STATE="NOT_CHECKED"
+SSH_AUTH_MESSAGE="NOT_CHECKED"
+REWRITES=""
+
+case "$MODE" in
+  install)
+    install_route
+    check_rewrite
+    check_ssh
+    ;;
+  install-only)
+    install_route
+    check_rewrite
+    ;;
+  check)
+    check_rewrite
+    check_ssh
+    ;;
+esac
+
+STATUS_FILE="$STATUS_DIR/GITHUB_SSH_TRANSPORT.status"
+
+{
+  printf 'SCHEMA=AEHUB_GITHUB_SSH_PERPETUAL_V1\n'
+  printf 'TIMESTAMP_UTC=%s\n' "$(date -u +%FT%TZ)"
+  printf 'HOST=%s\n' "$(hostname 2>/dev/null || printf UNKNOWN)"
+  printf 'MODE=%s\n' "$MODE"
+  printf 'TRANSPORT=SSH\n'
+  printf 'CANONICAL_PREFIX=git@github.com:\n'
+  printf 'REWRITE_STATE=%s\n' "$REWRITE_STATE"
+  printf 'SSH_AUTH_STATE=%s\n' "$SSH_AUTH_STATE"
+  printf 'SSH_AUTH_MESSAGE=%s\n' "$SSH_AUTH_MESSAGE"
+  printf 'INTERACTIVE_LOGIN_REQUIRED=NO\n'
+  printf 'CREDENTIAL_MUTATION=NO\n'
+  printf 'KEY_ROTATION=NO\n'
+  printf 'AEHUB_RULE=CONDUCTS_NOT_BODY\n'
+  printf '\nREWRITES\n%s\n' "$REWRITES"
+} > "$STATUS_FILE"
+
+if [ "$QUIET" -eq 0 ]; then
+  cat "$STATUS_FILE"
+fi
+
+[ "$REWRITE_STATE" = "PASS" ] || exit 1
+
+if [ "$MODE" != "install-only" ]; then
+  [ "$SSH_AUTH_STATE" = "PASS" ] || exit 1
+fi

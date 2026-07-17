@@ -1,0 +1,351 @@
+#!/usr/bin/env python3
+import argparse
+import datetime as dt
+import hashlib
+import json
+import os
+import re
+import shutil
+import socket
+import subprocess
+import sys
+from pathlib import Path
+
+
+def valid_root(path: Path) -> bool:
+    return (
+        path.is_dir()
+        and (path / ".aeth_root").is_file()
+        and (path / "STATUS.md").is_file()
+        and not (path / ".aeth_heavy_body").exists()
+        and not (path / "AE320GB_HEAVY_BODY").exists()
+    )
+
+
+def resolve_root() -> Path:
+    candidates = []
+
+    try:
+        result = subprocess.run(
+            ["aeusb-root"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+            check=False,
+        )
+        if result.stdout.strip():
+            candidates.append(Path(result.stdout.strip()))
+    except (OSError, subprocess.SubprocessError):
+        pass
+
+    for name in (
+        "AETHIEA_ROOT",
+        "AETH_ROOT",
+        "AETHIEA",
+        "AETHIEAOPSYS",
+    ):
+        value = os.environ.get(name)
+        if value:
+            candidates.append(Path(value))
+
+    candidates.extend(Path("/mnt").glob("*/AETHIEAOPSYS"))
+
+    seen = set()
+
+    for candidate in candidates:
+        key = str(candidate)
+
+        if key in seen:
+            continue
+
+        seen.add(key)
+
+        if valid_root(candidate):
+            return candidate
+
+    raise RuntimeError("authority corpus body not found")
+
+
+def dns_state(host: str) -> str:
+    try:
+        socket.getaddrinfo(host, None)
+        return "RESOLVED"
+    except socket.gaierror:
+        return "UNRESOLVED"
+    except OSError:
+        return "ERROR"
+
+
+def https_state(host: str) -> str:
+    curl = shutil.which("curl")
+
+    if not curl:
+        return "NOT_CHECKED"
+
+    try:
+        result = subprocess.run(
+            [
+                curl,
+                "--silent",
+                "--show-error",
+                "--location",
+                "--output",
+                "/dev/null",
+                "--write-out",
+                "%{http_code}",
+                "--connect-timeout",
+                "5",
+                "--max-time",
+                "12",
+                f"https://{host}",
+            ],
+            capture_output=True,
+            text=True,
+            timeout=15,
+            check=False,
+        )
+
+        code = result.stdout.strip()
+
+        if re.fullmatch(r"\d{3}", code):
+            return code
+
+        return "000"
+    except (OSError, subprocess.SubprocessError):
+        return "000"
+
+
+def flatten_routes(zone: dict) -> list[tuple[str, str]]:
+    routes = zone.get("routes", [])
+    flattened = []
+
+    if isinstance(routes, list):
+        flattened.extend(("declared", host) for host in routes)
+    elif isinstance(routes, dict):
+        for category, hosts in routes.items():
+            flattened.extend((category, host) for host in hosts)
+
+    return flattened
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(
+        description="Audit the independent thematriculation.cc and aethiea.net zones."
+    )
+    parser.add_argument("--check", action="store_true")
+    parser.add_argument("--quiet", action="store_true")
+    args = parser.parse_args()
+
+    root = resolve_root()
+    repo = root / "GITLAB/repos/AETHIEAOPSYS"
+    policy_file = repo / "CONFIG/network/domain-zone-boundary.json"
+
+    if not policy_file.is_file():
+        print("AEHUB_DOMAIN_ERROR=policy not found", file=sys.stderr)
+        return 1
+
+    policy = json.loads(policy_file.read_text(encoding="utf-8"))
+    zones = policy.get("zones", {})
+
+    public_zone = zones.get("thematriculation.cc", {})
+    infra_zone = zones.get("aethiea.net", {})
+
+    configuration_errors = []
+
+    if public_zone.get("valid") is not True:
+        configuration_errors.append("THEMATRICULATION_CC_NOT_VALID")
+
+    if infra_zone.get("valid") is not True:
+        configuration_errors.append("AETHIEA_NET_NOT_VALID")
+
+    active_hits = []
+    hostname_pattern = re.compile(
+        r"(?<![A-Za-z0-9-])"
+        r"(?:[A-Za-z0-9-]+\.)+[A-Za-z]{2,}"
+        r"(?![A-Za-z0-9-])"
+    )
+
+    inactive_context_terms = (
+        "deny",
+        "denied",
+        "forbid",
+        "forbidden",
+        "not_zone",
+        "rule",
+        "warning",
+        "note",
+        "historical",
+        "repair",
+        "evidence",
+        "example",
+        "conflict",
+        "previous",
+    )
+
+    def inactive_context(path_parts):
+        for part in path_parts:
+            lowered = str(part).lower()
+
+            if any(term in lowered for term in inactive_context_terms):
+                return True
+
+        return False
+
+    def active_hostnames(node, path_parts=()):
+        if inactive_context(path_parts):
+            return
+
+        if isinstance(node, dict):
+            for key, value in node.items():
+                next_path = path_parts + (str(key),)
+
+                if inactive_context(next_path):
+                    continue
+
+                for host in hostname_pattern.findall(str(key)):
+                    yield next_path, host
+
+                yield from active_hostnames(value, next_path)
+
+        elif isinstance(node, list):
+            for index, value in enumerate(node):
+                yield from active_hostnames(
+                    value,
+                    path_parts + (str(index),),
+                )
+
+        elif isinstance(node, str):
+            for host in hostname_pattern.findall(node):
+                yield path_parts, host
+
+    for relative in policy.get("active_route_sources", []):
+        source = repo / relative
+
+        if not source.is_file():
+            continue
+
+        try:
+            source_data = json.loads(
+                source.read_text(
+                    encoding="utf-8",
+                    errors="replace",
+                )
+            )
+        except json.JSONDecodeError as exc:
+            configuration_errors.append(
+                f"ACTIVE_SOURCE_JSON_INVALID:{relative}:{exc.lineno}"
+            )
+            continue
+
+        for path_parts, host in active_hostnames(source_data):
+            normalized = host.lower().rstrip(".")
+
+            if (
+                normalized == "aethiea.net.thematriculation.cc"
+                or normalized.endswith(
+                    ".aethiea.net.thematriculation.cc"
+                )
+            ):
+                json_path = ".".join(path_parts)
+
+                active_hits.append(
+                    f"{relative}:{json_path}:{normalized}"
+                )
+
+    active_hits = sorted(set(active_hits))
+
+    boundary_state = (
+        "PASS"
+        if not configuration_errors and not active_hits
+        else "FAIL"
+    )
+
+    observations = []
+
+    for zone_name, zone in (
+        ("thematriculation.cc", public_zone),
+        ("aethiea.net", infra_zone),
+    ):
+        for category, host in flatten_routes(zone):
+            protocol = "SSH" if category == "bounded_authorized_routes" else "HTTPS"
+
+            observations.append(
+                {
+                    "zone": zone_name,
+                    "category": category,
+                    "host": host,
+                    "dns": dns_state(host),
+                    "protocol": protocol,
+                    "service": (
+                        "NOT_HTTP_ROUTE"
+                        if protocol == "SSH"
+                        else https_state(host)
+                    ),
+                }
+            )
+
+    timestamp = dt.datetime.now(dt.timezone.utc)
+    timestamp_iso = timestamp.strftime("%Y-%m-%dT%H:%M:%SZ")
+    timestamp_compact = timestamp.strftime("%Y%m%dT%H%M%SZ")
+
+    status_dir = root / "DATA/STATUS/AEHUB"
+    receipt_dir = root / "DATA/STATUS/receipts"
+
+    status_dir.mkdir(parents=True, exist_ok=True)
+    receipt_dir.mkdir(parents=True, exist_ok=True)
+
+    policy_hash = hashlib.sha256(policy_file.read_bytes()).hexdigest()
+
+    record = {
+        "schema": "AEHUB_DOMAIN_ZONE_BOUNDARY_V1",
+        "timestamp_utc": timestamp_iso,
+        "host": socket.gethostname(),
+        "authority_root": str(root),
+        "policy": str(policy_file),
+        "policy_sha256": policy_hash,
+        "thematriculation_cc": "VALID_SEPARATE_PUBLIC_CORPUS_ZONE",
+        "aethiea_net": "VALID_SEPARATE_INFRASTRUCTURE_ZONE",
+        "boundary_state": boundary_state,
+        "configuration_errors": configuration_errors,
+        "active_mixed_zone_hits": active_hits,
+        "liveness_observation_only": True,
+        "mutations": {
+            "dns": False,
+            "cloudflare": False,
+            "tunnels": False,
+            "credentials": False,
+            "certificates": False,
+            "keys": False,
+        },
+        "observations": observations,
+        "doctrine": [
+            "Separation with coordination.",
+            "Symbiosis, not assimilation.",
+            "DON'T MINGLE.",
+        ],
+    }
+
+    rendered = json.dumps(
+        record,
+        indent=2,
+        ensure_ascii=False,
+    ) + "\n"
+
+    status_file = status_dir / "DOMAIN_ZONE_BOUNDARY.status.json"
+    receipt_file = (
+        receipt_dir
+        / f"domain_zone_boundary_{timestamp_compact}.receipt.json"
+    )
+
+    status_file.write_text(rendered, encoding="utf-8")
+    receipt_file.write_text(rendered, encoding="utf-8")
+
+    if not args.quiet:
+        print(rendered, end="")
+        print(f"RECEIPT={receipt_file}")
+
+    return 0 if boundary_state == "PASS" else 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())
