@@ -1,6 +1,6 @@
 {
   "policy": "AEHUB_DOMAIN_ZONE_BOUNDARY",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "mode": "PERPETUAL_NONBLOCKING_AUDIT",
   "mutations": {
     "dns": false,
@@ -70,12 +70,19 @@
     "CONFIG/network/aethiea-net-hub-dns.json",
     "CONFIG/network/cloudflare-door-normalization-v1.json",
     "LAYERS/AENET/CONFIG/cloudflare_routes.json",
-    "LAYERS/AENET/CLOUDFLARE/WORKERS/aethernet/worker_route.json"
+    "LAYERS/AENET/CLOUDFLARE/WORKERS/aethernet/worker_route.json",
+    "CONFIG/network/aevps-cloudflared-route-truth.json"
   ],
   "route_detection": {
     "mode": "STRUCTURED_JSON_OPERATIONAL_CONTEXT",
     "prose_and_denial_context_excluded": true,
     "historical_repair_evidence_excluded": true,
     "active_mixed_suffix_routes_fail_boundary": true
+  },
+  "aevps_runtime_route_observation": {
+    "current_observation_map": "CONFIG/network/aevps-cloudflared-route-truth.json",
+    "route_authority_surface": "AEUSB",
+    "executor_surface": "AEVPS",
+    "live_tunnel_is_distinct_from_rubiii_route_records": true
   }
 }

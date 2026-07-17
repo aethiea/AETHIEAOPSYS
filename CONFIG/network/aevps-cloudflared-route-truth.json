@@ -1,0 +1,85 @@
+{
+  "system": "AETHIEAOPSYS",
+  "map": "AEVPS_CLOUDFLARED_ROUTE_TRUTH",
+  "version": "1.0.0",
+  "observed_utc": "2026-07-17T06:43:55Z",
+  "observation_source": "READ_ONLY_REMOTE_AUDIT",
+  "executor": {
+    "surface": "AEVPS",
+    "host": "aevps-001",
+    "role": "REMOTE_PERSISTENCE_AND_ROUTE_EXECUTOR",
+    "owns_corpus": false
+  },
+  "network": {
+    "ipv4": "5.161.63.237",
+    "ipv6": "2a01:4ff:f4:4e2e::1",
+    "public_origin_exposure": false,
+    "origin_bind": "127.0.0.1"
+  },
+  "cloudflared": {
+    "service": "aethiea-cloudflared.service",
+    "active": true,
+    "enabled": true,
+    "mode": "CONFIG_MODE",
+    "config": "/etc/cloudflared/config.yml",
+    "tunnel_id": "8b52d381-a5e5-464a-a5cf-67951b475be0",
+    "fallback": "http_status:404"
+  },
+  "ingress": {
+    "hub.aethiea.net": "http://127.0.0.1:3910",
+    "status.aethiea.net": "http://127.0.0.1:3910",
+    "api.aethiea.net": "http://127.0.0.1:3910",
+    "aenet.aethiea.net": "http://127.0.0.1:3910",
+    "aethernet.aethiea.net": "http://127.0.0.1:3910",
+    "aevps.aethiea.net": "http://127.0.0.1:3910",
+    "scrapegpt.aethiea.net": "http://127.0.0.1:3925",
+    "vrag.aethiea.net": "http://127.0.0.1:3935",
+    "aethvnas.aethiea.net": "http://127.0.0.1:3940"
+  },
+  "origin_health": {
+    "3910_AEHUB_AENET": 200,
+    "3925_SCRAPEGPT": 200,
+    "3935_VRAG": 200,
+    "3940_AETHVNAS": 200
+  },
+  "public_edge_health": {
+    "hub.aethiea.net": 200,
+    "status.aethiea.net": 200,
+    "api.aethiea.net": 200,
+    "aenet.aethiea.net": 200,
+    "aethernet.aethiea.net": 200,
+    "aevps.aethiea.net": 200,
+    "scrapegpt.aethiea.net": 200,
+    "vrag.aethiea.net": 200,
+    "aethvnas.aethiea.net": 200
+  },
+  "separate_zone_boundary": {
+    "zone": "aethiea.net",
+    "thematriculation_cc_ingress_present": false,
+    "commingled": false
+  },
+  "supersedes_as_current_aevps_observation": [
+    {
+      "source": "CONFIG/network/aethiea-net-hub-dns.json",
+      "stale_value": "aevps.aethiea.net -> 3935",
+      "current_value": "aevps.aethiea.net -> 3910"
+    },
+    {
+      "source": "CONFIG/network/cloudflare-door-normalization-v1.json",
+      "stale_scope": "RUBIII/older tunnel observation",
+      "current_aevps_tunnel": "8b52d381-a5e5-464a-a5cf-67951b475be0"
+    }
+  ],
+  "invariants": [
+    "AEUSB retains route authority.",
+    "AEVPS executes and persists but does not own the corpus.",
+    "Cloudflare routes but does not become the body.",
+    "thematriculation.cc and aethiea.net remain separate zones.",
+    "DON'T MINGLE."
+  ],
+  "authority": {
+    "surface": "AEUSB",
+    "role": "ROUTE_AUTHORITY"
+  },
+  "runtime_truth_scope": "AEVPS_EXECUTION_OBSERVATION"
+}
