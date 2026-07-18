@@ -6,27 +6,19 @@ AUTH="$(aeusb-root)" || {
   exit 1
 }
 
-AEG_RESOLVER="$AUTH/LAYERS/AEG/resolve.py"
+AEG_SESSION_LIB="$AUTH/TOOLIO/lib/aeg-session.sh"
 
-[ -f "$AEG_RESOLVER" ] || {
-  echo "HUSH_AE: AEG resolver missing: $AEG_RESOLVER" >&2
+[ -f "$AEG_SESSION_LIB" ] || {
+  echo "HUSH_AE: AEG session loader missing: $AEG_SESSION_LIB" >&2
   exit 1
 }
 
 # shellcheck disable=SC1090
-source <(
-  python3 "$AEG_RESOLVER" --exports |
-  awk '
-    /^export (AEUSB_ROOT|AEXHD_ROOT|AEGNOSTIXXX_RESOLUTION)=/ {
-      print
-    }
-  '
-)
+source "$AEG_SESSION_LIB"
 
-[ "${AEGNOSTIXXX_RESOLUTION:-}" = "PASS" ] || {
-  echo "HUSH_AE: AEGNOSTIXXX resolution failed" >&2
-  exit 1
-}
+aeg_load_session \
+  "$AUTH/LAYERS/AEG/resolve.py" \
+  "HUSH_AE" || exit 1
 
 HUSH_ROOT="$AEXHD_ROOT/DATA/MEMORY/HUSH"
 VAULT="$HUSH_ROOT/vault"

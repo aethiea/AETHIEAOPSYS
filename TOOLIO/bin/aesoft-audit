@@ -17,27 +17,19 @@ AUTH="$(aeusb-root)" || {
   exit 1
 }
 
-AEG_RESOLVER="$AUTH/LAYERS/AEG/resolve.py"
+AEG_SESSION_LIB="$AUTH/TOOLIO/lib/aeg-session.sh"
 
-[ -f "$AEG_RESOLVER" ] || {
-  echo "AESOFT_AUDIT: AEG resolver missing: $AEG_RESOLVER" >&2
+[ -f "$AEG_SESSION_LIB" ] || {
+  echo "AESOFT_AUDIT: AEG session loader missing: $AEG_SESSION_LIB" >&2
   exit 1
 }
 
 # shellcheck disable=SC1090
-source <(
-  python3 "$AEG_RESOLVER" --exports |
-  awk '
-    /^export (AEUSB_ROOT|AEXHD_ROOT|AEGNOSTIXXX_RESOLUTION)=/ {
-      print
-    }
-  '
-)
+source "$AEG_SESSION_LIB"
 
-[ "${AEGNOSTIXXX_RESOLUTION:-}" = "PASS" ] || {
-  echo "AESOFT_AUDIT: AEGNOSTIXXX resolution failed" >&2
-  exit 1
-}
+aeg_load_session \
+  "$AUTH/LAYERS/AEG/resolve.py" \
+  "AESOFT_AUDIT" || exit 1
 
 [ -n "${AEUSB_ROOT:-}" ] || {
   echo "AESOFT_AUDIT: resolved AEUSB root is empty" >&2
