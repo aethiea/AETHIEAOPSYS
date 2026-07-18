@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-ROOT="${AETHIEA_ROOT:-/mnt/j/AETHIEAOPSYS}"
+ROOT="$(aeusb-root)" || {
+  echo "AETHER_METABOLISM_STATUS: AEUSB authority root not found" >&2
+  exit 1
+}
+
 exec "$ROOT/TOOLIO/bin/aether-metabolize" \
   --root "$ROOT" \
   --status

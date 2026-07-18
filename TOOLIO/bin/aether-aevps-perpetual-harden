@@ -1,0 +1,537 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+MODE="${1:---ensure}"
+AEVPS="${AEVPS_HOST:-aevps-001}"
+
+resolve_root() {
+    local script_dir root
+
+    script_dir="$(
+        cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &&
+        pwd -P
+    )"
+
+    root="$(
+        cd -- "$script_dir/../.." &&
+        pwd -P
+    )"
+
+    [ -f "$root/.aeth_root" ] || return 1
+
+    [ "$(cat "$root/.aeth_surface" 2>/dev/null)" = "AEUSB" ] ||
+        return 1
+
+    printf '%s\n' "$root"
+}
+
+ROOT="$(resolve_root)" || {
+    echo "AEUSB_AUTHORITY_NOT_PRESENT"
+    exit 1
+}
+
+TS="$(date -u +%Y%m%dT%H%M%SZ)"
+OUT="$ROOT/DATA/STATUS/receipts/aevps_perpetual_harden_${TS}.txt"
+
+mkdir -p "$(dirname "$OUT")"
+chmod 700 "$(dirname "$OUT")" 2>/dev/null || true
+
+exec > >(tee -a "$OUT") 2>&1
+
+echo "=== AETHIEAOPSYS AEVPS PERPETUAL HARDEN ==="
+echo "timestamp_utc=$(date -u +%FT%TZ)"
+echo "authority_root=$ROOT"
+echo "authority_surface=AEUSB"
+echo "target=$AEVPS"
+echo "mode=$MODE"
+echo
+
+SSH_OPTS=(
+    -o BatchMode=yes
+    -o ConnectTimeout=12
+    -o IdentitiesOnly=yes
+    -o StrictHostKeyChecking=accept-new
+)
+
+if ! ssh "${SSH_OPTS[@]}" "$AEVPS" \
+    'test "$(hostname)" = "aevps-001" && echo AEVPS_AUTHORITY_LINK_OK'
+then
+    echo "AEVPS_SSH_UNAVAILABLE"
+
+    if [ "$MODE" = "--plugplay" ]; then
+        echo "PLUGPLAY_DEFERRED_NO_KEY_OR_NETWORK"
+        exit 0
+    fi
+
+    exit 1
+fi
+
+ssh "${SSH_OPTS[@]}" "$AEVPS" 'bash -s' <<'REMOTE'
+set -Eeuo pipefail
+
+TID='8b52d381-a5e5-464a-a5cf-67951b475be0'
+CFG='/etc/cloudflared/config.yml'
+CREDS="/etc/cloudflared/${TID}.json"
+CF_SERVICE='aethiea-cloudflared.service'
+
+STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
+TMP="$(mktemp -d)"
+CHANGED=0
+CF_CHANGED=0
+
+trap 'rm -rf "$TMP"' EXIT
+
+backup_file() {
+    local file="$1"
+
+    [ -e "$file" ] || return 0
+
+    mkdir -p /opt/AETHIEAOPSYS/DATA/STATUS/backups
+    cp -a "$file" \
+        "/opt/AETHIEAOPSYS/DATA/STATUS/backups/$(basename "$file").${STAMP}"
+}
+
+install_changed() {
+    local source="$1"
+    local target="$2"
+    local mode="$3"
+
+    if [ -f "$target" ] && cmp -s "$source" "$target"; then
+        echo "UNCHANGED=$target"
+        return 1
+    fi
+
+    backup_file "$target"
+    install -D -o root -g root -m "$mode" "$source" "$target"
+    echo "INSTALLED=$target"
+    CHANGED=1
+    return 0
+}
+
+echo
+echo "=== PRECONDITIONS ==="
+
+test -s "$CFG" || {
+    echo "STOP: CLOUDFLARED_CONFIG_MISSING"
+    exit 1
+}
+
+test -s "$CREDS" || {
+    echo "STOP: CLOUDFLARED_CREDENTIAL_MISSING"
+    exit 1
+}
+
+test "$(hostname)" = 'aevps-001' || {
+    echo "STOP: WRONG_REMOTE_HOST"
+    exit 1
+}
+
+chmod 700 /etc/cloudflared
+chmod 600 "$CFG" "$CREDS"
+chown root:root "$CFG" "$CREDS"
+
+echo "CONFIG_PRESENT=yes"
+echo "CREDENTIAL_PRESENT=yes"
+
+/usr/local/bin/cloudflared tunnel \
+    --config "$CFG" \
+    ingress validate
+
+echo
+echo "=== INSTALL PERPETUAL GUARD ==="
+
+cat > "$TMP/aethiea-aevps-guard" <<'GUARD'
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+LOCK='/run/lock/aethiea-aevps-guard.lock'
+RECEIPTS='/opt/AETHIEAOPSYS/DATA/STATUS/receipts'
+TS="$(date -u +%Y%m%dT%H%M%SZ)"
+OUT="$RECEIPTS/aevps_guard_${TS}.txt"
+FAIL=0
+
+mkdir -p "$RECEIPTS" /run/lock
+chmod 700 "$RECEIPTS"
+
+exec 9>"$LOCK"
+
+if command -v flock >/dev/null 2>&1; then
+    flock -n 9 || exit 0
+fi
+
+exec > >(tee -a "$OUT") 2>&1
+
+echo "AETHIEAOPSYS_AEVPS_GUARD"
+echo "timestamp_utc=$(date -u +%FT%TZ)"
+echo "host=$(hostname)"
+
+check_origin() {
+    local name="$1"
+    local port="$2"
+    local unit="$3"
+    local tmp
+
+    tmp="$(mktemp)"
+
+    if curl -fsS --max-time 5 \
+        "http://127.0.0.1:${port}/status.json" \
+        -o "$tmp" &&
+       python3 - "$tmp" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], encoding="utf-8") as handle:
+    data = json.load(handle)
+
+raise SystemExit(
+    0 if data.get("status") == "AEVPS_ORIGIN_READY" else 1
+)
+PY
+    then
+        echo "ORIGIN_OK=$name:$port"
+        rm -f "$tmp"
+        return 0
+    fi
+
+    echo "ORIGIN_REPAIR=$name:$port unit=$unit"
+    systemctl restart "$unit" || true
+    sleep 3
+
+    if curl -fsS --max-time 5 \
+        "http://127.0.0.1:${port}/status.json" \
+        -o "$tmp"
+    then
+        echo "ORIGIN_RESTORED=$name:$port"
+    else
+        echo "ORIGIN_FAILED=$name:$port"
+        FAIL=1
+    fi
+
+    rm -f "$tmp"
+}
+
+check_origin \
+    AEHUB_AENET \
+    3910 \
+    aeth-aehub-status.service
+
+check_origin \
+    SCRAPEGPT \
+    3925 \
+    aeth-scrapegpt-status.service
+
+check_origin \
+    vRAG \
+    3935 \
+    aeth-vrag-status.service
+
+check_origin \
+    AETHvNAS \
+    3940 \
+    aeth-aethvnas-status.service
+
+echo
+echo "=== CLOUDFLARED ==="
+
+if ! systemctl is-active --quiet aethiea-cloudflared.service; then
+    echo "CLOUDFLARED_RESTART=inactive"
+    systemctl restart aethiea-cloudflared.service
+    sleep 4
+fi
+
+/usr/local/bin/cloudflared tunnel \
+    --config /etc/cloudflared/config.yml \
+    ingress validate
+
+CONNECTIONS="$(
+    curl -fsS --max-time 5 \
+        http://127.0.0.1:20241/metrics 2>/dev/null |
+    awk '
+        /^cloudflared_tunnel_ha_connections / {
+            if (!seen) {
+                value = $2
+                seen = 1
+            }
+        }
+        END {
+            if (seen) {
+                print value
+            }
+        }
+    '
+)"
+
+if [ "${CONNECTIONS:-0}" -lt 1 ]; then
+    echo "CLOUDFLARED_RESTART=no_edge_connections"
+    systemctl restart aethiea-cloudflared.service
+    sleep 5
+
+    CONNECTIONS="$(
+        curl -fsS --max-time 5 \
+            http://127.0.0.1:20241/metrics 2>/dev/null |
+        awk '
+            /^cloudflared_tunnel_ha_connections / {
+                if (!seen) {
+                    value = $2
+                    seen = 1
+                }
+            }
+            END {
+                if (seen) {
+                    print value
+                }
+            }
+        '
+    )"
+fi
+
+echo "CLOUDFLARED_CONNECTIONS=${CONNECTIONS:-0}"
+
+if [ "${CONNECTIONS:-0}" -lt 1 ]; then
+    FAIL=1
+fi
+
+echo
+echo "=== PUBLIC EDGE ==="
+
+check_public() {
+    local host="$1"
+    local expected="$2"
+    local response ip http
+
+    response="$(
+        curl -fsS --max-time 8 \
+            --resolve cloudflare-dns.com:443:1.1.1.1 \
+            "https://cloudflare-dns.com/dns-query?name=${host}&type=A" \
+            -H 'accept: application/dns-json' 2>/dev/null ||
+        true
+    )"
+
+    ip="$(
+        printf '%s' "$response" |
+        python3 -c '
+import json
+import sys
+
+try:
+    data = json.load(sys.stdin)
+    ips = [
+        item.get("data", "")
+        for item in data.get("Answer", [])
+        if item.get("type") == 1
+    ]
+    print(ips[0] if ips else "")
+except Exception:
+    print("")
+'
+    )"
+
+    if [ -z "$ip" ]; then
+        echo "PUBLIC_DNS_FAILED=$host"
+        FAIL=1
+        return
+    fi
+
+    http="$(
+        curl -sS --max-time 12 \
+            --resolve "${host}:443:${ip}" \
+            -o "/tmp/${host}.status.$$" \
+            -w '%{http_code}' \
+            "https://${host}/status.json" 2>/dev/null ||
+        true
+    )"
+
+    if [ "$http" = '200' ] &&
+       grep -q "\"service\": \"${expected}\"" \
+           "/tmp/${host}.status.$$"
+    then
+        echo "PUBLIC_OK=$host service=$expected"
+    else
+        echo "PUBLIC_FAILED=$host http=${http:-000}"
+        FAIL=1
+    fi
+
+    rm -f "/tmp/${host}.status.$$"
+}
+
+check_public hub.aethiea.net AEHUB_AENET
+check_public status.aethiea.net AEHUB_AENET
+check_public api.aethiea.net AEHUB_AENET
+check_public aenet.aethiea.net AEHUB_AENET
+check_public aethernet.aethiea.net AEHUB_AENET
+check_public aevps.aethiea.net AEHUB_AENET
+check_public scrapegpt.aethiea.net SCRAPEGPT
+check_public vrag.aethiea.net vRAG
+check_public aethvnas.aethiea.net AETHvNAS
+
+chmod 600 "$OUT" 2>/dev/null || true
+if [ "$FAIL" -eq 0 ]; then
+    echo "STATUS=AEVPS_PERPETUAL_READY"
+    exit 0
+fi
+
+echo "STATUS=AEVPS_PERPETUAL_DEGRADED"
+exit 1
+GUARD
+
+cat > "$TMP/aethiea-aevps-guard.service" <<'UNIT'
+[Unit]
+Description=AETHIEAOPSYS AEVPS Perpetual Guard
+After=network-online.target aethiea-cloudflared.service
+Wants=network-online.target
+Requires=aethiea-cloudflared.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/aethiea-aevps-guard
+User=root
+Group=root
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictRealtime=true
+SystemCallArchitectures=native
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+ReadWritePaths=/opt/AETHIEAOPSYS/DATA/STATUS /run
+UMask=0077
+UNIT
+
+cat > "$TMP/aethiea-aevps-guard.timer" <<'TIMER'
+[Unit]
+Description=AETHIEAOPSYS AEVPS Perpetual Guard Timer
+
+[Timer]
+OnBootSec=45s
+OnUnitActiveSec=3min
+AccuracySec=20s
+RandomizedDelaySec=20s
+Persistent=true
+Unit=aethiea-aevps-guard.service
+
+[Install]
+WantedBy=timers.target
+TIMER
+
+cat > "$TMP/cloudflared-hardening.conf" <<'HARDEN'
+[Unit]
+StartLimitIntervalSec=0
+
+[Service]
+Restart=always
+RestartSec=5s
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+SystemCallArchitectures=native
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+ReadWritePaths=/opt/AETHIEAOPSYS/LOGS/CLOUDFLARED /opt/AETHIEAOPSYS/DATA/STATUS /run
+UMask=0077
+HARDEN
+
+install_changed \
+    "$TMP/aethiea-aevps-guard" \
+    /usr/local/sbin/aethiea-aevps-guard \
+    0700 || true
+
+install_changed \
+    "$TMP/aethiea-aevps-guard.service" \
+    /etc/systemd/system/aethiea-aevps-guard.service \
+    0644 || true
+
+install_changed \
+    "$TMP/aethiea-aevps-guard.timer" \
+    /etc/systemd/system/aethiea-aevps-guard.timer \
+    0644 || true
+
+if install_changed \
+    "$TMP/cloudflared-hardening.conf" \
+    /etc/systemd/system/aethiea-cloudflared.service.d/20-hardening.conf \
+    0644
+then
+    CF_CHANGED=1
+fi
+
+echo
+echo "=== ACTIVATE ==="
+
+systemctl daemon-reload
+
+if [ "$CF_CHANGED" -eq 1 ]; then
+    systemctl restart "$CF_SERVICE"
+    sleep 5
+fi
+
+if ! systemctl is-active --quiet "$CF_SERVICE"; then
+    echo "HARDENING_ROLLBACK=cloudflared_failed"
+
+    rm -f \
+        /etc/systemd/system/aethiea-cloudflared.service.d/20-hardening.conf
+
+    systemctl daemon-reload
+    systemctl restart "$CF_SERVICE"
+    exit 1
+fi
+
+/usr/local/bin/cloudflared tunnel \
+    --config "$CFG" \
+    ingress validate
+
+systemctl enable --now aethiea-aevps-guard.timer
+systemctl start aethiea-aevps-guard.service || true
+
+echo
+echo "=== FINAL STATE ==="
+
+systemctl show "$CF_SERVICE" \
+    -p ActiveState \
+    -p SubState \
+    -p MainPID \
+    -p ExecMainStatus \
+    --no-pager
+
+systemctl show aethiea-aevps-guard.timer \
+    -p ActiveState \
+    -p SubState \
+    -p UnitFileState \
+    -p NextElapseUSecRealtime \
+    --no-pager
+
+curl -fsS http://127.0.0.1:20241/metrics |
+grep '^cloudflared_tunnel_ha_connections '
+
+echo
+echo "=== SECURITY SCORE ==="
+
+systemd-analyze security "$CF_SERVICE" --no-pager 2>/dev/null |
+tail -n 8 || true
+
+echo
+echo "STATUS=AEVPS_HARDENED_PERPETUAL_READY"
+REMOTE
+
+echo
+echo "=== AEUSB RECEIPT ==="
+echo "tool=$0"
+echo "tool_sha256=$(sha256sum "$0" | awk '{print $1}')"
+echo "status=AEUSB_AUTHORITY_DEPLOYED_AEVPS_PERPETUAL"
+echo "lock=AEUSB authorizes. AEVPS persists. Cloudflare routes. vRAG retrieves. Corpus proves."
+
+chmod 600 "$OUT" 2>/dev/null || true

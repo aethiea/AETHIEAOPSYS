@@ -1,0 +1,5 @@
+AEHUB
+TYPE=conduction_and_status_hub
+FUNCTION=coordinate and report component state
+AUTHORITY=false
+PUBLIC_EDGE=false

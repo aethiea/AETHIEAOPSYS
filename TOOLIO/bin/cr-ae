@@ -1,3 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
-exec /mnt/h/AETHIEAOPSYS/TOOLIO/bin/coderabbit-ae "$@"
+
+ROOT="$(aeusb-root)" || {
+  echo "CR_AE: AEUSB authority root not found" >&2
+  exit 1
+}
+
+TARGET="$ROOT/TOOLIO/bin/coderabbit-ae"
+
+[ -f "$TARGET" ] || {
+  echo "CR_AE_TARGET_MISSING=$TARGET" >&2
+  exit 1
+}
+
+exec "$TARGET" "$@"
