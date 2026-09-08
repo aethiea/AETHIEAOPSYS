@@ -2,7 +2,6 @@
 
 import datetime
 import json
-import os
 from pathlib import Path
 import re
 import shutil
@@ -81,11 +80,7 @@ def audit(event, **fields):
 def safe_path(value):
     value = value or "."
     candidate = Path(value)
-    if candidate.is_absolute():
-        resolved = candidate.resolve()
-    else:
-        resolved = (ROOT / candidate).resolve()
-
+    resolved = candidate.resolve() if candidate.is_absolute() else (ROOT / candidate).resolve()
     if resolved != ROOT and ROOT not in resolved.parents:
         raise ValueError(f"path escapes AEVPS root: {value}")
     return resolved
@@ -98,8 +93,7 @@ def relative_name(path):
 def backup_existing(path):
     if not path.exists() or not path.is_file():
         return None
-    stamp = now_stamp()
-    destination = BACKUPS / stamp / path.relative_to(ROOT)
+    destination = BACKUPS / now_stamp() / path.relative_to(ROOT)
     destination.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(path, destination)
     return relative_name(destination)
@@ -111,9 +105,11 @@ def tool_list_dir(args):
         raise ValueError("not a directory")
     entries = []
     for child in sorted(path.iterdir(), key=lambda p: (not p.is_dir(), p.name.lower())):
-        kind = "dir" if child.is_dir() else "file"
-        size = child.stat().st_size if child.is_file() else None
-        entries.append({"name": child.name, "kind": kind, "size": size})
+        entries.append({
+            "name": child.name,
+            "kind": "dir" if child.is_dir() else "file",
+            "size": child.stat().st_size if child.is_file() else None,
+        })
         if len(entries) >= 200:
             break
     return {"path": relative_name(path), "entries": entries}
@@ -146,11 +142,7 @@ def tool_write_file(args):
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(content, encoding="utf-8")
     audit("write_file", path=relative_name(path), backup=backup, bytes=len(content.encode("utf-8")))
-    return {
-        "path": relative_name(path),
-        "bytes": len(content.encode("utf-8")),
-        "backup": backup,
-    }
+    return {"path": relative_name(path), "bytes": len(content.encode("utf-8")), "backup": backup}
 
 
 def tool_replace_text(args):
@@ -187,8 +179,7 @@ def tool_chmod_exec(args):
     path = safe_path(args["path"])
     if not path.is_file():
         raise ValueError("not a file")
-    mode = path.stat().st_mode
-    path.chmod(mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+    path.chmod(path.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
     audit("chmod_exec", path=relative_name(path))
     return {"path": relative_name(path), "executable": True}
 
@@ -203,8 +194,7 @@ def run_argv(argv, cwd=ROOT, timeout=60):
         timeout=timeout,
         check=False,
     )
-    output = completed.stdout[-20000:]
-    return {"exit_code": completed.returncode, "output": output}
+    return {"exit_code": completed.returncode, "output": completed.stdout[-20000:]}
 
 
 def tool_run_check(args):
@@ -219,11 +209,9 @@ def tool_run_check(args):
             argv.append(relative_name(safe_path(path_arg)))
         result = run_argv(argv)
     elif kind == "python_compile":
-        path = safe_path(path_arg)
-        result = run_argv(["python3", "-m", "py_compile", str(path)])
+        result = run_argv(["python3", "-m", "py_compile", str(safe_path(path_arg))])
     elif kind == "bash_syntax":
-        path = safe_path(path_arg)
-        result = run_argv(["bash", "-n", str(path)])
+        result = run_argv(["bash", "-n", str(safe_path(path_arg))])
     elif kind == "json_parse":
         path = safe_path(path_arg)
         try:
@@ -253,12 +241,11 @@ def execute_tool(call):
     name = call.get("tool")
     args = call.get("args", {})
     if name not in TOOLS:
-        return {"ok": False, "error": f"unknown tool: {name}"}
+        return {"ok": False, "tool": name, "error": f"unknown tool: {name}"}
     if not isinstance(args, dict):
-        return {"ok": False, "error": "args must be an object"}
+        return {"ok": False, "tool": name, "error": "args must be an object"}
     try:
-        result = TOOLS[name](args)
-        return {"ok": True, "tool": name, "result": result}
+        return {"ok": True, "tool": name, "result": TOOLS[name](args)}
     except Exception as exc:
         audit("tool_error", tool=name, error=str(exc))
         return {"ok": False, "tool": name, "error": str(exc)}
@@ -323,7 +310,6 @@ def ollama_chat(model, wire_messages, stream=True, think=None):
     }
     if think is not None:
         payload["think"] = think
-
     req = urllib.request.Request(
         URL,
         data=json.dumps(payload).encode(),
@@ -343,8 +329,7 @@ def run_open(prompt):
                 raw = raw.strip()
                 if not raw:
                     continue
-                data = json.loads(raw)
-                content = data.get("message", {}).get("content", "")
+                content = json.loads(raw).get("message", {}).get("content", "")
                 if content:
                     print(content, end="", flush=True)
                     answer.append(content)
@@ -357,7 +342,6 @@ def run_open(prompt):
         print(f"\nERROR: {exc}\n")
         messages.pop()
         return
-
     final = "".join(answer).strip()
     if final:
         messages.append({"role": "assistant", "content": final})
@@ -373,7 +357,6 @@ def run_ground(prompt):
     answer = []
     initial_buffer = ""
     answer_mode = False
-
     try:
         with ollama_chat(DEFAULT_MODEL, wire, stream=True, think=False) as response:
             print()
@@ -381,11 +364,9 @@ def run_ground(prompt):
                 raw = raw.strip()
                 if not raw:
                     continue
-                data = json.loads(raw)
-                content = data.get("message", {}).get("content", "")
+                content = json.loads(raw).get("message", {}).get("content", "")
                 if not content:
                     continue
-
                 if not answer_mode:
                     initial_buffer += content
                     marker = initial_buffer.find("</think>")
@@ -397,10 +378,8 @@ def run_ground(prompt):
                             print(visible, end="", flush=True)
                             answer.append(visible)
                     continue
-
                 print(content, end="", flush=True)
                 answer.append(content)
-
             if not answer_mode and initial_buffer.strip():
                 clean = initial_buffer.strip()
                 print(clean, end="", flush=True)
@@ -414,7 +393,6 @@ def run_ground(prompt):
         print(f"\nERROR: {exc}\n")
         messages.pop()
         return
-
     final = "".join(answer).strip()
     if final:
         messages.append({"role": "assistant", "content": final})
@@ -460,14 +438,14 @@ def run_ops(prompt):
         if before:
             print(before)
 
+        call = {}
         try:
             call = json.loads(match.group(1))
-        except json.JSONDecodeError as exc:
-            tool_result = {"ok": False, "error": f"invalid tool JSON: {exc}"}
-        else:
             tool_result = execute_tool(call)
+        except json.JSONDecodeError as exc:
+            tool_result = {"ok": False, "tool": "unknown", "error": f"invalid tool JSON: {exc}"}
 
-        tool_name = tool_result.get("tool", call.get("tool") if 'call' in locals() else "unknown")
+        tool_name = tool_result.get("tool", call.get("tool", "unknown"))
         if tool_result.get("ok"):
             print(f"[tool:{tool_name}] PASS")
         else:
@@ -497,32 +475,25 @@ while True:
 
     if not prompt:
         continue
-
     if prompt in {"/bye", "/exit", "/quit"}:
         break
-
     if prompt == "/clear":
         messages.clear()
         print("conversation cleared")
         continue
-
     if prompt == "/open":
         clear_for_mode("open")
         continue
-
     if prompt == "/ground":
         clear_for_mode("ground")
         continue
-
     if prompt == "/ops":
         clear_for_mode("ops")
         continue
-
     if prompt == "/mode":
         print(f"mode={MODE}")
         print(f"model={active_model()}")
         continue
-
     if prompt == "/status":
         status()
         continue
