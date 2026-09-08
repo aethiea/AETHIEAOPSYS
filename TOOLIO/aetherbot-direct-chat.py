@@ -29,11 +29,12 @@ Keep verified context separate from inference.
 /no_think
 """
 
-OPS_PROMPT = f"""You are ÆTHERBOT in native AEVPS programming mode.
-Your writable programming root is {ROOT}.
-You can directly inspect and modify that root using the tool protocol below.
+TOOL_PROTOCOL = f"""AEVPS PROGRAMMING CAPABILITY
+You have direct programming tools rooted at {ROOT}.
+You may converse normally. Do not force tool use for ordinary conversation.
+When the operator asks you to inspect, build, create, edit, patch, fix, validate, or otherwise program AEVPS, use the tools yourself instead of merely printing code or telling the operator to save/run it.
 Do not claim a file changed or a check ran unless a tool result confirms it.
-Work incrementally: inspect before editing, make the smallest useful change, validate afterward.
+Inspect before editing when useful, make the smallest useful change, and validate afterward.
 
 Request exactly one tool at a time using this exact form, with no Markdown fence:
 <tool_call>{{"tool":"TOOL_NAME","args":{{...}}}}</tool_call>
@@ -51,9 +52,17 @@ Available tools:
 - run_check: {{"kind":"bash_syntax","path":"relative/file.sh"}}
 - run_check: {{"kind":"json_parse","path":"relative/file.json"}}
 
-Tool results will be returned to you as a user message beginning with TOOL_RESULT.
-After the requested programming work is complete, summarize exactly what changed and which checks passed.
+Tool results arrive as a user message beginning with TOOL_RESULT.
+After programming work is complete, summarize exactly what changed and which checks passed.
 """
+
+OPS_PROMPT = """You are ÆTHERBOT in forced native AEVPS programming mode.
+Prioritize completing the operator's programming task with the available AEVPS tools.
+""" + TOOL_PROTOCOL
+
+OPEN_PROMPT = """You are ÆTHERBOT, the operator's local AETHIEA assistant.
+Chat naturally for ordinary conversation. You also have native AEVPS programming capability in this same conversation.
+""" + TOOL_PROTOCOL
 
 TOOL_RE = re.compile(r"<tool_call>\s*(\{.*?\})\s*</tool_call>", re.DOTALL)
 
@@ -200,7 +209,6 @@ def run_argv(argv, cwd=ROOT, timeout=60):
 def tool_run_check(args):
     kind = args["kind"]
     path_arg = args.get("path")
-
     if kind == "git_status":
         result = run_argv(["git", "-C", str(ROOT), "status", "--short"])
     elif kind == "git_diff":
@@ -221,7 +229,6 @@ def tool_run_check(args):
             result = {"exit_code": 1, "output": f"JSON parse FAIL: {exc}"}
     else:
         raise ValueError(f"unsupported check kind: {kind}")
-
     audit("run_check", kind=kind, path=path_arg, exit_code=result["exit_code"])
     return {"kind": kind, "path": path_arg, **result}
 
@@ -252,10 +259,8 @@ def execute_tool(call):
 
 
 def active_model():
-    if MODE == "open":
+    if MODE in {"open", "ops"}:
         return OPEN_MODEL
-    if MODE == "ops":
-        return OPS_MODEL
     return DEFAULT_MODEL
 
 
@@ -276,27 +281,31 @@ def status():
     print(f"mode={MODE}")
 
     if MODE == "open":
-        print("streaming=ON")
+        print("chat=ON")
+        print("autonomous_programming=ON")
         print("open_model=qwen2.5-coder:3b")
-        print("system_prompt=NONE")
+        print("system_prompt=CAPABILITY_ONLY")
         print("thinking_mode=NONE")
         print("thinking_display=OFF")
-        print("aevps_programming=OFF")
+        print(f"programming_root={ROOT}")
+        print("tools=list_dir,read_file,write_file,replace_text,make_dir,chmod_exec,run_check")
+        print(f"audit_log={AUDIT}")
         print("aemcp=false")
         print("topology=false")
         print("vrag=false")
         print("b43=false")
     elif MODE == "ground":
+        print("chat=ON")
         print("streaming=ON")
         print("thinking_mode=qwen3-no_think")
         print("thinking_display=OFF")
         print("ground_backend=not-connected-in-direct-client")
     elif MODE == "ops":
-        print("streaming=OFF_AGENT_LOOP")
+        print("chat=ON")
+        print("autonomous_programming=FORCED")
         print("ops_model=qwen2.5-coder:3b")
         print("ops_backend=native-aevps-programmer")
-        print(f"ops_root={ROOT}")
-        print("aevps_programming=ON")
+        print(f"programming_root={ROOT}")
         print("tools=list_dir,read_file,write_file,replace_text,make_dir,chmod_exec,run_check")
         print(f"audit_log={AUDIT}")
 
@@ -319,32 +328,68 @@ def ollama_chat(model, wire_messages, stream=True, think=None):
     return urllib.request.urlopen(req, timeout=300)
 
 
-def run_open(prompt):
+def run_agent(prompt, forced=False):
+    system_prompt = OPS_PROMPT if forced else OPEN_PROMPT
+    session = [
+        {"role": "system", "content": system_prompt},
+        *messages,
+        {"role": "user", "content": prompt},
+    ]
     messages.append({"role": "user", "content": prompt})
-    answer = []
-    try:
-        with ollama_chat(OPEN_MODEL, list(messages), stream=True) as response:
-            print()
-            for raw in response:
-                raw = raw.strip()
-                if not raw:
-                    continue
-                content = json.loads(raw).get("message", {}).get("content", "")
-                if content:
-                    print(content, end="", flush=True)
-                    answer.append(content)
-            print("\n")
-    except KeyboardInterrupt:
-        print("\n[interrupted]\n")
-        messages.pop()
-        return
-    except Exception as exc:
-        print(f"\nERROR: {exc}\n")
-        messages.pop()
-        return
-    final = "".join(answer).strip()
-    if final:
-        messages.append({"role": "assistant", "content": final})
+    audit("agent_request", mode="ops" if forced else "open", prompt=prompt)
+    print()
+
+    for step in range(1, 13):
+        try:
+            with ollama_chat(OPEN_MODEL, session, stream=False) as response:
+                data = json.loads(response.read())
+        except KeyboardInterrupt:
+            print("[interrupted]\n")
+            messages.pop()
+            return
+        except Exception as exc:
+            print(f"ERROR: {exc}\n")
+            messages.pop()
+            return
+
+        content = data.get("message", {}).get("content", "").strip()
+        if not content:
+            print("[no response returned]\n")
+            messages.pop()
+            return
+
+        match = TOOL_RE.search(content)
+        if not match:
+            print(content + "\n")
+            messages.append({"role": "assistant", "content": content})
+            audit("agent_complete", mode="ops" if forced else "open", steps=step, final=content[:4000])
+            return
+
+        before = content[:match.start()].strip()
+        if before:
+            print(before)
+
+        call = {}
+        try:
+            call = json.loads(match.group(1))
+            tool_result = execute_tool(call)
+        except json.JSONDecodeError as exc:
+            tool_result = {"ok": False, "tool": "unknown", "error": f"invalid tool JSON: {exc}"}
+
+        tool_name = tool_result.get("tool", call.get("tool", "unknown"))
+        if tool_result.get("ok"):
+            print(f"[tool:{tool_name}] PASS")
+        else:
+            print(f"[tool:{tool_name}] FAIL: {tool_result.get('error')}")
+
+        session.append({"role": "assistant", "content": content})
+        session.append({
+            "role": "user",
+            "content": "TOOL_RESULT " + json.dumps(tool_result, ensure_ascii=False),
+        })
+
+    print("[agent stopped: tool-step limit reached]\n")
+    audit("agent_step_limit", mode="ops" if forced else "open", steps=12)
 
 
 def run_ground(prompt):
@@ -398,71 +443,8 @@ def run_ground(prompt):
         messages.append({"role": "assistant", "content": final})
 
 
-def run_ops(prompt):
-    session = [
-        {"role": "system", "content": OPS_PROMPT},
-        *messages,
-        {"role": "user", "content": prompt},
-    ]
-    messages.append({"role": "user", "content": prompt})
-    audit("ops_request", prompt=prompt)
-    print()
-
-    for step in range(1, 13):
-        try:
-            with ollama_chat(OPS_MODEL, session, stream=False) as response:
-                data = json.loads(response.read())
-        except KeyboardInterrupt:
-            print("[interrupted]\n")
-            messages.pop()
-            return
-        except Exception as exc:
-            print(f"ERROR: {exc}\n")
-            messages.pop()
-            return
-
-        content = data.get("message", {}).get("content", "").strip()
-        if not content:
-            print("[no response returned]\n")
-            messages.pop()
-            return
-
-        match = TOOL_RE.search(content)
-        if not match:
-            print(content + "\n")
-            messages.append({"role": "assistant", "content": content})
-            audit("ops_complete", steps=step, final=content[:4000])
-            return
-
-        before = content[:match.start()].strip()
-        if before:
-            print(before)
-
-        call = {}
-        try:
-            call = json.loads(match.group(1))
-            tool_result = execute_tool(call)
-        except json.JSONDecodeError as exc:
-            tool_result = {"ok": False, "tool": "unknown", "error": f"invalid tool JSON: {exc}"}
-
-        tool_name = tool_result.get("tool", call.get("tool", "unknown"))
-        if tool_result.get("ok"):
-            print(f"[tool:{tool_name}] PASS")
-        else:
-            print(f"[tool:{tool_name}] FAIL: {tool_result.get('error')}")
-
-        session.append({"role": "assistant", "content": content})
-        session.append({
-            "role": "user",
-            "content": "TOOL_RESULT " + json.dumps(tool_result, ensure_ascii=False),
-        })
-
-    print("[ops stopped: tool-step limit reached]\n")
-    audit("ops_step_limit", steps=12)
-
-
 ensure_state()
-print(f"ÆTHERBOT // OPEN {OPEN_MODEL} // DIRECT OLLAMA")
+print(f"ÆTHERBOT // CHAT+PROGRAM {OPEN_MODEL} // DIRECT OLLAMA")
 print("Mode: open")
 print("Commands: /open  /ground  /ops  /mode  /status  /clear  /bye")
 
@@ -498,9 +480,9 @@ while True:
         status()
         continue
 
-    if MODE == "open":
-        run_open(prompt)
-    elif MODE == "ground":
+    if MODE == "ground":
         run_ground(prompt)
+    elif MODE == "ops":
+        run_agent(prompt, forced=True)
     else:
-        run_ops(prompt)
+        run_agent(prompt, forced=False)
