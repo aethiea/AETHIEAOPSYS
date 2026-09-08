@@ -7,26 +7,63 @@ import urllib.request
 MODEL = sys.argv[1] if len(sys.argv) > 1 else "qwen3:4b"
 URL = "http://127.0.0.1:11434/api/chat"
 
-SYSTEM_PROMPT = """You are ÆTHERBOT, a local operator assistant running through Ollama.
-
-Behavior:
-- Be concise, direct, technical, and evidence-first.
-- Do not moralize, lecture, shame, or pad refusals with long warnings.
-- Do not invent legal conclusions, fines, enforcement outcomes, statistics, platform rules, dates, or citations.
-- Distinguish clearly between verified fact, inference, uncertainty, platform-policy concerns, and illegality.
-- Do not claim something is illegal unless that conclusion is actually established from reliable evidence supplied or verified for the relevant jurisdiction.
-- Do not assume harmful intent from an ambiguous request. Answer benign analysis, defensive work, local testing, simulations, and compliant automation when possible.
-- If a request would require deceptive metric manipulation, fake engagement, credential abuse, unauthorized access, fraud, evasion of safeguards, or other harmful operational assistance, decline only that operational portion in one or two sentences and immediately offer the closest safe alternative.
-- Do not fabricate links or authorities. If current external verification is unavailable, say so briefly.
-- Prefer useful technical substance over generic advice.
-
-/no_think
-"""
-
+MODE = "open"
 messages = []
 
+MODE_PROMPTS = {
+    "open": """You are ÆTHERBOT, the local AETHIEA conversational assistant.
+Converse naturally with the operator.
+Do not force retrieval, evidence templates, operations framing, topology, VRAG, AEMCP, or B43 into ordinary conversation.
+Keep the response direct and useful.
+/no_think
+""",
+    "ground": """You are ÆTHERBOT in grounded-context mode.
+Use grounded context when it has actually been supplied to this client.
+Do not pretend retrieval occurred when no retrieval result is present.
+Keep verified context separate from inference.
+/no_think
+""",
+    "ops": """You are ÆTHERBOT in governed operations mode.
+Be precise about what has and has not actually executed.
+Do not claim a tool, shell command, MCP action, VRAG lookup, or topology action ran unless a real result is present.
+/no_think
+""",
+}
+
+
+def clear_for_mode(new_mode):
+    global MODE
+    MODE = new_mode
+    messages.clear()
+    print(f"mode={MODE}")
+    print("conversation cleared")
+
+
+def status():
+    print(f"model={MODEL}")
+    print("provider=ollama")
+    print("codex=OFF")
+    print("endpoint=/api/chat")
+    print("streaming=ON")
+    print("thinking_mode=qwen3-no_think")
+    print("thinking_display=OFF")
+    print(f"mode={MODE}")
+
+    if MODE == "open":
+        print("llama=true")
+        print("aemcp=false")
+        print("topology=false")
+        print("vrag=false")
+        print("b43=false")
+    elif MODE == "ground":
+        print("ground_backend=not-connected-in-direct-client")
+    elif MODE == "ops":
+        print("ops_backend=not-connected-in-direct-client")
+
+
 print(f"ÆTHERBOT // {MODEL} // DIRECT OLLAMA")
-print("Commands: /bye  /clear  /status")
+print("Mode: open")
+print("Commands: /open  /ground  /ops  /mode  /status  /clear  /bye")
 
 while True:
     try:
@@ -46,15 +83,24 @@ while True:
         print("conversation cleared")
         continue
 
+    if prompt == "/open":
+        clear_for_mode("open")
+        continue
+
+    if prompt == "/ground":
+        clear_for_mode("ground")
+        continue
+
+    if prompt == "/ops":
+        clear_for_mode("ops")
+        continue
+
+    if prompt == "/mode":
+        print(f"mode={MODE}")
+        continue
+
     if prompt == "/status":
-        print(f"model={MODEL}")
-        print("provider=ollama")
-        print("codex=OFF")
-        print("endpoint=/api/chat")
-        print("streaming=ON")
-        print("thinking_mode=qwen3-no_think")
-        print("thinking_display=OFF")
-        print("behavior_profile=neutral-evidence-first")
+        status()
         continue
 
     messages.append({
@@ -62,12 +108,10 @@ while True:
         "content": prompt,
     })
 
-    # Qwen3 documents /no_think as its prompt-level soft switch.
-    # Put it on the current user turn as the most recent thinking directive.
     wire_messages = [
         {
             "role": "system",
-            "content": SYSTEM_PROMPT,
+            "content": MODE_PROMPTS[MODE],
         },
         *messages[:-1],
         {
@@ -108,14 +152,11 @@ while True:
 
                 data = json.loads(raw)
                 message = data.get("message", {})
-
-                # Never display Ollama's dedicated reasoning field.
                 content = message.get("content", "")
+
                 if not content:
                     continue
 
-                # Defensive stripping if a future/model variant emits
-                # explicit <think>...</think> tags in content.
                 tag_buffer += content
 
                 while tag_buffer:
@@ -130,7 +171,6 @@ while True:
 
                     start = tag_buffer.find("<think>")
                     if start == -1:
-                        # Keep a short suffix in case a tag is split across chunks.
                         keep = min(len(tag_buffer), len("<think>") - 1)
                         emit = tag_buffer[:-keep] if keep else tag_buffer
                         tag_buffer = tag_buffer[-keep:] if keep else ""
