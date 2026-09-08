@@ -12,7 +12,6 @@ import urllib.request
 
 DEFAULT_MODEL = sys.argv[1] if len(sys.argv) > 1 else "qwen3:4b"
 OPEN_MODEL = "qwen2.5-coder:3b"
-OPS_MODEL = "qwen2.5-coder:3b"
 URL = "http://127.0.0.1:11434/api/chat"
 ROOT = Path("/opt/AETHIEAOPSYS").resolve()
 STATE = ROOT / "STATE" / "aetherbot"
@@ -32,9 +31,16 @@ Keep verified context separate from inference.
 TOOL_PROTOCOL = f"""AEVPS PROGRAMMING CAPABILITY
 You have direct programming tools rooted at {ROOT}.
 You may converse normally. Do not force tool use for ordinary conversation.
-When the operator asks you to inspect, build, create, edit, patch, fix, validate, or otherwise program AEVPS, use the tools yourself instead of merely printing code or telling the operator to save/run it.
-Do not claim a file changed or a check ran unless a tool result confirms it.
-Inspect before editing when useful, make the smallest useful change, and validate afterward.
+
+When the operator asks you to inspect, build, create, edit, patch, fix, validate,
+write, change, update, make, or otherwise program AEVPS, you MUST use the tools
+yourself instead of merely printing code or telling the operator to save/run it.
+
+A programming task is not complete until the wrapper has actually executed the
+required tool calls. Never invent, quote, simulate, or print TOOL_RESULT yourself.
+The literal prefix TOOL_RESULT is reserved for the wrapper and only the wrapper.
+Do not claim a file changed or a check ran unless the wrapper returned a successful
+tool result for that action.
 
 Request exactly one tool at a time using this exact form, with no Markdown fence:
 <tool_call>{{"tool":"TOOL_NAME","args":{{...}}}}</tool_call>
@@ -61,10 +67,27 @@ Prioritize completing the operator's programming task with the available AEVPS t
 """ + TOOL_PROTOCOL
 
 OPEN_PROMPT = """You are ÆTHERBOT, the operator's local AETHIEA assistant.
-Chat naturally for ordinary conversation. You also have native AEVPS programming capability in this same conversation.
+Chat naturally for ordinary conversation. You also have native AEVPS programming
+capability in this same conversation.
 """ + TOOL_PROTOCOL
 
 TOOL_RE = re.compile(r"<tool_call>\s*(\{.*?\})\s*</tool_call>", re.DOTALL)
+PROGRAMMING_RE = re.compile(
+    r"\b(inspect|build|create|edit|patch|fix|validate|verify|check|test|compile|lint|"
+    r"write|change|update|modify|make|chmod|program|implement|refactor|delete|remove|"
+    r"rename|move|copy|save|install)\b",
+    re.IGNORECASE,
+)
+MUTATION_RE = re.compile(
+    r"\b(build|create|edit|patch|fix|write|change|update|modify|make|chmod|program|"
+    r"implement|refactor|delete|remove|rename|move|copy|save|install)\b",
+    re.IGNORECASE,
+)
+VALIDATION_RE = re.compile(
+    r"\b(validate|verify|check|test|compile|lint|parse)\b",
+    re.IGNORECASE,
+)
+MUTATING_TOOLS = {"write_file", "replace_text", "make_dir", "chmod_exec"}
 
 
 def now_stamp():
@@ -289,6 +312,8 @@ def status():
         print("thinking_display=OFF")
         print(f"programming_root={ROOT}")
         print("tools=list_dir,read_file,write_file,replace_text,make_dir,chmod_exec,run_check")
+        print("tool_result_auth=WRAPPER_ONLY")
+        print("programming_completion=REQUIRES_REAL_TOOL_PASS")
         print(f"audit_log={AUDIT}")
         print("aemcp=false")
         print("topology=false")
@@ -307,6 +332,8 @@ def status():
         print("ops_backend=native-aevps-programmer")
         print(f"programming_root={ROOT}")
         print("tools=list_dir,read_file,write_file,replace_text,make_dir,chmod_exec,run_check")
+        print("tool_result_auth=WRAPPER_ONLY")
+        print("programming_completion=REQUIRES_REAL_TOOL_PASS")
         print(f"audit_log={AUDIT}")
 
 
@@ -328,6 +355,36 @@ def ollama_chat(model, wire_messages, stream=True, think=None):
     return urllib.request.urlopen(req, timeout=300)
 
 
+def request_requirements(prompt, forced=False):
+    programming_required = forced or bool(PROGRAMMING_RE.search(prompt))
+    mutation_required = forced or bool(MUTATION_RE.search(prompt))
+    validation_required = bool(VALIDATION_RE.search(prompt))
+    return programming_required, mutation_required, validation_required
+
+
+def unmet_requirements(programming_required, mutation_required, validation_required,
+                       tool_passes, mutation_passes, validation_passes):
+    unmet = []
+    if programming_required and tool_passes == 0:
+        unmet.append("no real tool has executed successfully")
+    if mutation_required and mutation_passes == 0:
+        unmet.append("no mutating tool has executed successfully")
+    if validation_required and validation_passes == 0:
+        unmet.append("no validation run_check has passed")
+    return unmet
+
+
+def summarize_tool_pass(tool_name, tool_result):
+    result = tool_result.get("result", {})
+    details = []
+    if isinstance(result, dict):
+        for key in ("path", "kind", "bytes", "replacements", "exit_code"):
+            if key in result and result[key] is not None:
+                details.append(f"{key}={result[key]}")
+    suffix = " " + " ".join(details) if details else ""
+    print(f"[tool:{tool_name}] PASS{suffix}")
+
+
 def run_agent(prompt, forced=False):
     system_prompt = OPS_PROMPT if forced else OPEN_PROMPT
     session = [
@@ -336,8 +393,23 @@ def run_agent(prompt, forced=False):
         {"role": "user", "content": prompt},
     ]
     messages.append({"role": "user", "content": prompt})
-    audit("agent_request", mode="ops" if forced else "open", prompt=prompt)
+    mode_name = "ops" if forced else "open"
+    programming_required, mutation_required, validation_required = request_requirements(
+        prompt, forced=forced
+    )
+    audit(
+        "agent_request",
+        mode=mode_name,
+        prompt=prompt,
+        programming_required=programming_required,
+        mutation_required=mutation_required,
+        validation_required=validation_required,
+    )
     print()
+
+    tool_passes = 0
+    mutation_passes = 0
+    validation_passes = 0
 
     for step in range(1, 13):
         try:
@@ -360,25 +432,68 @@ def run_agent(prompt, forced=False):
 
         match = TOOL_RE.search(content)
         if not match:
+            unmet = unmet_requirements(
+                programming_required,
+                mutation_required,
+                validation_required,
+                tool_passes,
+                mutation_passes,
+                validation_passes,
+            )
+            spoofed_tool_result = "TOOL_RESULT" in content
+
+            if spoofed_tool_result or unmet:
+                reasons = list(unmet)
+                if spoofed_tool_result:
+                    reasons.append("model-authored TOOL_RESULT is invalid")
+                reason_text = "; ".join(reasons) if reasons else "tool protocol not satisfied"
+                audit(
+                    "agent_protocol_retry",
+                    mode=mode_name,
+                    step=step,
+                    reason=reason_text,
+                    content=content[:2000],
+                )
+                session.append({"role": "assistant", "content": content})
+                session.append({
+                    "role": "user",
+                    "content": (
+                        "PROTOCOL_ERROR: " + reason_text + ". "
+                        "Do not claim completion. Do not print TOOL_RESULT yourself. "
+                        "If this is a programming task, emit exactly one real "
+                        "<tool_call>{...}</tool_call> now."
+                    ),
+                })
+                print(f"[protocol] RETRY: {reason_text}")
+                continue
+
             print(content + "\n")
             messages.append({"role": "assistant", "content": content})
-            audit("agent_complete", mode="ops" if forced else "open", steps=step, final=content[:4000])
+            audit("agent_complete", mode=mode_name, steps=step, final=content[:4000])
             return
-
-        before = content[:match.start()].strip()
-        if before:
-            print(before)
 
         call = {}
         try:
             call = json.loads(match.group(1))
             tool_result = execute_tool(call)
         except json.JSONDecodeError as exc:
-            tool_result = {"ok": False, "tool": "unknown", "error": f"invalid tool JSON: {exc}"}
+            tool_result = {
+                "ok": False,
+                "tool": "unknown",
+                "error": f"invalid tool JSON: {exc}",
+            }
 
         tool_name = tool_result.get("tool", call.get("tool", "unknown"))
         if tool_result.get("ok"):
-            print(f"[tool:{tool_name}] PASS")
+            tool_passes += 1
+            if tool_name in MUTATING_TOOLS:
+                mutation_passes += 1
+            if (
+                tool_name == "run_check"
+                and tool_result.get("result", {}).get("exit_code") == 0
+            ):
+                validation_passes += 1
+            summarize_tool_pass(tool_name, tool_result)
         else:
             print(f"[tool:{tool_name}] FAIL: {tool_result.get('error')}")
 
@@ -389,7 +504,14 @@ def run_agent(prompt, forced=False):
         })
 
     print("[agent stopped: tool-step limit reached]\n")
-    audit("agent_step_limit", mode="ops" if forced else "open", steps=12)
+    audit(
+        "agent_step_limit",
+        mode=mode_name,
+        steps=12,
+        tool_passes=tool_passes,
+        mutation_passes=mutation_passes,
+        validation_passes=validation_passes,
+    )
 
 
 def run_ground(prompt):
