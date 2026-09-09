@@ -7,7 +7,7 @@ SERVICE=aeth-middleware-awareness.service
 SERVER="$ROOT/WORKSPACE/codex/middleware-awareness-aevps/runtime/llama.cpp/build-aevps/bin/llama-server"
 PORT=3926
 MODEL_REPO="${MODEL_REPO:-lmstudio-community/dolphin-2.8-mistral-7b-v02-GGUF}"
-MODEL_ARTIFACT="${MODEL_ARTIFACT:-dolphin-2.8-mistral-7b-v02.Q4_K_M.gguf}"
+MODEL_ARTIFACT="${MODEL_ARTIFACT:-dolphin-2.8-mistral-7b-v02-Q4_K_M.gguf}"
 MODEL_DIR="$ROOT/DATA/AEVPS/MODELS/dolphin-2.8-mistral-7b-v02"
 MODEL="$MODEL_DIR/$MODEL_ARTIFACT"
 MODEL_URL="https://huggingface.co/${MODEL_REPO}/resolve/main/${MODEL_ARTIFACT}?download=true"
