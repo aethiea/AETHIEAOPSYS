@@ -13,10 +13,12 @@ MODEL="$MODEL_DIR/$MODEL_ARTIFACT"
 MODEL_URL="https://huggingface.co/${MODEL_REPO}/resolve/main/${MODEL_ARTIFACT}?download=true"
 LAUNCHER=/usr/local/bin/aeth-middleware-awareness-dolphin
 DROPIN_DIR=/etc/systemd/system/aeth-middleware-awareness.service.d
-DROPIN="$DROPIN_DIR/30-dolphin.conf"
+LEGACY_DOLPHIN_DROPIN="$DROPIN_DIR/30-dolphin.conf"
+DROPIN="$DROPIN_DIR/99-dolphin.conf"
 STATE="$ROOT/STATE/aetherbot/middleware-model"
 STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
 BACKUP="$STATE/$STAMP"
+REQUIRED_MEMORY_MAX_BYTES=6442450944
 
 require_root() {
     [[ "$(id -u)" -eq 0 ]] || { echo "STOP=ROOT_REQUIRED"; exit 2; }
@@ -40,7 +42,8 @@ THREADS=2
 MEMORY_MAX=6G
 CURRENT_MISTRAL_DROPIN_PRESERVED=$DROPIN_DIR/20-mistral.conf
 DOLPHIN_DROPIN=$DROPIN
-ROLLBACK=remove 30-dolphin.conf and restart service
+PREVIOUS_DOLPHIN_DROPIN=$LEGACY_DOLPHIN_DROPIN
+ROLLBACK=remove Dolphin drop-ins and restart service
 AETHER_BODY_CHANGED=NO
 AEMCP_CHANGED=NO
 B43_CHANGED=NO
@@ -61,10 +64,24 @@ wait_health() {
 
 rollback() {
     echo "ROLLBACK=START"
-    rm -f "$DROPIN"
+    rm -f "$DROPIN" "$LEGACY_DOLPHIN_DROPIN"
     systemctl daemon-reload
     systemctl restart "$SERVICE" || true
     echo "ROLLBACK=20_MISTRAL_RESTORED"
+}
+
+verify_memory_ceiling() {
+    local value
+    value="$(systemctl show "$SERVICE" -p MemoryMax --value)"
+    if [[ "$value" == "infinity" ]]; then
+        echo "MEMORY_MAX_EFFECTIVE=infinity"
+        return 0
+    fi
+    if [[ ! "$value" =~ ^[0-9]+$ ]] || (( value < REQUIRED_MEMORY_MAX_BYTES )); then
+        echo "STOP=MEMORY_MAX_NOT_6G_OR_HIGHER:$value" >&2
+        return 1
+    fi
+    echo "MEMORY_MAX_EFFECTIVE=$value"
 }
 
 apply() {
@@ -80,6 +97,8 @@ apply() {
     systemctl show "$SERVICE" -p ActiveState -p SubState -p MainPID -p MemoryCurrent -p MemoryMax || true
     systemctl cat "$SERVICE" >"$BACKUP/service-before.txt" || true
     [[ -f "$DROPIN_DIR/20-mistral.conf" ]] && cp -a "$DROPIN_DIR/20-mistral.conf" "$BACKUP/20-mistral.conf"
+    [[ -f "$LEGACY_DOLPHIN_DROPIN" ]] && cp -a "$LEGACY_DOLPHIN_DROPIN" "$BACKUP/30-dolphin.conf"
+    [[ -f "$DROPIN" ]] && cp -a "$DROPIN" "$BACKUP/99-dolphin.conf"
 
     echo "=== MODEL ==="
     if [[ ! -s "$MODEL" ]]; then
@@ -124,6 +143,7 @@ EOF
     trap rollback ERR INT TERM
     systemctl restart "$SERVICE"
     wait_health
+    verify_memory_ceiling
 
     echo "=== ACTIVE MODEL ==="
     curl -fsS "http://127.0.0.1:${PORT}/v1/models" | tee "$BACKUP/models-after.json"
@@ -138,6 +158,7 @@ EOF
     echo "MIDDLEWARE_MODEL=DOLPHIN_2.8_MISTRAL_7B_V02_Q4_K_M"
     echo "MIDDLEWARE_UNCENSORED_MODEL=YES"
     echo "MIDDLEWARE_3926=ONLINE"
+    echo "MEMORY_HEADROOM_GUARD=PASS"
     echo "AETHER_BODY_CHANGED=NO"
     echo "B43_CHANGED=NO"
     echo "ROLLBACK_DROPIN=$DROPIN"
@@ -154,7 +175,7 @@ case "$MODE" in
     --rollback)
         require_root
         require_host
-        rm -f "$DROPIN"
+        rm -f "$DROPIN" "$LEGACY_DOLPHIN_DROPIN"
         systemctl daemon-reload
         systemctl restart "$SERVICE"
         wait_health
