@@ -19,6 +19,7 @@ STATE="$ROOT/STATE/aetherbot/middleware-model"
 STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
 BACKUP="$STATE/$STAMP"
 REQUIRED_MEMORY_MAX_BYTES=6442450944
+CHAT_TEMPLATE=chatml
 
 require_root() {
     [[ "$(id -u)" -eq 0 ]] || { echo "STOP=ROOT_REQUIRED"; exit 2; }
@@ -39,6 +40,7 @@ LISTENER=127.0.0.1:$PORT
 CONTEXT=8192
 PARALLEL=1
 THREADS=2
+CHAT_TEMPLATE=$CHAT_TEMPLATE
 MEMORY_MAX=6G
 CURRENT_MISTRAL_DROPIN_PRESERVED=$DROPIN_DIR/20-mistral.conf
 DOLPHIN_DROPIN=$DROPIN
@@ -84,6 +86,27 @@ verify_memory_ceiling() {
     echo "MEMORY_MAX_EFFECTIVE=$value"
 }
 
+verify_chat_template() {
+    local probe="$BACKUP/chat-template-probe.json"
+    curl -fsS \
+      -H 'Content-Type: application/json' \
+      -d '{"messages":[{"role":"system","content":"AETHER_TEMPLATE_PROBE"},{"role":"user","content":"ping"}]}' \
+      "http://127.0.0.1:${PORT}/apply-template" >"$probe"
+
+    python3 - "$probe" <<'PY'
+import json, pathlib, sys
+p = pathlib.Path(sys.argv[1])
+data = json.loads(p.read_text(encoding="utf-8"))
+prompt = data.get("prompt", "")
+assert "AETHER_TEMPLATE_PROBE" in prompt, "system message missing from rendered template"
+assert "ping" in prompt, "user message missing from rendered template"
+for injected in ("You are Dolphin", "helpful AI assistant"):
+    assert injected not in prompt, f"unexpected injected system text: {injected}"
+print("CHAT_TEMPLATE_RENDER=PASS")
+print("CHAT_TEMPLATE_INJECTED_SYSTEM_TEXT=NO")
+PY
+}
+
 apply() {
     require_root
     require_host
@@ -122,6 +145,7 @@ exec "$SERVER" \\
   --parallel 1 \\
   --threads 2 \\
   --jinja \\
+  --chat-template $CHAT_TEMPLATE \\
   --no-webui \\
   --batch-size 128 \\
   --ubatch-size 32 \\
@@ -144,6 +168,7 @@ EOF
     systemctl restart "$SERVICE"
     wait_health
     verify_memory_ceiling
+    verify_chat_template
 
     echo "=== ACTIVE MODEL ==="
     curl -fsS "http://127.0.0.1:${PORT}/v1/models" | tee "$BACKUP/models-after.json"
@@ -157,6 +182,7 @@ EOF
     trap - ERR INT TERM
     echo "MIDDLEWARE_MODEL=DOLPHIN_2.8_MISTRAL_7B_V02_Q4_K_M"
     echo "MIDDLEWARE_UNCENSORED_MODEL=YES"
+    echo "MIDDLEWARE_CHAT_TEMPLATE=CHATML"
     echo "MIDDLEWARE_3926=ONLINE"
     echo "MEMORY_HEADROOM_GUARD=PASS"
     echo "AETHER_BODY_CHANGED=NO"
