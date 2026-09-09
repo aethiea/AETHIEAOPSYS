@@ -8,6 +8,7 @@ import shutil
 import stat
 import subprocess
 import sys
+import urllib.error
 import urllib.request
 
 DEFAULT_MODEL = sys.argv[1] if len(sys.argv) > 1 else "qwen3:4b"
@@ -28,50 +29,38 @@ Keep verified context separate from inference.
 /no_think
 """
 
-TOOL_PROTOCOL = f"""AEVPS PROGRAMMING CAPABILITY
-You have direct programming tools rooted at {ROOT}.
-You may converse normally. Do not force tool use for ordinary conversation.
-
-When the operator asks you to inspect, build, create, edit, patch, fix, validate,
-write, change, update, make, or otherwise program AEVPS, you MUST use the tools
-yourself instead of merely printing code or telling the operator to save/run it.
-
-A programming task is not complete until the wrapper has actually executed the
-required tool calls. Never invent, quote, simulate, or print TOOL_RESULT yourself.
-The literal prefix TOOL_RESULT is reserved for the wrapper and only the wrapper.
-Do not claim a file changed or a check ran unless the wrapper returned a successful
-tool result for that action.
-
-Request exactly one tool at a time using this exact form, with no Markdown fence:
-<tool_call>{{"tool":"TOOL_NAME","args":{{...}}}}</tool_call>
-
-Available tools:
-- list_dir: {{"path":"relative/path"}}
-- read_file: {{"path":"relative/path","start_line":1,"end_line":240}}
-- write_file: {{"path":"relative/path","content":"full file text"}}
-- replace_text: {{"path":"relative/path","old":"exact old text","new":"replacement text","count":1}}
-- make_dir: {{"path":"relative/path"}}
-- chmod_exec: {{"path":"relative/path"}}
-- run_check: {{"kind":"git_status"}}
-- run_check: {{"kind":"git_diff","path":"optional/relative/path"}}
-- run_check: {{"kind":"python_compile","path":"relative/file.py"}}
-- run_check: {{"kind":"bash_syntax","path":"relative/file.sh"}}
-- run_check: {{"kind":"json_parse","path":"relative/file.json"}}
-
-Tool results arrive as a user message beginning with TOOL_RESULT.
-After programming work is complete, summarize exactly what changed and which checks passed.
+CHAT_PROMPT = """You are ÆTHERBOT, the operator's local AETHIEA assistant.
+Chat naturally and directly. The wrapper can separately route programming requests
+into a real AEVPS tool executor rooted at /opt/AETHIEAOPSYS.
 """
 
-OPS_PROMPT = """You are ÆTHERBOT in forced native AEVPS programming mode.
-Prioritize completing the operator's programming task with the available AEVPS tools.
-""" + TOOL_PROTOCOL
+PLANNER_PROMPT = f"""You are ÆTHERBOT's AEVPS programming planner.
+Your programming root is {ROOT}.
 
-OPEN_PROMPT = """You are ÆTHERBOT, the operator's local AETHIEA assistant.
-Chat naturally for ordinary conversation. You also have native AEVPS programming
-capability in this same conversation.
-""" + TOOL_PROTOCOL
+For programming requests, choose exactly one next action. The wrapper executes the
+action; you never execute it yourself and you never invent tool results.
 
-TOOL_RE = re.compile(r"<tool_call>\s*(\{.*?\})\s*</tool_call>", re.DOTALL)
+Use action=reply only when the requested work is actually complete based on tool
+results already present in the conversation. Never claim a file changed or a check
+passed unless the wrapper supplied that result.
+
+Available actions and args:
+- list_dir: path
+- read_file: path, start_line, end_line
+- write_file: path, content
+- replace_text: path, old, new, count
+- make_dir: path
+- chmod_exec: path
+- run_check: kind, path
+  kinds: git_status, git_diff, python_compile, bash_syntax, json_parse
+- reply: no tool action; put the final conversational response in message
+
+For create/edit/build requests, perform a mutating action before reply.
+For validate/verify/check/test/compile/parse requests, perform run_check before reply.
+Inspect existing files before changing them when that is useful.
+Keep each step small and use one action at a time.
+"""
+
 PROGRAMMING_RE = re.compile(
     r"\b(inspect|build|create|edit|patch|fix|validate|verify|check|test|compile|lint|"
     r"write|change|update|modify|make|chmod|program|implement|refactor|delete|remove|"
@@ -88,6 +77,49 @@ VALIDATION_RE = re.compile(
     re.IGNORECASE,
 )
 MUTATING_TOOLS = {"write_file", "replace_text", "make_dir", "chmod_exec"}
+
+ACTION_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "action": {
+            "type": "string",
+            "enum": [
+                "reply",
+                "list_dir",
+                "read_file",
+                "write_file",
+                "replace_text",
+                "make_dir",
+                "chmod_exec",
+                "run_check",
+            ],
+        },
+        "args": {
+            "type": "object",
+            "properties": {
+                "path": {"type": "string"},
+                "start_line": {"type": "integer"},
+                "end_line": {"type": "integer"},
+                "content": {"type": "string"},
+                "old": {"type": "string"},
+                "new": {"type": "string"},
+                "count": {"type": "integer"},
+                "kind": {
+                    "type": "string",
+                    "enum": [
+                        "git_status",
+                        "git_diff",
+                        "python_compile",
+                        "bash_syntax",
+                        "json_parse",
+                    ],
+                },
+            },
+        },
+        "message": {"type": "string"},
+    },
+    "required": ["action", "args", "message"],
+}
 
 
 def now_stamp():
@@ -232,6 +264,7 @@ def run_argv(argv, cwd=ROOT, timeout=60):
 def tool_run_check(args):
     kind = args["kind"]
     path_arg = args.get("path")
+
     if kind == "git_status":
         result = run_argv(["git", "-C", str(ROOT), "status", "--short"])
     elif kind == "git_diff":
@@ -252,6 +285,7 @@ def tool_run_check(args):
             result = {"exit_code": 1, "output": f"JSON parse FAIL: {exc}"}
     else:
         raise ValueError(f"unsupported check kind: {kind}")
+
     audit("run_check", kind=kind, path=path_arg, exit_code=result["exit_code"])
     return {"kind": kind, "path": path_arg, **result}
 
@@ -267,18 +301,17 @@ TOOLS = {
 }
 
 
-def execute_tool(call):
-    name = call.get("tool")
-    args = call.get("args", {})
-    if name not in TOOLS:
-        return {"ok": False, "tool": name, "error": f"unknown tool: {name}"}
+def execute_tool(action, args):
+    if action not in TOOLS:
+        return {"ok": False, "tool": action, "error": f"unknown tool: {action}"}
     if not isinstance(args, dict):
-        return {"ok": False, "tool": name, "error": "args must be an object"}
+        return {"ok": False, "tool": action, "error": "args must be an object"}
     try:
-        return {"ok": True, "tool": name, "result": TOOLS[name](args)}
+        result = TOOLS[action](args)
+        return {"ok": True, "tool": action, "result": result}
     except Exception as exc:
-        audit("tool_error", tool=name, error=str(exc))
-        return {"ok": False, "tool": name, "error": str(exc)}
+        audit("tool_error", tool=action, error=str(exc))
+        return {"ok": False, "tool": action, "error": str(exc)}
 
 
 def active_model():
@@ -307,7 +340,7 @@ def status():
         print("chat=ON")
         print("autonomous_programming=ON")
         print("open_model=qwen2.5-coder:3b")
-        print("system_prompt=CAPABILITY_ONLY")
+        print("planner=OLLAMA_STRUCTURED_JSON")
         print("thinking_mode=NONE")
         print("thinking_display=OFF")
         print(f"programming_root={ROOT}")
@@ -329,6 +362,7 @@ def status():
         print("chat=ON")
         print("autonomous_programming=FORCED")
         print("ops_model=qwen2.5-coder:3b")
+        print("planner=OLLAMA_STRUCTURED_JSON")
         print("ops_backend=native-aevps-programmer")
         print(f"programming_root={ROOT}")
         print("tools=list_dir,read_file,write_file,replace_text,make_dir,chmod_exec,run_check")
@@ -337,15 +371,20 @@ def status():
         print(f"audit_log={AUDIT}")
 
 
-def ollama_chat(model, wire_messages, stream=True, think=None):
+def ollama_chat(model, wire_messages, stream=True, think=None, format_value=None, temperature=None):
     payload = {
         "model": model,
         "messages": wire_messages,
         "stream": stream,
         "options": {"num_ctx": 4096},
     }
+    if temperature is not None:
+        payload["options"]["temperature"] = temperature
     if think is not None:
         payload["think"] = think
+    if format_value is not None:
+        payload["format"] = format_value
+
     req = urllib.request.Request(
         URL,
         data=json.dumps(payload).encode(),
@@ -357,7 +396,7 @@ def ollama_chat(model, wire_messages, stream=True, think=None):
 
 def request_requirements(prompt, forced=False):
     programming_required = forced or bool(PROGRAMMING_RE.search(prompt))
-    mutation_required = forced or bool(MUTATION_RE.search(prompt))
+    mutation_required = bool(MUTATION_RE.search(prompt))
     validation_required = bool(VALIDATION_RE.search(prompt))
     return programming_required, mutation_required, validation_required
 
@@ -385,18 +424,98 @@ def summarize_tool_pass(tool_name, tool_result):
     print(f"[tool:{tool_name}] PASS{suffix}")
 
 
-def run_agent(prompt, forced=False):
-    system_prompt = OPS_PROMPT if forced else OPEN_PROMPT
-    session = [
-        {"role": "system", "content": system_prompt},
+def run_chat(prompt):
+    wire = [
+        {"role": "system", "content": CHAT_PROMPT},
         *messages,
         {"role": "user", "content": prompt},
     ]
     messages.append({"role": "user", "content": prompt})
-    mode_name = "ops" if forced else "open"
+    answer = []
+
+    try:
+        with ollama_chat(OPEN_MODEL, wire, stream=True) as response:
+            print()
+            for raw in response:
+                raw = raw.strip()
+                if not raw:
+                    continue
+                content = json.loads(raw).get("message", {}).get("content", "")
+                if content:
+                    print(content, end="", flush=True)
+                    answer.append(content)
+            print("\n")
+    except KeyboardInterrupt:
+        print("\n[interrupted]\n")
+        messages.pop()
+        return
+    except Exception as exc:
+        print(f"\nERROR: {exc}\n")
+        messages.pop()
+        return
+
+    final = "".join(answer).strip()
+    if final:
+        messages.append({"role": "assistant", "content": final})
+
+
+def planner_step(session):
+    try:
+        with ollama_chat(
+            OPEN_MODEL,
+            session,
+            stream=False,
+            format_value=ACTION_SCHEMA,
+            temperature=0,
+        ) as response:
+            data = json.loads(response.read())
+    except urllib.error.HTTPError as exc:
+        if exc.code != 400:
+            raise
+        # Fallback for an older Ollama build: still force JSON mode.
+        with ollama_chat(
+            OPEN_MODEL,
+            session,
+            stream=False,
+            format_value="json",
+            temperature=0,
+        ) as response:
+            data = json.loads(response.read())
+
+    content = data.get("message", {}).get("content", "").strip()
+    if not content:
+        raise ValueError("planner returned empty content")
+    decision = json.loads(content)
+    if not isinstance(decision, dict):
+        raise ValueError("planner response is not an object")
+    action = decision.get("action")
+    args = decision.get("args", {})
+    message = decision.get("message", "")
+    if action not in set(ACTION_SCHEMA["properties"]["action"]["enum"]):
+        raise ValueError(f"planner returned unsupported action: {action}")
+    if not isinstance(args, dict):
+        raise ValueError("planner args are not an object")
+    if not isinstance(message, str):
+        raise ValueError("planner message is not text")
+    return {"action": action, "args": args, "message": message}
+
+
+def run_agent(prompt, forced=False):
     programming_required, mutation_required, validation_required = request_requirements(
         prompt, forced=forced
     )
+
+    if not programming_required and not forced:
+        run_chat(prompt)
+        return
+
+    mode_name = "ops" if forced else "open"
+    session = [
+        {"role": "system", "content": PLANNER_PROMPT},
+        *messages,
+        {"role": "user", "content": prompt},
+    ]
+    messages.append({"role": "user", "content": prompt})
     audit(
         "agent_request",
         mode=mode_name,
@@ -404,6 +523,7 @@ def run_agent(prompt, forced=False):
         programming_required=programming_required,
         mutation_required=mutation_required,
         validation_required=validation_required,
+        planner="structured_json",
     )
     print()
 
@@ -413,25 +533,28 @@ def run_agent(prompt, forced=False):
 
     for step in range(1, 13):
         try:
-            with ollama_chat(OPEN_MODEL, session, stream=False) as response:
-                data = json.loads(response.read())
+            decision = planner_step(session)
         except KeyboardInterrupt:
             print("[interrupted]\n")
             messages.pop()
             return
         except Exception as exc:
-            print(f"ERROR: {exc}\n")
-            messages.pop()
-            return
+            print(f"[planner] FAIL: {exc}")
+            audit("planner_error", mode=mode_name, step=step, error=str(exc))
+            session.append({
+                "role": "user",
+                "content": (
+                    "PLANNER_ERROR: return one valid JSON object matching the required schema. "
+                    f"Previous error: {exc}"
+                ),
+            })
+            continue
 
-        content = data.get("message", {}).get("content", "").strip()
-        if not content:
-            print("[no response returned]\n")
-            messages.pop()
-            return
+        action = decision["action"]
+        args = decision["args"]
+        message = decision["message"].strip()
 
-        match = TOOL_RE.search(content)
-        if not match:
+        if action == "reply":
             unmet = unmet_requirements(
                 programming_required,
                 mutation_required,
@@ -440,67 +563,58 @@ def run_agent(prompt, forced=False):
                 mutation_passes,
                 validation_passes,
             )
-            spoofed_tool_result = "TOOL_RESULT" in content
-
-            if spoofed_tool_result or unmet:
-                reasons = list(unmet)
-                if spoofed_tool_result:
-                    reasons.append("model-authored TOOL_RESULT is invalid")
-                reason_text = "; ".join(reasons) if reasons else "tool protocol not satisfied"
-                audit(
-                    "agent_protocol_retry",
-                    mode=mode_name,
-                    step=step,
-                    reason=reason_text,
-                    content=content[:2000],
-                )
-                session.append({"role": "assistant", "content": content})
+            if unmet:
+                reason_text = "; ".join(unmet)
+                print(f"[planner] CONTINUE: {reason_text}")
+                audit("planner_continue", mode=mode_name, step=step, reason=reason_text)
+                session.append({
+                    "role": "assistant",
+                    "content": json.dumps(decision, ensure_ascii=False),
+                })
                 session.append({
                     "role": "user",
                     "content": (
-                        "PROTOCOL_ERROR: " + reason_text + ". "
-                        "Do not claim completion. Do not print TOOL_RESULT yourself. "
-                        "If this is a programming task, emit exactly one real "
-                        "<tool_call>{...}</tool_call> now."
+                        "WRAPPER_REQUIREMENT: completion rejected because " + reason_text + ". "
+                        "Choose the required real tool action next."
                     ),
                 })
-                print(f"[protocol] RETRY: {reason_text}")
                 continue
 
-            print(content + "\n")
-            messages.append({"role": "assistant", "content": content})
-            audit("agent_complete", mode=mode_name, steps=step, final=content[:4000])
+            final = message or "Completed."
+            print(final + "\n")
+            messages.append({"role": "assistant", "content": final})
+            audit(
+                "agent_complete",
+                mode=mode_name,
+                steps=step,
+                tool_passes=tool_passes,
+                mutation_passes=mutation_passes,
+                validation_passes=validation_passes,
+                final=final[:4000],
+            )
             return
 
-        call = {}
-        try:
-            call = json.loads(match.group(1))
-            tool_result = execute_tool(call)
-        except json.JSONDecodeError as exc:
-            tool_result = {
-                "ok": False,
-                "tool": "unknown",
-                "error": f"invalid tool JSON: {exc}",
-            }
-
-        tool_name = tool_result.get("tool", call.get("tool", "unknown"))
+        tool_result = execute_tool(action, args)
         if tool_result.get("ok"):
             tool_passes += 1
-            if tool_name in MUTATING_TOOLS:
+            if action in MUTATING_TOOLS:
                 mutation_passes += 1
             if (
-                tool_name == "run_check"
+                action == "run_check"
                 and tool_result.get("result", {}).get("exit_code") == 0
             ):
                 validation_passes += 1
-            summarize_tool_pass(tool_name, tool_result)
+            summarize_tool_pass(action, tool_result)
         else:
-            print(f"[tool:{tool_name}] FAIL: {tool_result.get('error')}")
+            print(f"[tool:{action}] FAIL: {tool_result.get('error')}")
 
-        session.append({"role": "assistant", "content": content})
+        session.append({
+            "role": "assistant",
+            "content": json.dumps(decision, ensure_ascii=False),
+        })
         session.append({
             "role": "user",
-            "content": "TOOL_RESULT " + json.dumps(tool_result, ensure_ascii=False),
+            "content": "WRAPPER_TOOL_RESULT " + json.dumps(tool_result, ensure_ascii=False),
         })
 
     print("[agent stopped: tool-step limit reached]\n")
@@ -524,6 +638,7 @@ def run_ground(prompt):
     answer = []
     initial_buffer = ""
     answer_mode = False
+
     try:
         with ollama_chat(DEFAULT_MODEL, wire, stream=True, think=False) as response:
             print()
@@ -547,6 +662,7 @@ def run_ground(prompt):
                     continue
                 print(content, end="", flush=True)
                 answer.append(content)
+
             if not answer_mode and initial_buffer.strip():
                 clean = initial_buffer.strip()
                 print(clean, end="", flush=True)
@@ -560,6 +676,7 @@ def run_ground(prompt):
         print(f"\nERROR: {exc}\n")
         messages.pop()
         return
+
     final = "".join(answer).strip()
     if final:
         messages.append({"role": "assistant", "content": final})
