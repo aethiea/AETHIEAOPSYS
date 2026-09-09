@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 
-"""Bare aetherbot handoff to the canonical AETHER chat body.
+"""Bare `aetherbot` handoff to the canonical AETHER chat client.
 
-The full /usr/local/bin/aetherbot wrapper owns command-family routing.  Its bare
-chat branch invokes this file.  Do not duplicate AETHER's conversation, session,
-memory, receipt, or mode router here; hand control back to the canonical
-`aetherbody --latest` human window instead.
+The full /usr/local/bin/aetherbot wrapper owns the broader command family. Its
+bare-chat branch invokes this file. Do not duplicate AETHER's conversation,
+session, memory, receipt, retrieval, or mode-routing logic here. Hand control to
+the existing `aetherchat` client, which talks to the canonical AETHER service on
+its configured local endpoint (historically 127.0.0.1:3936).
+
+`aetherbody` remains the transcript/history viewer and is intentionally not used
+as the interactive chat entry point.
 """
 
 import os
@@ -13,19 +17,19 @@ import shutil
 import sys
 
 
-AETHERBODY = os.environ.get("AETHERBODY_CMD", "aetherbody")
+AETHERCHAT = os.environ.get("AETHERCHAT_CMD", "aetherchat")
 
 
 def main() -> int:
-    resolved = shutil.which(AETHERBODY)
+    resolved = shutil.which(AETHERCHAT)
     if resolved is None:
         print(
-            f"ERROR: canonical AETHER client {AETHERBODY!r} not found in PATH",
+            f"ERROR: canonical AETHER chat client {AETHERCHAT!r} not found in PATH",
             file=sys.stderr,
         )
         return 127
 
-    os.execv(resolved, [AETHERBODY, "--latest"])
+    os.execv(resolved, [AETHERCHAT])
     return 0
 
 
