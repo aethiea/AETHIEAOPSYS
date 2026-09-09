@@ -1,35 +1,39 @@
 #!/usr/bin/env python3
 
-"""Bare `aetherbot` handoff to the canonical AETHER chat client.
+"""Bare `aetherbot` handoff to the canonical AETHER body.
 
-The full /usr/local/bin/aetherbot wrapper owns the broader command family. Its
-bare-chat branch invokes this file. Do not duplicate AETHER's conversation,
-session, memory, receipt, retrieval, or mode-routing logic here. Hand control to
-the existing `aetherchat` client, which talks to the canonical AETHER service on
-its configured local endpoint (historically 127.0.0.1:3936).
+Historical AEVPS evidence shows the original front door did not exec the
+separate `aetherchat` client. It exported the AETHER workspace on PYTHONPATH and
+ran `python3 -m body "$@"`. That body owns sessions, memory, receipts, mode
+routing, `/open`, `/ground`, `/ops`, and `--latest` resume semantics.
 
-`aetherbody` remains the transcript/history viewer and is intentionally not used
-as the interactive chat entry point.
+The broader /usr/local/bin/aetherbot wrapper currently invokes this shim for its
+bare-chat route and may inject a legacy model token (for example `qwen3:4b`).
+That token belonged to the later direct-Ollama experiment, not to the canonical
+body CLI, so this shim strips only a leading model-shaped compatibility token
+before handing remaining CLI arguments to `python3 -m body`.
 
-If the canonical service is down, this shim may bootstrap only the two services
-required for ordinary AETHER chat: the local llama.cpp middleware and
-`aether.service`. B43 is deliberately not auto-started for ordinary open chat.
-
-If the live AETHER source has drifted from the historically proven open-mode
-source set, use `TOOLIO/aether-restore-open-mode.py` from this branch. That
-restorer is fail-closed and will only install byte-for-byte historical files that
-match the recorded known-good SHA256 values.
+If AETHER :3936 is down, bootstrap only the two services required for ordinary
+AETHER chat: the local llama.cpp middleware and `aether.service`. B43 remains
+optional and is not auto-started for ordinary open chat.
 """
 
+from __future__ import annotations
+
 import os
-import shutil
+from pathlib import Path
 import socket
 import subprocess
 import sys
 import time
 
 
-AETHERCHAT = os.environ.get("AETHERCHAT_CMD", "aetherchat")
+AETHER_ROOT = Path(
+    os.environ.get(
+        "AETHER_CHAT_ROOT",
+        "/opt/AETHIEAOPSYS/WORKSPACE/codex/aether-chat-aevps",
+    )
+).resolve()
 AETHER_HOST = os.environ.get("AETHER_HOST", "127.0.0.1")
 AETHER_PORT = int(os.environ.get("AETHER_PORT", "3936"))
 BOOTSTRAP = os.environ.get("AETHERBOT_BOOTSTRAP", "1") not in {"0", "false", "False"}
@@ -70,8 +74,6 @@ def ensure_aether() -> bool:
     if not BOOTSTRAP:
         return False
 
-    # Historical working AETHER ordinary-chat baseline had both of these
-    # services active. B43 remains optional and is not forced into open chat.
     if not start_unit("aeth-middleware-awareness.service"):
         print("ERROR: could not start local llama.cpp middleware", file=sys.stderr)
         return False
@@ -89,13 +91,18 @@ def ensure_aether() -> bool:
     return False
 
 
+def body_args(argv: list[str]) -> list[str]:
+    """Drop only the legacy wrapper's injected direct-Ollama model token."""
+    args = list(argv)
+    if args and not args[0].startswith("-") and ":" in args[0]:
+        args.pop(0)
+    return args
+
+
 def main() -> int:
-    resolved = shutil.which(AETHERCHAT)
-    if resolved is None:
-        print(
-            f"ERROR: canonical AETHER chat client {AETHERCHAT!r} not found in PATH",
-            file=sys.stderr,
-        )
+    body_main = AETHER_ROOT / "body" / "__main__.py"
+    if not body_main.is_file():
+        print(f"ERROR: canonical AETHER body missing: {body_main}", file=sys.stderr)
         return 127
 
     if not ensure_aether():
@@ -109,7 +116,12 @@ def main() -> int:
         )
         return 69
 
-    os.execv(resolved, [AETHERCHAT])
+    env = os.environ.copy()
+    existing = env.get("PYTHONPATH", "")
+    env["PYTHONPATH"] = str(AETHER_ROOT) + ((":" + existing) if existing else "")
+
+    argv = [sys.executable, "-m", "body", *body_args(sys.argv[1:])]
+    os.execve(sys.executable, argv, env)
     return 0
 
 
