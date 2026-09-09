@@ -8,84 +8,84 @@ session, memory, receipt, retrieval, or mode-routing logic here. Hand control to
 the existing `aetherchat` client, which talks to the canonical AETHER service on
 its configured local endpoint (historically 127.0.0.1:3936).
 
-If the canonical AETHER service is not listening, restore the two services needed
-for ordinary local chat: the llama.cpp middleware and AETHER itself. B43-RU5 is
-not started automatically because ordinary chat does not require multi-agent
-routing. `aetherbody` remains the transcript/history viewer.
+`aetherbody` remains the transcript/history viewer and is intentionally not used
+as the interactive chat entry point.
+
+If the canonical service is down, this shim may bootstrap only the two services
+required for ordinary AETHER chat: the local llama.cpp middleware and
+`aether.service`. B43 is deliberately not auto-started for ordinary open chat.
+
+If the live AETHER source has drifted from the historically proven open-mode
+source set, use `TOOLIO/aether-restore-open-mode.py` from this branch. That
+restorer is fail-closed and will only install byte-for-byte historical files that
+match the recorded known-good SHA256 values.
 """
 
 import os
 import shutil
+import socket
 import subprocess
 import sys
 import time
-import urllib.error
-import urllib.request
 
 
 AETHERCHAT = os.environ.get("AETHERCHAT_CMD", "aetherchat")
-AETHER_HEALTH = os.environ.get("AETHER_HEALTH_URL", "http://127.0.0.1:3936/health")
-LLAMA_UNIT = os.environ.get("AETHER_LLAMA_UNIT", "aeth-middleware-awareness.service")
-AETHER_UNIT = os.environ.get("AETHER_SERVICE_UNIT", "aether.service")
+AETHER_HOST = os.environ.get("AETHER_HOST", "127.0.0.1")
+AETHER_PORT = int(os.environ.get("AETHER_PORT", "3936"))
+BOOTSTRAP = os.environ.get("AETHERBOT_BOOTSTRAP", "1") not in {"0", "false", "False"}
 
 
-def healthy() -> bool:
+def port_open(host: str, port: int) -> bool:
     try:
-        with urllib.request.urlopen(AETHER_HEALTH, timeout=2) as response:
-            return 200 <= response.status < 300
-    except (urllib.error.URLError, TimeoutError, OSError):
+        with socket.create_connection((host, port), timeout=1.0):
+            return True
+    except OSError:
         return False
 
 
-def unit_active(unit: str) -> bool:
-    return subprocess.run(
+def start_unit(unit: str) -> bool:
+    status = subprocess.run(
         ["systemctl", "is-active", "--quiet", unit],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
         check=False,
-    ).returncode == 0
-
-
-def start_unit(unit: str) -> bool:
-    if unit_active(unit):
+    )
+    if status.returncode == 0:
         return True
 
-    print(f"[bootstrap] starting {unit}")
-    result = subprocess.run(
+    print(f"[bootstrap] starting {unit}", flush=True)
+    started = subprocess.run(
         ["systemctl", "start", unit],
-        text=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
         check=False,
     )
-    if result.returncode != 0:
-        detail = result.stdout.strip()
-        print(f"ERROR: failed to start {unit}: {detail}", file=sys.stderr)
-        return False
-    return unit_active(unit)
+    return started.returncode == 0
 
 
 def ensure_aether() -> bool:
-    if healthy():
+    if port_open(AETHER_HOST, AETHER_PORT):
         return True
 
-    # Original working AETHER used both the local llama.cpp middleware and
-    # aether.service. Restore only those normal-chat dependencies here.
-    if not start_unit(LLAMA_UNIT):
+    if not BOOTSTRAP:
         return False
-    if not start_unit(AETHER_UNIT):
+
+    # Historical working AETHER ordinary-chat baseline had both of these
+    # services active. B43 remains optional and is not forced into open chat.
+    if not start_unit("aeth-middleware-awareness.service"):
+        print("ERROR: could not start local llama.cpp middleware", file=sys.stderr)
+        return False
+
+    if not start_unit("aether.service"):
+        print("ERROR: could not start aether.service", file=sys.stderr)
         return False
 
     for _ in range(30):
-        if healthy():
-            print("[bootstrap] AETHER :3936 online")
+        if port_open(AETHER_HOST, AETHER_PORT):
+            print(f"[bootstrap] AETHER :{AETHER_PORT} online", flush=True)
             return True
         time.sleep(1)
 
-    print(
-        f"ERROR: {AETHER_UNIT} started but {AETHER_HEALTH} did not become healthy",
-        file=sys.stderr,
-    )
     return False
 
 
@@ -99,7 +99,15 @@ def main() -> int:
         return 127
 
     if not ensure_aether():
-        return 1
+        print(
+            f"ERROR: AETHER service unavailable at {AETHER_HOST}:{AETHER_PORT}",
+            file=sys.stderr,
+        )
+        print(
+            "Inspect: systemctl status aether.service aeth-middleware-awareness.service --no-pager",
+            file=sys.stderr,
+        )
+        return 69
 
     os.execv(resolved, [AETHERCHAT])
     return 0
