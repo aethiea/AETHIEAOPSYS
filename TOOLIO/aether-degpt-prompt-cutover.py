@@ -27,6 +27,8 @@ BODY = ROOT / "WORKSPACE/codex/aether-chat-aevps"
 CHAT = BODY / "src/aether_chat.py"
 ENGINE = BODY / "body/code_engine.py"
 STATE = ROOT / "STATE/aetherbot/degpt-prompts"
+SERVICE = "aether.service"
+HEALTH_URL = "http://127.0.0.1:3936/health"
 
 EXPECTED_CHAT_SHA256 = "35820fe69964e7a05fdf8e3504e1604d42f9a7a1429061cebfc9b5208ae850d9"
 EXPECTED_ENGINE_SHA256 = "e5c0c0f4cc20a139b20533bc67b075d919ecfbdd0cfa79540200586c02e9074f"
@@ -91,7 +93,6 @@ def prompt_rail_hits(text: str) -> list[str]:
 
 
 def replace_open(source: str) -> str:
-    # Replace only OPEN_SYSTEM, stopping before GROUND_SYSTEM.
     pattern = re.compile(
         r'# AETHER_OPEN_[^\n]*\nOPEN_SYSTEM = """\\\n.*?\n"""\n\n\n(?=GROUND_SYSTEM = """\\\n)',
         re.S,
@@ -100,7 +101,6 @@ def replace_open(source: str) -> str:
     if len(matches) == 1:
         return pattern.sub(OPEN_BLOCK, source, count=1)
 
-    # Current V2 exact fallback.
     token = '# AETHER_OPEN_IDENTITY_ONLY_V2\nOPEN_SYSTEM = """\\\n'
     start = source.find(token)
     if start < 0:
@@ -146,6 +146,34 @@ def compile_file(path: Path) -> tuple[int, str]:
     return cp.returncode, cp.stdout
 
 
+def wait_health(attempts: int = 60, delay: float = 0.5) -> bool:
+    for _ in range(attempts):
+        cp = subprocess.run(
+            ["curl", "-fsS", HEALTH_URL],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            check=False,
+        )
+        if cp.returncode == 0:
+            return True
+        time.sleep(delay)
+    return False
+
+
+def service_diag() -> None:
+    subprocess.run(
+        ["systemctl", "status", SERVICE, "--no-pager", "-l"],
+        check=False,
+    )
+
+
+def restart_aether() -> bool:
+    cp = subprocess.run(["systemctl", "restart", SERVICE], check=False)
+    if cp.returncode != 0:
+        return False
+    return wait_health()
+
+
 def plan() -> int:
     if not CHAT.is_file() or not ENGINE.is_file():
         print("STOP=CANONICAL_PROMPT_FILES_MISSING")
@@ -163,6 +191,7 @@ def plan() -> int:
     print("TOOL_EXECUTOR_CHANGED=NO")
     print("PATH_SCOPE_CHANGED=NO")
     print("RECEIPTS_CHANGED=NO")
+    print("HEALTH_CHECK=RETRY_30S")
     print("OPEN_PROMPT_RAIL_HITS=" + (",".join(prompt_rail_hits(extract_open(chat_text))) or "NONE"))
     print("CREATOR_PROMPT_RAIL_HITS=" + (",".join(prompt_rail_hits(extract_creator(engine_text))) or "NONE"))
     return 0
@@ -181,7 +210,12 @@ def apply() -> int:
 
     if OPEN_MARKER in chat_text and CREATOR_MARKER in engine_text:
         print("AETHER_DEGPT_PROMPTS=ALREADY_PATCHED")
-        return 0
+        if wait_health(attempts=2, delay=0.25):
+            print("AETHER_3936=ONLINE")
+            return 0
+        print("AETHER_3936=OFFLINE")
+        service_diag()
+        return 12
 
     chat_hash = sha256(CHAT)
     engine_hash = sha256(ENGINE)
@@ -239,19 +273,17 @@ def apply() -> int:
             print(out.rstrip())
             return 9
 
-    # OPEN prompt is owned by aether.service; reload that service only.
-    subprocess.run(["systemctl", "restart", "aether.service"], check=True)
-    health = subprocess.run(
-        ["curl", "-fsS", "http://127.0.0.1:3936/health"],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-        check=False,
-    )
-    if health.returncode != 0:
+    if not restart_aether():
+        print("AETHER_RESTART_OR_HEALTH=FAILED")
+        service_diag()
         shutil.copy2(chat_backup, CHAT)
         shutil.copy2(engine_backup, ENGINE)
-        subprocess.run(["systemctl", "restart", "aether.service"], check=False)
-        print("ROLLBACK=AETHER_HEALTH_FAILED")
+        rollback_ok = restart_aether()
+        if rollback_ok:
+            print("ROLLBACK=AETHER_HEALTH_RESTORED")
+        else:
+            print("ROLLBACK=AETHER_HEALTH_FAILED")
+            service_diag()
         return 10
 
     final_open = extract_open(CHAT.read_text(encoding="utf-8"))
@@ -259,8 +291,11 @@ def apply() -> int:
     if prompt_rail_hits(final_open) or prompt_rail_hits(final_creator):
         shutil.copy2(chat_backup, CHAT)
         shutil.copy2(engine_backup, ENGINE)
-        subprocess.run(["systemctl", "restart", "aether.service"], check=False)
+        rollback_ok = restart_aether()
         print("ROLLBACK=RAIL_TERM_VERIFY_FAILED")
+        print(f"ROLLBACK_HEALTH={'PASS' if rollback_ok else 'FAIL'}")
+        if not rollback_ok:
+            service_diag()
         return 11
 
     print("AETHER_DEGPT_PROMPTS=V1")
@@ -295,9 +330,18 @@ def rollback() -> int:
         return 4
     shutil.copy2(chat_backup, CHAT)
     shutil.copy2(engine_backup, ENGINE)
-    subprocess.run([sys.executable, "-m", "py_compile", str(CHAT), str(ENGINE)], cwd=str(BODY), check=True)
-    subprocess.run(["systemctl", "restart", "aether.service"], check=True)
+    rc1, out1 = compile_file(CHAT)
+    rc2, out2 = compile_file(ENGINE)
+    if rc1 != 0 or rc2 != 0:
+        print("STOP=ROLLBACK_COMPILE_FAILED")
+        print((out1 + out2).rstrip())
+        return 5
+    if not restart_aether():
+        print("STOP=ROLLBACK_HEALTH_FAILED")
+        service_diag()
+        return 6
     print(f"ROLLBACK=PASS:{chat_backup.parent}")
+    print("AETHER_3936=ONLINE")
     return 0
 
 
