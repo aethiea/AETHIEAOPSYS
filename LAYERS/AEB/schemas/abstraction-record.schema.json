@@ -1,0 +1,75 @@
+{
+  "$id": "aethiea.aeb.abstraction-record.v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "abstraction_id": {
+      "type": "string"
+    },
+    "abstraction_stage": {
+      "enum": [
+        "conceptual",
+        "decontextualized",
+        "generalized",
+        "normalized",
+        "operationalized"
+      ]
+    },
+    "execution_authority": {
+      "enum": [
+        "none",
+        "operator",
+        "policy",
+        "service"
+      ]
+    },
+    "generated_is_canonical": {
+      "const": false
+    },
+    "promotion_state": {
+      "enum": [
+        "unpromoted",
+        "approved",
+        "canonical"
+      ]
+    },
+    "schema": {
+      "const": "aethiea.aeb.abstraction-record.v1"
+    },
+    "source_authority": {
+      "enum": [
+        "canonical",
+        "historical",
+        "external",
+        "operator-provided"
+      ]
+    },
+    "source_hash": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "source_id": {
+      "type": "string"
+    },
+    "source_preserved": {
+      "const": true
+    }
+  },
+  "required": [
+    "schema",
+    "source_id",
+    "source_hash",
+    "source_authority",
+    "abstraction_id",
+    "abstraction_stage",
+    "provenance",
+    "routing_class",
+    "validation_state",
+    "promotion_state",
+    "execution_authority",
+    "created_utc",
+    "source_preserved",
+    "generated_is_canonical"
+  ],
+  "type": "object"
+}

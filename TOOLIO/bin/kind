@@ -1,4 +1,33 @@
 #!/usr/bin/env bash
-export KUBECONFIG="/mnt/i/AETHIEAOPSYS/DATA/MEMORY/KUBERNETES/kube/config"
+set -euo pipefail
+
+AUTH="$(aeusb-root)" || {
+  echo "KIND_AE: AEUSB authority root not found" >&2
+  exit 1
+}
+
+AEG_SESSION_LIB="$AUTH/TOOLIO/lib/aeg-session.sh"
+
+[ -f "$AEG_SESSION_LIB" ] || {
+  echo "KIND_AE: AEG session loader missing: $AEG_SESSION_LIB" >&2
+  exit 1
+}
+
+# shellcheck disable=SC1090
+source "$AEG_SESSION_LIB"
+
+aeg_load_session \
+  "$AUTH/LAYERS/AEG/resolve.py" \
+  "KIND_AE" || exit 1
+
+export KUBECONFIG="$AEXHD_ROOT/DATA/MEMORY/KUBERNETES/kube/config"
 export KIND_EXPERIMENTAL_DOCKER_NETWORK="bridge"
-exec /mnt/i/AETHIEAOPSYS/TOOLIO/KUBERNETES/bin/kind "$@"
+
+PAYLOAD="$AEXHD_ROOT/TOOLIO/KUBERNETES/bin/kind"
+
+[ -x "$PAYLOAD" ] || {
+  echo "KIND_AE: payload unavailable: $PAYLOAD" >&2
+  exit 127
+}
+
+exec "$PAYLOAD" "$@"

@@ -1,0 +1,33 @@
+{
+  "$id": "aethiea.aehub.component-status.v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "authority": {
+      "const": false
+    },
+    "public_exposure": {
+      "const": false
+    },
+    "schema": {
+      "const": "aethiea.aehub.component-status.v1"
+    },
+    "state": {
+      "enum": [
+        "PASS",
+        "FAIL"
+      ]
+    }
+  },
+  "required": [
+    "schema",
+    "utc",
+    "host",
+    "release_root",
+    "authority",
+    "public_exposure",
+    "components",
+    "state"
+  ],
+  "type": "object"
+}

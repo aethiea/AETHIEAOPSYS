@@ -4,18 +4,32 @@
   "authority_resolution": "CORPUS_SIGNATURE+AUTHORITY_ROLE_MARKERS+HEAVY_MARKER_REJECTION",
   "authority_surface": {
     "name": "AEUSB",
-    "current_root": "/mnt/j/AETHIEAOPSYS",
     "role": "HOSTLESS_AUTHORITY",
-    "drive_letter_is_authority": false
+    "drive_letter_is_authority": false,
+    "root_resolution": {
+      "mode": "RUNTIME_AEG",
+      "resolver": "LAYERS/AEG/resolve.py",
+      "environment_values_are_hints_only": true,
+      "attachment_coordinates_are_identity": false
+    }
   },
   "heavy_surface": {
     "name": "AEXHD",
-    "current_root": "/mnt/k/AETHIEAOPSYS",
     "role": "MIRROR_CONTINUITY_HEAVY_PAYLOAD_BODY",
-    "may_become_root_authority": false
+    "may_become_root_authority": false,
+    "root_resolution": {
+      "mode": "RUNTIME_AEG",
+      "resolver": "LAYERS/AEG/resolve.py",
+      "environment_values_are_hints_only": true,
+      "attachment_coordinates_are_identity": false
+    }
   },
   "continuity_owner": "AETHIEAOPSYS",
   "host_owned": false,
   "tool_owned": false,
-  "generated_utc": "20260716T212430Z"
+  "runtime_attachment_state": {
+    "record_class": "OBSERVATION_NOT_IDENTITY",
+    "status_root": "DATA/STATUS/AEGNOSTIXXX"
+  },
+  "declaration_updated_utc": "20260717T154253Z"
 }

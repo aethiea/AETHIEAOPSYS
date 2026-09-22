@@ -1,0 +1,6 @@
+AEB / AEBSTRACTION
+TYPE=governed_transformation_layer
+FUNCTION=source-preserving derivation
+PROMOTION_AUTHORITY=none
+EXECUTION_AUTHORITY=none
+PROVENANCE_ORGAN=AERAG

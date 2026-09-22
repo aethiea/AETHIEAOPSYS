@@ -1,0 +1,6 @@
+AEVPS
+TYPE=persistent_runtime_surface
+HOST_INSTANCE=aevps-001
+AUTHORITY=false
+OWNS_CORPUS=false
+SOURCE_AUTONOMY=false

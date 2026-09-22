@@ -1,0 +1,18 @@
+{
+  "checksum_required": true,
+  "clean_source_required": true,
+  "cloudflare_mutation": false,
+  "current_link": "/opt/AETHIEAOPSYS/CURRENT/AEG-AEB-AEHUB",
+  "heavy_continuity": "AEXHD",
+  "provider_neutral_continuum": "ÆCLOUD",
+  "public_exposure": false,
+  "release_root": "/opt/AETHIEAOPSYS/RELEASES/AEG-AEB-AEHUB",
+  "remote_forest_root": "/srv/AETHIEAOPSYS_FOREST/SURFACES/AEVPS/AEVPS-001",
+  "remote_heavy_root": "/srv/AETHIEAOPSYS_HEAVY/DATA",
+  "route_id": "aecloud:aevps-001:aeg-aeb-aehub",
+  "runtime_surface": "AEVPS",
+  "schema": "aethiea.aecloud.route.v1",
+  "source_authority": "AEUSB",
+  "target_host": "aevps-001",
+  "transport": "ssh"
+}

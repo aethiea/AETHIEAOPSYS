@@ -1,5 +1,35 @@
 #!/usr/bin/env bash
-export HELM_CACHE_HOME="/mnt/i/AETHIEAOPSYS/DATA/MEMORY/KUBERNETES/helm/cache"
-export HELM_CONFIG_HOME="/mnt/i/AETHIEAOPSYS/DATA/MEMORY/KUBERNETES/helm/config"
-export HELM_DATA_HOME="/mnt/i/AETHIEAOPSYS/DATA/MEMORY/KUBERNETES/helm/data"
-exec /mnt/i/AETHIEAOPSYS/TOOLIO/KUBERNETES/bin/helm "$@"
+set -euo pipefail
+
+AUTH="$(aeusb-root)" || {
+  echo "HELM_AE: AEUSB authority root not found" >&2
+  exit 1
+}
+
+AEG_SESSION_LIB="$AUTH/TOOLIO/lib/aeg-session.sh"
+
+[ -f "$AEG_SESSION_LIB" ] || {
+  echo "HELM_AE: AEG session loader missing: $AEG_SESSION_LIB" >&2
+  exit 1
+}
+
+# shellcheck disable=SC1090
+source "$AEG_SESSION_LIB"
+
+aeg_load_session \
+  "$AUTH/LAYERS/AEG/resolve.py" \
+  "HELM_AE" || exit 1
+
+HELM_MEMORY="$AEXHD_ROOT/DATA/MEMORY/KUBERNETES/helm"
+PAYLOAD="$AEXHD_ROOT/TOOLIO/KUBERNETES/bin/helm"
+
+export HELM_CACHE_HOME="$HELM_MEMORY/cache"
+export HELM_CONFIG_HOME="$HELM_MEMORY/config"
+export HELM_DATA_HOME="$HELM_MEMORY/data"
+
+[ -x "$PAYLOAD" ] || {
+  echo "HELM_AE: payload unavailable: $PAYLOAD" >&2
+  exit 127
+}
+
+exec "$PAYLOAD" "$@"

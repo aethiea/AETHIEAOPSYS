@@ -1,0 +1,5 @@
+AEG / AEGNOSTIXXX
+TYPE=foundational_identity_layer
+FUNCTION=resolve logical bodies before execution
+OUTPUT=ephemeral session routes
+CREATES_AUTHORITY=false

@@ -1,0 +1,30 @@
+{
+  "$id": "aethiea.aeg.body-resolution.v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "canonical_name": {
+      "const": "AEGNOSTIXXX"
+    },
+    "drive_letter_is_identity": {
+      "const": false
+    },
+    "mount_path_is_identity": {
+      "const": false
+    },
+    "roles": {
+      "type": "object"
+    },
+    "schema": {
+      "const": "aethiea.aeg.body-resolution.v1"
+    }
+  },
+  "required": [
+    "schema",
+    "canonical_name",
+    "mount_path_is_identity",
+    "drive_letter_is_identity",
+    "roles"
+  ],
+  "type": "object"
+}

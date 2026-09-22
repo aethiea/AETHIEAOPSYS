@@ -1,13 +1,26 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT="$(pwd -P)"
-while [ "$ROOT" != "/" ] && [ ! -f "$ROOT/.aeth_root" ]; do
-  ROOT="$(dirname "$ROOT")"
-done
-[ -f "$ROOT/.aeth_root" ] || { echo "NO_AETH_ROOT_FOUND"; exit 1; }
+AUTH="$(aeusb-root)" || {
+  echo "K8S_AE: AEUSB authority root not found" >&2
+  exit 1
+}
 
-AEXHD_ROOT="/mnt/i/AETHIEAOPSYS"
+AEG_SESSION_LIB="$AUTH/TOOLIO/lib/aeg-session.sh"
+
+[ -f "$AEG_SESSION_LIB" ] || {
+  echo "K8S_AE: AEG session loader missing: $AEG_SESSION_LIB" >&2
+  exit 1
+}
+
+# shellcheck disable=SC1090
+source "$AEG_SESSION_LIB"
+
+aeg_load_session \
+  "$AUTH/LAYERS/AEG/resolve.py" \
+  "K8S_AE" || exit 1
+
+ROOT="$AEUSB_ROOT"
 K8S_MEM="$AEXHD_ROOT/DATA/MEMORY/KUBERNETES"
 K8S_PAYLOAD="$AEXHD_ROOT/TOOLIO/KUBERNETES/bin"
 
@@ -24,6 +37,7 @@ case "$cmd" in
   env)
     echo "AEUSB_ROOT=$ROOT"
     echo "AEXHD_ROOT=$AEXHD_ROOT"
+    echo "AEGNOSTIXXX_RESOLUTION=$AEGNOSTIXXX_RESOLUTION"
     echo "K8S_PAYLOAD=$K8S_PAYLOAD"
     echo "KUBECONFIG=$KUBECONFIG"
     echo "HELM_CACHE_HOME=$HELM_CACHE_HOME"
@@ -34,15 +48,20 @@ case "$cmd" in
     echo "KUBERNETES AE LANE STATUS"
     echo "AEUSB_ROOT=$ROOT"
     echo "AEXHD_ROOT=$AEXHD_ROOT"
+    echo "AEGNOSTIXXX_RESOLUTION=$AEGNOSTIXXX_RESOLUTION"
     echo "K8S_PAYLOAD=$K8S_PAYLOAD"
     echo "KUBECONFIG=$KUBECONFIG"
     command -v kubectl || true
-    kubectl version --client 2>/dev/null || echo "KUBECTL_NOT_CALLABLE"
+    kubectl version --client=true 2>/dev/null ||
+      echo "KUBECTL_NOT_CALLABLE"
     command -v helm || true
-    helm version 2>/dev/null || echo "HELM_NOT_CALLABLE"
+    helm version --short 2>/dev/null ||
+      echo "HELM_NOT_CALLABLE"
     command -v kind || true
-    kind version 2>/dev/null || echo "KIND_NOT_CALLABLE"
-    kubectl config current-context 2>/dev/null || echo "NO_KUBECTL_CONTEXT"
+    kind version 2>/dev/null ||
+      echo "KIND_NOT_CALLABLE"
+    kubectl config current-context 2>/dev/null ||
+      echo "NO_KUBECTL_CONTEXT"
     ;;
   kubectl)
     shift

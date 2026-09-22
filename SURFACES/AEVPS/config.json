@@ -1,0 +1,14 @@
+{
+  "authority": false,
+  "forest_root": "/srv/AETHIEAOPSYS_FOREST",
+  "heavy_root": "/srv/AETHIEAOPSYS_HEAVY",
+  "instance": "aevps-001",
+  "loopback_first": true,
+  "owns_corpus": false,
+  "public_exposure": false,
+  "runtime_root": "/opt/AETHIEAOPSYS",
+  "schema": "aethiea.aevps.surface.v1",
+  "source_autonomy": false,
+  "surface": "AEVPS",
+  "type": "persistent_runtime_surface"
+}

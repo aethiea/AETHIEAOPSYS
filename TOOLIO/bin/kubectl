@@ -1,2 +1,30 @@
 #!/usr/bin/env bash
-exec /mnt/i/AETHIEAOPSYS/TOOLIO/KUBERNETES/bin/kubectl "$@"
+set -euo pipefail
+
+AUTH="$(aeusb-root)" || {
+  echo "KUBECTL_AE: AEUSB authority root not found" >&2
+  exit 1
+}
+
+AEG_SESSION_LIB="$AUTH/TOOLIO/lib/aeg-session.sh"
+
+[ -f "$AEG_SESSION_LIB" ] || {
+  echo "KUBECTL_AE: AEG session loader missing: $AEG_SESSION_LIB" >&2
+  exit 1
+}
+
+# shellcheck disable=SC1090
+source "$AEG_SESSION_LIB"
+
+aeg_load_session \
+  "$AUTH/LAYERS/AEG/resolve.py" \
+  "KUBECTL_AE" || exit 1
+
+PAYLOAD="$AEXHD_ROOT/TOOLIO/KUBERNETES/bin/kubectl"
+
+[ -x "$PAYLOAD" ] || {
+  echo "KUBECTL_AE: payload unavailable: $PAYLOAD" >&2
+  exit 127
+}
+
+exec "$PAYLOAD" "$@"
